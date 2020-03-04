@@ -1,4 +1,4 @@
-# Taylor Tobin's Workspace Setup
+# Sunrise Workspace Setup (Mac)
 
 ### Devtools and files to install on a new workspace via the command line
 

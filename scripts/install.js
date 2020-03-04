@@ -422,7 +422,7 @@ async function install_devtools() {
         }
         // install tmux
         if (response.config[i] === 'tmux') {
-            if (shell.exec('tmux -V', { silent: true }).code != 0) {
+            if (shell.exec('tmux', { silent: true }).code != 0) {
                 shell.exec('brew install tmux');
                 // update installed
                 installed.push(response.config[i])

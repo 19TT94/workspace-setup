@@ -4,12 +4,12 @@
 
 ## Run Workspace setup script
 ```
-git clone git@github.com:19TT94/workspace-setup.git && cd workspace-setup && ./run.sh
+git clone git@github.com:Sunrise-Integration/workspace-setup.git && cd workspace-setup && ./run.sh
 ```
 
-## Project Setup
+## Contributing
 ```
-git clone git@github.com:19TT94/workspace-setup.git
+git clone git@github.com:Sunrise-Integration/workspace-setup.git
 
 npm install
 ```

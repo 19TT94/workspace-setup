@@ -537,7 +537,7 @@ async function install_apps() {
             }
         }
         // install sequel-pro
-        if (response.config[i] === 'sequel-pro') {
+        if (response.config[i] === 'sequel pro') {
             if (shell.exec('brew cask list sequel-pro', { silent: true }).code != 0) {
                 shell.exec('brew cask install sequel-pro');
                 // update installed
@@ -592,7 +592,7 @@ async function install_apps() {
             }
         }
         // install brave-browser
-        if (response.config[i] === 'brave-browser') {
+        if (response.config[i] === 'brave') {
             if (shell.exec('brew cask list brave-browser', { silent: true }).code != 0) {
                 shell.exec('brew cask install brave-browser');
                 // update installed
@@ -603,7 +603,7 @@ async function install_apps() {
             }
         }
         // install mark-text
-        if (response.config[i] === 'mark-text') {
+        if (response.config[i] === 'mark text') {
             if (shell.exec('brew cask list mark-text', { silent: true }).code != 0) {
                 shell.exec('brew cask install mark-text');
                 // update installed

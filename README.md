@@ -44,5 +44,6 @@ npm install
 * android studio
 * google chrome
 * brave
+* firefox
 * mark text
 * iterm2

@@ -476,6 +476,10 @@ async function install_apps() {
                     checked: 'true'
                 },
                 {
+                    name: 'firefox',
+                    checked: true
+                },
+                {
                     name: 'brave',
                     checked: 'true'
                 },
@@ -569,6 +573,17 @@ async function install_apps() {
         if (response.config[i] === 'google-chrome') {
             if (shell.exec('brew cask info google-chrome', { silent: true }).code != 0) {
                 shell.exec('brew cask install google-chrome');
+                // update installed
+                installed.push(response.config[i])
+            } else {
+                // update exist
+                exist.push(response.config[i])
+            }
+        }
+        // install google-chrome
+        if (response.config[i] === 'firefox') {
+            if (shell.exec('brew cask info firefox', { silent: true }).code != 0) {
+                shell.exec('brew cask install firefox');
                 // update installed
                 installed.push(response.config[i])
             } else {

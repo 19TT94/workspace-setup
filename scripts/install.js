@@ -117,23 +117,6 @@ async function install_config() {
                 }
             }
         }
-        // check for tmux config
-        if (response.config[i] === 'tmux') {
-            if(!shell.test('-e', file)) {
-                // tmux settings | create tmux.conf
-                shell.exec('cat ./tools/tmux.conf > ~/.tmux.conf');
-                // initialize .tmux.conf
-                shell.exec('tmux source-file ~/.tmux.conf');
-            } else {
-                if(await overwrite('File exists: Overwrite .tmux?')) {
-                    console.log('overwrite');
-                    // tmux settings | create tmux.conf
-                    shell.exec('cat ./tools/tmux.conf > ~/.tmux.conf');
-                    // initialize .tmux.conf
-                    shell.exec('tmux source-file ~/.tmux.conf');
-                }
-            }
-        }
         // check for vimrc config
         if (response.config[i] === 'vimrc') {
             if (!shell.test('-e', file)) {

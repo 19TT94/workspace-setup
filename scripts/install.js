@@ -238,15 +238,7 @@ async function install_devtools() {
                     checked: 'true'
                 },
                 {
-                    name: 'bower',
-                    checked: 'true'
-                },
-                {
                     name: 'composer',
-                    checked: 'true'
-                },
-                {
-                    name: 'ember',
                     checked: 'true'
                 },
                 {
@@ -395,17 +387,6 @@ async function install_devtools() {
                 exist.push(response.config[i])
             }
         }
-        // install ember
-        if (response.config[i] === 'ember') {
-            if (shell.exec('ember --version', { silent: true }).code != 0) {
-                shell.exec('npm install -g ember-cli');
-                // update installed
-                installed.push(response.config[i])
-            } else {
-                // update exist
-                exist.push(response.config[i])
-            }
-        }
         // install vue
         if (response.config[i] === 'vue') {
             if (shell.exec('vue --version', { silent: true }).code != 0) {
@@ -504,14 +485,6 @@ async function install_apps() {
                 },
                 {
                     name: 'iterm2',
-                    checked: 'true'
-                },
-                {
-                    name: 'sketch',
-                    checked: 'true'
-                },
-                {
-                    name: '1password',
                     checked: 'true'
                 }
             ]

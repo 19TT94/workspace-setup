@@ -1,8 +1,8 @@
 # Sunrise Workspace Setup (Mac)
 
-### Devtools and files to install on a new workspace via the command line
+### Devtools and files to install on a new workspace via the command line.
 
-## Run Workspace setup script
+## Run Workspace Setup Script
 ```
 git clone git@github.com:Sunrise-Integration/workspace-setup.git && cd workspace-setup && ./run.sh
 ```
@@ -13,25 +13,25 @@ git clone git@github.com:Sunrise-Integration/workspace-setup.git
 
 npm install
 ```
-## Default Installs
+## Default Installations:
 * Xcode Command Line Tools
 * HomeBrew
 * Node
 * NPM
 
-## Configuration (current list of options to install)
+## Configuration File Options:
 * gitignore
-* zshrc (shell config file)
-* nvm (Node Version Manager)
-* tmux.conf (Terminal Multiplexor: split panes config file)
-* vimrc (vim config file)
-* pathogen (package manager for vim)
-* NERDTree (file tree for vim)
+* zshrc *(shell config file)*
+* nvm *(Node Version Manager)*
+* tmux.conf *(Terminal Multiplexor config file)*
+* vimrc *(vim config file)*
+* pathogen *(package manager for vim)*
+* NERDTree *(file tree for vim)*
 
-## Tools: (current list of options to install)
+## DevTool Options:
 * xcode-select
 * homebrew
-* homebrew cask (for installing apps via terminal)
+* homebrew cask *(app installation via terminal)*
 * node
 * php
 * python
@@ -45,7 +45,7 @@ npm install
 * laravel
 * tmux
 
-## Apps: (current list of options to install)
+## App Options:
 * virtualbox
 * vagrant
 * docker
@@ -54,12 +54,12 @@ npm install
 * vscode
 * sublime text
 * sequel pro
-* postman (endpoint validation)
-* cyberduck (ftp client)
+* postman *(collaboration platform for API development)*
+* cyberduck *(ftp client)*
 * spotify
 * android studio
 * google chrome
 * brave
 * firefox
-* mark text (markdown editor)
-* iterm2 (updated terminal, allows tabs)
+* mark text *(markdown editor)*
+* iterm2 *(updated terminal, allows tabs)*

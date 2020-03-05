@@ -1,5 +1,4 @@
 # Load Git Autocomplete
-❯ cat ~/.zshrc 
 zstyle ':completion:*:*:git:*' script ~/.zsh/git-completion.bash
 fpath=(~/.zsh $fpath)
 

@@ -25,7 +25,7 @@ program
 
 // async function to wait for response from user
 (async () => {
-    await write_figlet("TT's Workspace Setup");
+    await write_figlet("Sunrise Workspace Setup");
 
     let response = null;
     setTimeout(async () => {
@@ -73,7 +73,7 @@ async function choose_install() {
                 'install everthing.',
                 'install everything except the configuration files (.bash_profile, .nvm ...).',
                 'install devtools and configuration files (no extra apps).',
-                'install devtools only (node, npm, nvm, ember, vue, ...).',
+                'install devtools only (node, npm, nvm, ...).',
                 'install apps only (slack, atom, vscode, sequel-pro ...).'
             ]
         }

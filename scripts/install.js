@@ -1,9 +1,5 @@
-const inquirer = require('inquirer');
 const { prompt } = require('inquirer');
 const shell = require('shelljs');
-const fs = require("fs");
-const ora = require('ora');
-const spinner = ora('spinning');
 
 module.exports = {
     install_config,
@@ -21,35 +17,31 @@ async function install_config() {
             choices: [
                 {
                     name: 'gitignore',
-                    checked: 'true'
+                    checked: true
                 },
-                {
-                    name: 'bash_profile',
-                    checked: 'true'
-                },
-                {
-                    name: 'bashrc',
-                    checked: 'true'
+                { 
+                    name: 'zshrc',
+                    checked: true
                 },
                 {
                     name: 'nvm',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'tmux',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'vimrc',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'pathogen',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'NERDTree',
-                    checked: 'true'
+                    checked: false
                 }
             ]
         }
@@ -70,38 +62,21 @@ async function install_config() {
                 }
             }
         }
-        // check for bash profile
-        if (response.config[i] === 'bash_profile') {
+        // check for zsh profile
+        if (response.config[i] === 'zshrc') {
             if (!shell.test('-e', file)) {
                 // terminal settings | create bash_profile
-                shell.exec('cat ./tools/bash_profile > ~/.bash_profile');
+                shell.exec('cat ./tools/zshrc > ~/.zshrc');
                 // initialize bash_profile
-                shell.exec('source ~/.bash_profile');
+                shell.exec('source ~/.zshrc');
             } else {
                 console.log("file exists");
-                if(await overwrite('File exists: Overwrite .bash_profile?')) {
+                if(await overwrite('File exists: Overwrite .zshrc?')) {
                     console.log("overwrite");
                     // terminal settings | create bash_profile
-                    shell.exec('cat ./tools/bash_profile > ~/.bash_profile');
+                    shell.exec('cat ./tools/zshrc > ~/.zshrc');
                     // initialize bash_profile
-                    shell.exec('source ~/.bash_profile');
-                }
-            }
-        }
-        // check for bashrc
-        if (response.config[i] === 'bashrc') {
-            if (!shell.test('-e', file)) {
-                // terminal settings | create bash_profile
-                shell.exec('cat ./tools/bashrc > ~/.bashrc');
-                // initialize bash_profile
-                shell.exec('source ~/.bashrc');
-            } else {
-                console.log("file exists");
-                if(await overwrite('File exists: Overwrite .bashrc?')) {
-                    // terminal settings | create bash_profile
-                    shell.exec('cat ./tools/bashrc > ~/.bashrc');
-                    // initialize bash_profile
-                    shell.exec('source ~/.bashrc');
+                    shell.exec('source ~/.zshrc');
                 }
             }
         }
@@ -186,59 +161,55 @@ async function install_devtools() {
             choices: [
                 {
                     name: 'xcode-select',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'homebrew',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'homebrew cask',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'node',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'php',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'python',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'nvm',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'npm',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'yarn',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'composer',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'vue',
-                    checked: 'true'
-                },
-                {
-                    name: 'angular',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'react',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'laravel',
-                    checked: 'true'
+                    checked: true
                 }
             ]
         }
@@ -381,17 +352,6 @@ async function install_devtools() {
                 exist.push(response.config[i])
             }
         }
-        // install angular
-        if (response.config[i] === 'angular') {
-            if (shell.exec('ng --version', { silent: true }).code != 0) {
-                shell.exec('npm install -g @angular/cli');
-                // update installed
-                installed.push(response.config[i])
-            } else {
-                // update exist
-                exist.push(response.config[i])
-            }
-        }
         // install laravel
         if (response.config[i] === 'laravel') {
             if (shell.exec('laravel --version', { silent: true }).code != 0) {
@@ -431,32 +391,56 @@ async function install_apps() {
             message: 'Unselect any options to ignore',
             choices: [
                 {
+                    name: 'virtualbox',
+                    checked: true
+                },
+                {
+                    name: 'vagrant',
+                    checked: true
+                },
+                {
+                    name: 'docker',
+                    checked: true
+                },
+                {
                     name: 'slack',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'atom',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'vscode',
-                    checked: 'true'
+                    checked: true
+                },
+                {
+                    name: 'sublime text',
+                    checked: true
                 },
                 {
                     name: 'sequel pro',
-                    checked: 'true'
+                    checked: true
+                },
+                {
+                    name: 'postman',
+                    checked: true
+                },
+                {
+                    name: 'cyberduck',
+                    checked: true
                 },
                 {
                     name: 'spotify',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'android studio',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'google chrome',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'firefox',
@@ -464,7 +448,7 @@ async function install_apps() {
                 },
                 {
                     name: 'brave',
-                    checked: 'true'
+                    checked: true
                 },
                 {
                     name: 'mark text',
@@ -481,11 +465,41 @@ async function install_apps() {
     let installed = [];
     let exist = [];
 
-    // spinner.text = "Installing apps ...";
-    // spinner.start();
-
     // go through config files other than selected exclusions
     for(var i=0; i < response.config.length; i++) {
+        // install virtualbox
+        if (response.config[i] === 'virtualbox') {
+            if (shell.exec('brew cask list virtualbox', { silent: true }).code != 0) {
+                shell.exec('brew cask install virtualbox');
+                // update installed
+                installed.push(response.config[i])
+            } else {
+                // update exist
+                exist.push(response.config[i])
+            }
+        }
+        // install vagrant
+        if (response.config[i] === 'vagrant') {
+            if (shell.exec('brew cask list vagrant', { silent: true }).code != 0) {
+                shell.exec('brew cask install vagrant');
+                // update installed
+                installed.push(response.config[i])
+            } else {
+                // update exist
+                exist.push(response.config[i])
+            }
+        }
+        // install docker
+        if (response.config[i] === 'docker') {
+            if (shell.exec('brew cask list docker', { silent: true }).code != 0) {
+                shell.exec('brew cask install docker');
+                // update installed
+                installed.push(response.config[i])
+            } else {
+                // update exist
+                exist.push(response.config[i])
+            }
+        }
         // install slack
         if (response.config[i] === 'slack') {
             if (shell.exec('brew cask list slack', { silent: true }).code != 0) {
@@ -519,10 +533,43 @@ async function install_apps() {
                 exist.push(response.config[i])
             }
         }
+         // install sublime
+         if (response.config[i] === 'sublime text') {
+            if (shell.exec('brew cask list sublime-text', { silent: true }).code != 0) {
+                shell.exec('brew cask install sublime-text');
+                // update installed
+                installed.push(response.config[i])
+            } else {
+                // update exist
+                exist.push(response.config[i])
+            }
+        }
         // install sequel-pro
         if (response.config[i] === 'sequel pro') {
             if (shell.exec('brew cask list sequel-pro', { silent: true }).code != 0) {
                 shell.exec('brew cask install sequel-pro');
+                // update installed
+                installed.push(response.config[i])
+            } else {
+                // update exist
+                exist.push(response.config[i])
+            }
+        }
+        // install postman
+        if (response.config[i] === 'postman') {
+            if (shell.exec('brew cask list postman', { silent: true }).code != 0) {
+                shell.exec('brew cask install postman');
+                // update installed
+                installed.push(response.config[i])
+            } else {
+                // update exist
+                exist.push(response.config[i])
+            }
+        }
+         // install postman
+         if (response.config[i] === 'cyberduck') {
+            if (shell.exec('brew cask list cyberduck', { silent: true }).code != 0) {
+                shell.exec('brew cask install cyberduck');
                 // update installed
                 installed.push(response.config[i])
             } else {

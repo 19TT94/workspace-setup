@@ -23,7 +23,7 @@ npm install
 * gitignore
 * zshrc (shell config file)
 * nvm (Node Version Manager)
-* tmux (Terminal Multiplexor: split panes)
+* tmux.conf (Terminal Multiplexor: split panes config file)
 * vimrc (vim config file)
 * pathogen (package manager for vim)
 * NERDTree (file tree for vim)
@@ -43,6 +43,7 @@ npm install
 * angular
 * react
 * laravel
+* tmux
 
 ## Apps: (current list of options to install)
 * virtualbox

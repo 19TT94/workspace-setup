@@ -57,6 +57,7 @@ async function install_config() {
                 shell.exec('echo *.DS_Store >> ~/.gitignore');
             } else {
                 if(await overwrite('File exists: Overwrite .gitignore?')) {
+                    shell.exec('rm ' + file);
                     shell.exec('git config --global core.excludesfile ~/.gitignore');
                     shell.exec('echo *.DS_Store >> ~/.gitignore');
                 }
@@ -72,7 +73,7 @@ async function install_config() {
 
             if (!shell.test('-e', file)) {
                 // terminal settings | create bash_profile
-                shell.exec('cat ./tools/.zshrc > ~/.zshrc');
+                shell.exec('cat ./tools/zshrc > ~/.zshrc');
                 // initialize bash_profile
                 shell.exec('source ~/.zshrc');
                 shell.exec('rm ~/.zcompdump');
@@ -81,7 +82,7 @@ async function install_config() {
                 if(await overwrite('File exists: Overwrite .zshrc?')) {
                     console.log("overwrite");
                     // terminal settings | create bash_profile
-                    shell.exec('cat ./tools/.zshrc > ~/.zshrc');
+                    shell.exec('cat ./tools/zshrc > ~/.zshrc');
                     shell.exec('rm ~/.zcompdump');
                     // initialize bash_profile
                     shell.exec('source ~/.zshrc');
@@ -104,14 +105,14 @@ async function install_config() {
         if (response.config[i] === 'tmux.conf') {
             if(!shell.test('-e', file)) {
                 // tmux settings | create tmux.conf
-                shell.exec('cat ./tools/.tmux.conf > ~/.tmux.conf');
+                shell.exec('cat ./tools/tmux.conf > ~/.tmux.conf');
                 // initialize .tmux.conf
                 shell.exec('tmux source-file ~/.tmux.conf');
             } else {
                 if(await overwrite('File exists: Overwrite .tmux?')) {
                     console.log('overwrite');
                     // tmux settings | create tmux.conf
-                    shell.exec('cat ./tools/.tmux.conf > ~/.tmux.conf');
+                    shell.exec('cat ./tools/tmux.conf > ~/.tmux.conf');
                     // initialize .tmux.conf
                     shell.exec('tmux source-file ~/.tmux.conf');
                 }
@@ -123,7 +124,7 @@ async function install_config() {
                 // vim settings | create .vimrc
                 shell.exec('touch .vimrc');
                 // copy over .vimrc
-                shell.exec('cat ./tools/.vimrc > ~/.vimrc');
+                shell.exec('cat ./tools/vimrc > ~/.vimrc');
                 // vim package manager ~ pathogen
                 shell.exec('mkdir -p ~/.vim/autoload ~/.vim/bundle && \// curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim');
                 // install NERDTree
@@ -136,7 +137,7 @@ async function install_config() {
                     // vim settings | create .vimrc
                     shell.exec('touch .vimrc');
                     // copy over .vimrc
-                    shell.exec('cat .vimrc > ~/.vimrc');
+                    shell.exec('cat ./tools/vimrc > ~/.vimrc');
                     // vim package manager ~ pathogen
                     shell.exec('mkdir -p ~/.vim/autoload ~/.vim/bundle && \
                     // curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim');
@@ -326,7 +327,7 @@ async function install_devtools() {
                 installed.push(response.config[i])
                 
                 // write to .zshrc
-                let starship = "eval \"$(starship init zsh)\""
+                let starship = 'eval "$(starship init zsh)"';
                 shell.exec("echo \n" + starship + " >> ~/.zshrc;");
                 shell.exec('source ~/.zshrc');
             } else {

@@ -63,7 +63,15 @@ async function install_config() {
             }
         }
         // check for zsh profile
-        if (response.config[i] === 'zshrc') {
+        if (response.config[i] === 'zshrc') {   
+            
+            // Install dependencies for github autocomplete
+            shell.exec('mkdir ~/.zsh');
+            shell.exec('cd ~/.zsh');
+            shell.exec('curl -o git-completion.bash https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash');
+            shell.exec('curl -o _git https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.zsh');
+            shell.exec('cd ..');
+
             if (!shell.test('-e', file)) {
                 // terminal settings | create bash_profile
                 shell.exec('cat ./tools/zshrc > ~/.zshrc');
@@ -184,6 +192,10 @@ async function install_devtools() {
                     checked: true
                 },
                 {
+                    name: 'starship',
+                    checked: true
+                },
+                {
                     name: 'nvm',
                     checked: true
                 },
@@ -281,6 +293,20 @@ async function install_devtools() {
                 shell.exec('brew install python');
                 // update installed
                 installed.push(response.config[i])
+            } else {
+                // update exist
+                exist.push(response.config[i])
+            }
+        }
+        // install python
+        if (response.config[i] === 'starship') {
+            if (shell.exec('starship --version', { silent: true }).code != 0) {
+                shell.exec('brew install starship');
+                // update installed
+                installed.push(response.config[i])
+                
+                // write to .zshrc
+                shell.exec('echo "eval \'$(starship init bash)\'" >> ~/.zshrc;')
             } else {
                 // update exist
                 exist.push(response.config[i])

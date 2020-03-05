@@ -37,7 +37,7 @@ async function install_config() {
                 },
                 {
                     name: 'pathogen',
-                    checked: true
+                    checked: false
                 },
                 {
                     name: 'NERDTree',
@@ -193,7 +193,7 @@ async function install_devtools() {
                 },
                 {
                     name: 'yarn',
-                    checked: true
+                    checked: false
                 },
                 {
                     name: 'composer',
@@ -408,7 +408,7 @@ async function install_apps() {
                 },
                 {
                     name: 'atom',
-                    checked: true
+                    checked: false
                 },
                 {
                     name: 'vscode',
@@ -416,7 +416,7 @@ async function install_apps() {
                 },
                 {
                     name: 'sublime text',
-                    checked: true
+                    checked: false
                 },
                 {
                     name: 'sequel pro',
@@ -436,7 +436,7 @@ async function install_apps() {
                 },
                 {
                     name: 'android studio',
-                    checked: true
+                    checked: false
                 },
                 {
                     name: 'google chrome',
@@ -448,15 +448,15 @@ async function install_apps() {
                 },
                 {
                     name: 'brave',
-                    checked: true
+                    checked: false
                 },
                 {
                     name: 'mark text',
-                    checked: 'true'
+                    checked: false
                 },
                 {
                     name: 'iterm2',
-                    checked: 'true'
+                    checked: false
                 }
             ]
         }

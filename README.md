@@ -19,10 +19,19 @@ npm install
 * Node
 * NPM
 
+## Configuration (current list of options to install)
+* gitignore
+* zshrc (shell config file)
+* nvm (Node Version Manager)
+* tmux (Terminal Multiplexor: split panes)
+* vimrc (vim config file)
+* pathogen (package manager for vim)
+* NERDTree (file tree for vim)
+
 ## Tools: (current list of options to install)
 * xcode-select
 * homebrew
-* homebrew cask
+* homebrew cask (for installing apps via terminal)
 * node
 * php
 * python
@@ -36,14 +45,20 @@ npm install
 * laravel
 
 ## Apps: (current list of options to install)
+* virtualbox
+* vagrant
+* docker
 * slack
 * atom
 * vscode
+* sublime text
 * sequel pro
+* postman (endpoint validation)
+* cyberduck (ftp client)
 * spotify
 * android studio
 * google chrome
 * brave
 * firefox
-* mark text
-* iterm2
+* mark text (markdown editor)
+* iterm2 (updated terminal, allows tabs)

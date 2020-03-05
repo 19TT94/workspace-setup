@@ -67,20 +67,22 @@ async function install_config() {
             
             // Install dependencies for github autocomplete
             shell.exec('mkdir ~/.zsh');
-            shell.exec('curl -o git-completion.bash https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash > ~/.zsh/git-completion.bash');
-            shell.exec('curl -o _git https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.zsh > ~/.zsh/_git');
+            shell.exec('curl -o ~/.zsh/git-completion.bash https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash');
+            shell.exec('curl -o ~/.zsh/_git https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.zsh');
 
             if (!shell.test('-e', file)) {
                 // terminal settings | create bash_profile
                 shell.exec('cat ./tools/zshrc > ~/.zshrc');
                 // initialize bash_profile
                 shell.exec('source ~/.zshrc');
+                shell.exec('rm ~/.zcompdump');
             } else {
                 console.log("file exists");
                 if(await overwrite('File exists: Overwrite .zshrc?')) {
                     console.log("overwrite");
                     // terminal settings | create bash_profile
                     shell.exec('cat ./tools/zshrc > ~/.zshrc');
+                    shell.exec('rm ~/.zcompdump');
                     // initialize bash_profile
                     shell.exec('source ~/.zshrc');
                 }
@@ -304,8 +306,9 @@ async function install_devtools() {
                 installed.push(response.config[i])
                 
                 // write to .zshrc
-                let starship = "eval '$(starship init bash)'"
-                shell.exec("echo \n" + starship + " >> ~/.zshrc;")
+                let starship = "eval \"$(starship init zsh)\""
+                shell.exec("echo \n" + starship + " >> ~/.zshrc;");
+                shell.exec('source ~/.zshrc');
             } else {
                 // update exist
                 exist.push(response.config[i])

@@ -305,7 +305,7 @@ async function install_devtools() {
                 
                 // write to .zshrc
                 let starship = "eval '$(starship init bash)'"
-                shell.exec("echo " + starship + " >> ~/.zshrc;")
+                shell.exec("echo \n" + starship + " >> ~/.zshrc;")
             } else {
                 // update exist
                 exist.push(response.config[i])

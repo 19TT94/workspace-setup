@@ -67,10 +67,8 @@ async function install_config() {
             
             // Install dependencies for github autocomplete
             shell.exec('mkdir ~/.zsh');
-            shell.exec('cd ~/.zsh');
-            shell.exec('curl -o git-completion.bash https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash');
-            shell.exec('curl -o _git https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.zsh');
-            shell.exec('cd ..');
+            shell.exec('curl -o git-completion.bash https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash > ~/.zsh/git-completion.bash');
+            shell.exec('curl -o _git https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.zsh > ~/.zsh/_git');
 
             if (!shell.test('-e', file)) {
                 // terminal settings | create bash_profile
@@ -298,7 +296,7 @@ async function install_devtools() {
                 exist.push(response.config[i])
             }
         }
-        // install python
+        // install starship
         if (response.config[i] === 'starship') {
             if (shell.exec('starship --version', { silent: true }).code != 0) {
                 shell.exec('brew install starship');

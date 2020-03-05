@@ -28,7 +28,7 @@ async function install_config() {
                     checked: true
                 },
                 {
-                    name: 'tmux',
+                    name: 'tmux.conf',
                     checked: true
                 },
                 {
@@ -72,7 +72,7 @@ async function install_config() {
 
             if (!shell.test('-e', file)) {
                 // terminal settings | create bash_profile
-                shell.exec('cat ./tools/zshrc > ~/.zshrc');
+                shell.exec('cat ./tools/.zshrc > ~/.zshrc');
                 // initialize bash_profile
                 shell.exec('source ~/.zshrc');
                 shell.exec('rm ~/.zcompdump');
@@ -81,7 +81,7 @@ async function install_config() {
                 if(await overwrite('File exists: Overwrite .zshrc?')) {
                     console.log("overwrite");
                     // terminal settings | create bash_profile
-                    shell.exec('cat ./tools/zshrc > ~/.zshrc');
+                    shell.exec('cat ./tools/.zshrc > ~/.zshrc');
                     shell.exec('rm ~/.zcompdump');
                     // initialize bash_profile
                     shell.exec('source ~/.zshrc');
@@ -100,16 +100,32 @@ async function install_config() {
                 }
             }
         }
+        // check for tmux config
+        if (response.config[i] === 'tmux.conf') {
+            if(!shell.test('-e', file)) {
+                // tmux settings | create tmux.conf
+                shell.exec('cat ./tools/.tmux.conf > ~/.tmux.conf');
+                // initialize .tmux.conf
+                shell.exec('tmux source-file ~/.tmux.conf');
+            } else {
+                if(await overwrite('File exists: Overwrite .tmux?')) {
+                    console.log('overwrite');
+                    // tmux settings | create tmux.conf
+                    shell.exec('cat ./tools/.tmux.conf > ~/.tmux.conf');
+                    // initialize .tmux.conf
+                    shell.exec('tmux source-file ~/.tmux.conf');
+                }
+            }
+        }
         // check for vimrc config
         if (response.config[i] === 'vimrc') {
             if (!shell.test('-e', file)) {
                 // vim settings | create .vimrc
                 shell.exec('touch .vimrc');
                 // copy over .vimrc
-                shell.exec('cat .vimrc > ~/.vimrc');
+                shell.exec('cat ./tools/.vimrc > ~/.vimrc');
                 // vim package manager ~ pathogen
-                shell.exec('mkdir -p ~/.vim/autoload ~/.vim/bundle && \
-                // curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim');
+                shell.exec('mkdir -p ~/.vim/autoload ~/.vim/bundle && \// curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim');
                 // install NERDTree
                 shell.exec('git clone https://github.com/scrooloose/nerdtree.git ~/.vim/bundle/nerdtree');
                 // link .vimrc
@@ -221,6 +237,10 @@ async function install_devtools() {
                 },
                 {
                     name: 'laravel',
+                    checked: true
+                },
+                {
+                    name: 'tmux',
                     checked: true
                 }
             ]
@@ -340,17 +360,6 @@ async function install_devtools() {
         if (response.config[i] === 'yarn') {
             if (shell.exec('yarn -v', { silent: true }).code != 0) {
                 shell.exec('brew install yarn');
-                // update installed
-                installed.push(response.config[i])
-            } else {
-                // update exist
-                exist.push(response.config[i])
-            }
-        }
-        // install bower
-        if (response.config[i] === 'bower') {
-            if (shell.exec('bower -v', { silent: true }).code != 0) {
-                shell.exec('brew install bower');
                 // update installed
                 installed.push(response.config[i])
             } else {

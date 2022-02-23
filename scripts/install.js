@@ -265,7 +265,8 @@ async function install_devtools() {
         // install homebrew
         if (response.config[i] === 'homebrew') {
             if (shell.exec('brew -v', { silent: true }).code != 0) {
-                shell.exec('/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"');
+                shell.exec('/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"');
+                shell.exec('eval "$(/opt/homebrew/bin/brew shellenv)"')
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -718,6 +719,26 @@ async function install_apps() {
         if (response.config[i] === 'iterm2') {
             if (shell.exec('brew list --cask iterm2', { silent: true }).code != 0) {
                 shell.exec('brew install --cask iterm2');
+                // update installed
+                installed.push(response.config[i])
+            } else {
+                // update exist
+                exist.push(response.config[i])
+            }
+        }
+        if (response.config[i] === 'tableplus') {
+            if (shell.exec('brew list --cask tableplus', { silent: true }).code != 0) {
+                shell.exec('brew install --cask tableplus');
+                // update installed
+                installed.push(response.config[i])
+            } else {
+                // update exist
+                exist.push(response.config[i])
+            }
+        }
+        if (response.config[i] === 'openvpn-connect') {
+            if (shell.exec('brew list --cask openvpn-connect', { silent: true }).code != 0) {
+                shell.exec('brew install --cask openvpn-connect');
                 // update installed
                 installed.push(response.config[i])
             } else {

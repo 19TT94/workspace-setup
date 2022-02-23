@@ -1,15 +1,15 @@
-# Workspace Setup (Mac)
+# Hero Services Workspace Setup (Mac)
 
 ### Devtools and files to install on a new workspace via the command line.
 
 ## Run Workspace Setup Script
 ```
-git clone git@github.com:19tt94/workspace-setup.git && cd workspace-setup && ./run.sh
+git clone git@github.com:Hero-Services/workspace-setup.git && cd workspace-setup && ./run.sh
 ```
 
 ## Contributing
 ```
-git clone git@github.com:19tt94/workspace-setup.git
+git clone git@github.com:Hero-Services/workspace-setup.git
 
 npm install
 ```
@@ -44,11 +44,13 @@ npm install
 * react
 * laravel
 * tmux
+* catlayst
+* docker
 
 ## App Options:
 * virtualbox
 * vagrant
-* docker
+* docker desktop
 * slack
 * atom
 * vscode

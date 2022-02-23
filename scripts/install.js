@@ -235,6 +235,10 @@ async function install_devtools() {
                     checked: true
                 },
                 {
+                    name: 'catalyst-cli',
+                    checked: true
+                },
+                {
                     name: 'docker',
                     checked: true
                 }
@@ -404,6 +408,17 @@ async function install_devtools() {
         if (response.config[i] === 'tmux') {
             if (shell.exec('tmux', { silent: true }).code != 0) {
                 shell.exec('brew install tmux');
+                // update installed
+                installed.push(response.config[i])
+            } else {
+                // update exist
+                exist.push(response.config[i])
+            }
+        }
+        // install catalyst
+        if (response.config[i] === 'tmux') {
+            if (shell.exec('catalyst', { silent: true }).code != 0) {
+                shell.exec('npm install -g zcatalyst-cli');
                 // update installed
                 installed.push(response.config[i])
             } else {

@@ -21,7 +21,7 @@ program
 
 // async function to wait for response from user
 (async () => {
-    await write_figlet("TT's Workspace Setup");
+    await write_figlet("Hero Services Workspace Setup");
 
     let response = null;
     setTimeout(async () => {

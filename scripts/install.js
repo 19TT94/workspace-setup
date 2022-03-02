@@ -517,8 +517,8 @@ async function install_apps() {
     for(var i=0; i < response.config.length; i++) {
         // install virtualbox
         if (response.config[i] === 'virtualbox') {
-            if (shell.exec('brew cask list virtualbox', { silent: true }).code != 0) {
-                shell.exec('brew cask install virtualbox');
+            if (shell.exec('brew list --cask virtualbox', { silent: true }).code != 0) {
+                shell.exec('brew install --cask virtualbox');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -528,8 +528,8 @@ async function install_apps() {
         }
         // install vagrant
         if (response.config[i] === 'vagrant') {
-            if (shell.exec('brew cask list vagrant', { silent: true }).code != 0) {
-                shell.exec('brew cask install vagrant');
+            if (shell.exec('brew list --cask vagrant', { silent: true }).code != 0) {
+                shell.exec('brew install --cask vagrant');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -539,8 +539,8 @@ async function install_apps() {
         }
         // install docker
         if (response.config[i] === 'docker desktop') {
-            if (shell.exec('brew cask list docker', { silent: true }).code != 0) {
-                shell.exec('brew cask install docker');
+            if (shell.exec('brew list --cask docker', { silent: true }).code != 0) {
+                shell.exec('brew install --cask docker');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -550,8 +550,8 @@ async function install_apps() {
         }
         // install slack
         if (response.config[i] === 'slack') {
-            if (shell.exec('brew cask list slack', { silent: true }).code != 0) {
-                shell.exec('brew cask install slack');
+            if (shell.exec('brew list --cask slack', { silent: true }).code != 0) {
+                shell.exec('brew install --cask slack');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -561,8 +561,8 @@ async function install_apps() {
         }
         // install atom
         if (response.config[i] === 'atom') {
-            if (shell.exec('brew cask list atom', { silent: true }).code != 0) {
-                shell.exec('brew cask install atom');
+            if (shell.exec('brew list --cask atom', { silent: true }).code != 0) {
+                shell.exec('brew install --cask atom');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -572,8 +572,8 @@ async function install_apps() {
         }
         // install vscode
         if (response.config[i] === 'vscode') {
-            if (shell.exec('brew cask list visual-studio-code', { silent: true }).code != 0) {
-                shell.exec('brew cask install visual-studio-code');
+            if (shell.exec('brew list --cask visual-studio-code', { silent: true }).code != 0) {
+                shell.exec('brew install --cask visual-studio-code');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -583,8 +583,8 @@ async function install_apps() {
         }
          // install sublime
          if (response.config[i] === 'sublime text') {
-            if (shell.exec('brew cask list sublime-text', { silent: true }).code != 0) {
-                shell.exec('brew cask install sublime-text');
+            if (shell.exec('brew list --cask sublime-text', { silent: true }).code != 0) {
+                shell.exec('brew install --cask sublime-text');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -594,8 +594,8 @@ async function install_apps() {
         }
         // install sequel-pro
         if (response.config[i] === 'sequel pro') {
-            if (shell.exec('brew cask list sequel-pro', { silent: true }).code != 0) {
-                shell.exec('brew cask install sequel-pro');
+            if (shell.exec('brew list --cask sequel-pro', { silent: true }).code != 0) {
+                shell.exec('brew install --cask sequel-pro');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -605,8 +605,8 @@ async function install_apps() {
         }
         // install postman
         if (response.config[i] === 'postman') {
-            if (shell.exec('brew cask list postman', { silent: true }).code != 0) {
-                shell.exec('brew cask install postman');
+            if (shell.exec('brew list --cask postman', { silent: true }).code != 0) {
+                shell.exec('brew install --cask postman');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -616,8 +616,8 @@ async function install_apps() {
         }
          // install postman
          if (response.config[i] === 'cyberduck') {
-            if (shell.exec('brew cask list cyberduck', { silent: true }).code != 0) {
-                shell.exec('brew cask install cyberduck');
+            if (shell.exec('brew list --cask cyberduck', { silent: true }).code != 0) {
+                shell.exec('brew install --install cyberduck');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -627,8 +627,8 @@ async function install_apps() {
         }
         // install spotify
         if (response.config[i] === 'spotify') {
-            if (shell.exec('brew cask list spotify', { silent: true }).code != 0) {
-                shell.exec('brew cask install spotify');
+            if (shell.exec('brew list --cask spotify', { silent: true }).code != 0) {
+                shell.exec('brew install --cask spotify');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -638,8 +638,8 @@ async function install_apps() {
         }
         // install android-studio
         if (response.config[i] === 'android-studio') {
-            if (shell.exec('brew cask list android-studio', { silent: true }).code != 0) {
-                shell.exec('brew cask install android-studio');
+            if (shell.exec('brew list --cask android-studio', { silent: true }).code != 0) {
+                shell.exec('brew install --cask android-studio');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -649,8 +649,8 @@ async function install_apps() {
         }
         // install google-chrome
         if (response.config[i] === 'google chrome') {
-            if (shell.exec('brew cask list google-chrome', { silent: true }).code != 0) {
-                shell.exec('brew cask install google-chrome');
+            if (shell.exec('brew list --cask google-chrome', { silent: true }).code != 0) {
+                shell.exec('brew install --cask google-chrome');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -660,8 +660,8 @@ async function install_apps() {
         }
         // install google-chrome
         if (response.config[i] === 'firefox') {
-            if (shell.exec('brew cask list firefox', { silent: true }).code != 0) {
-                shell.exec('brew cask install firefox');
+            if (shell.exec('brew list --cask firefox', { silent: true }).code != 0) {
+                shell.exec('brew install --cask firefox');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -671,8 +671,8 @@ async function install_apps() {
         }
         // install brave-browser
         if (response.config[i] === 'brave') {
-            if (shell.exec('brew cask list brave-browser', { silent: true }).code != 0) {
-                shell.exec('brew cask install brave-browser');
+            if (shell.exec('brew list --cask brave-browser', { silent: true }).code != 0) {
+                shell.exec('brew install --cask brave-browser');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -682,8 +682,8 @@ async function install_apps() {
         }
         // install mark-text
         if (response.config[i] === 'mark text') {
-            if (shell.exec('brew cask list mark-text', { silent: true }).code != 0) {
-                shell.exec('brew cask install mark-text');
+            if (shell.exec('brew list --cask mark-text', { silent: true }).code != 0) {
+                shell.exec('brew install --cask mark-text');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -693,8 +693,8 @@ async function install_apps() {
         }
         // install one password
         if (response.config[i] === '1password') {
-            if (shell.exec('brew cask list 1password', { silent: true }).code != 0) {
-                shell.exec('brew cask install 1password');
+            if (shell.exec('brew list --cask 1password', { silent: true }).code != 0) {
+                shell.exec('brew install --cask 1password');
                 // update installed
                 installed.push(response.config[i])
             } else {
@@ -704,8 +704,8 @@ async function install_apps() {
         }
         // install iterm2
         if (response.config[i] === 'iterm2') {
-            if (shell.exec('brew cask list iterm2', { silent: true }).code != 0) {
-                shell.exec('brew cask install iterm2');
+            if (shell.exec('brew list --cask iterm2', { silent: true }).code != 0) {
+                shell.exec('brew install --cask iterm2');
                 // update installed
                 installed.push(response.config[i])
             } else {

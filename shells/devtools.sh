@@ -27,15 +27,6 @@ else
     brew -v
 fi
 
-# Install Homebrew Cask
-if ! brew info cask &>/dev/null; then
-    echo installing brew cask ...
-    brew cask
-else
-    echo brew cask installed, version:
-    brew info cask
-fi
-
 # Install Node
 if ! command node -v > /dev/null; then
     echo Installing node ...
@@ -133,8 +124,6 @@ echo verifying installs ...
 echo ###
 xcode-select --version
 brew -v
-echo ###
-brew info cask
 echo ###
 node -v
 echo ###

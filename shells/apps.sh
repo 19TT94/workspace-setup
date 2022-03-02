@@ -8,20 +8,20 @@
 
 echo verifying/installing applications
 
-brew cask install slack
+brew install --cask slack
 
-brew cask install atom
+brew install --cask atom
 
-brew cask visual-studio-code
+brew install  --cask visual-studio-code
 
-brew cask install sequel-pro
+brew install --cask sequel-pro
 
-brew cask install spotify
+brew install --cask spotify
 
-brew cask install android-studio
+brew install --cask android-studio
 
-brew cask install google-chrome
+brew install --cask google-chrome
 
-brew cask install brave-browser
+brew install --cask brave-browser
 
-brew cask install mark-text
+brew install --cask mark-text

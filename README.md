@@ -4,7 +4,7 @@
 
 ## Run Workspace Setup Script
 ```
-git clone git@github.com:Hero-Services/workspace-setup.git && cd workspace-setup && ./run.sh
+git clone git@github.com:Hero-Services/workspace-setup.git && cd workspace-setup && source ./run.sh
 ```
 
 ## Contributing
@@ -65,3 +65,5 @@ npm install
 * firefox
 * mark text *(markdown editor)*
 * iterm2 *(updated terminal, allows tabs)*
+* openvpn-connect
+* tableplus

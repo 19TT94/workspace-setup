@@ -237,6 +237,10 @@ async function install_devtools() {
                 {
                     name: 'docker',
                     checked: true
+                },
+                {
+                    name: 'github cli',
+                    checked: true
                 }
             ]
         }
@@ -320,7 +324,12 @@ async function install_devtools() {
                 // update installed
                 installed.push(response.config[i])
                 // write to .zshrc
-                shell.echo("\n\neval \"$(starship init zsh)\"").toEnd('~/.zshrc');
+                shell.echo("\n\nif command -v starship >/dev/null 2>&1; then\n  eval \"$(starship init zsh)\"\nfi").toEnd('~/.zshrc');
+                // write default starship config
+                shell.exec('mkdir -p ~/.config');
+                if (!shell.test('-e', '~/.config/starship.toml')) {
+                    shell.exec('cat ./tools/starship.toml > ~/.config/starship.toml');
+                }
                 // clear cache
                 shell.exec('rm ~/.zcompdump');
                 // enable the default zsh completions!
@@ -415,6 +424,17 @@ async function install_devtools() {
          if (response.config[i] === 'docker') {
             if (shell.exec('docker --version', { silent: true }).code != 0) {
                 shell.exec('brew install docker');
+                // update installed
+                installed.push(response.config[i])
+            } else {
+                // update exist
+                exist.push(response.config[i])
+            }
+        }
+        // install github cli
+        if (response.config[i] === 'github cli') {
+            if (shell.exec('gh --version', { silent: true }).code != 0) {
+                shell.exec('brew install gh');
                 // update installed
                 installed.push(response.config[i])
             } else {

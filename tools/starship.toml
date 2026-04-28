@@ -1,0 +1,31 @@
+add_newline = true
+
+format = "⚓ $username$directory$git_branch$git_status$nodejs$python$cmd_duration$line_break$character"
+
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+style = "bold blue"
+
+[git_branch]
+symbol = "git:"
+style = "bold purple"
+
+[git_status]
+style = "bold red"
+
+[nodejs]
+symbol = "node "
+style = "bold green"
+
+[python]
+symbol = "py "
+style = "bold yellow"
+
+[cmd_duration]
+min_time = 500
+format = "took [$duration](bold italic white) "
+
+[character]
+success_symbol = "[>](bold green)"
+error_symbol = "[>](bold red)"

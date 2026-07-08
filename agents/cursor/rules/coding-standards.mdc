@@ -1,0 +1,11 @@
+---
+description: Core coding standards for all projects
+alwaysApply: true
+---
+
+# Coding Standards
+
+- Prefer small, focused changes over large refactors
+- Match existing project conventions before introducing new patterns
+- Write self-documenting code; add comments only for non-obvious logic
+- Run relevant tests or syntax checks when available

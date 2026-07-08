@@ -7,6 +7,8 @@
     "setup": "./index.js"
   },
   "scripts": {
+    "start": "node ./index.js",
+    "dry-run": "node ./index.js --dry-run",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,13 +21,12 @@
     "url": "https://github.com/19TT94/workspace-setup/issues"
   },
   "homepage": "https://github.com/19TT94/workspace-setup#readme",
-  "dependencies": {
+    "dependencies": {
     "commander": "^2.20.0",
     "figlet": "^1.2.3",
     "fs": "0.0.1-security",
     "inquirer": "^6.4.1",
     "ora": "^3.4.0",
-    "path": "^0.12.7",
-    "shelljs": "^0.8.3"
+    "path": "^0.12.7"
   }
 }

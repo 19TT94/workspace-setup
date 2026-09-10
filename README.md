@@ -10,7 +10,7 @@ This repository is a **starting template for organization developer onboarding**
 
 Fork it for you or your team, then customize the seed files and install lists to match how your org works:
 
-- **`tools/`** — shell profiles, editor config, and other dotfiles every developer should get
+- **`tools/`** — shell profiles, Vim/Neovim config, terminal config, and other dotfiles every developer should get
 - **`agents/`** — global Cursor, Codex, and Claude rules and skills that reflect your coding standards
 - **`scripts/install.js`** and **`scripts/installers/`** — which devtools and apps are offered during setup
 
@@ -129,7 +129,7 @@ workspace-setup/
   index.js                 # CLI entry point
   run.sh / run.ps1         # Platform bootstrap scripts
   agents/                  # AI agent starter files (Cursor, Codex, Claude)
-  tools/                   # Dotfile templates (zshrc, vimrc, starship, PowerShell profile, ...)
+  tools/                   # Dotfile templates (zshrc, vimrc, nvim/, wezterm.lua, starship, ...)
   scripts/
     install.js             # Install orchestration and file-copy helpers
     platform.js            # OS detection and platform-specific menus
@@ -154,7 +154,9 @@ Prompts let you pick which dotfiles to install. Existing files trigger an overwr
 | zshrc     | `tools/zshrc`     | `~/.zshrc` (+ git shell completions in `~/.zsh/`)  |
 | nvm       | —                 | creates `~/.nvm`                                   |
 | tmux.conf | `tools/tmux.conf` | `~/.tmux.conf`                                     |
-| vimrc     | `tools/vimrc`     | `~/.vimrc` (+ pathogen and NERDTree when selected) |
+| vimrc     | `tools/vimrc`     | `~/.vimrc`                                         |
+| Neovim    | `tools/nvim/init.lua` | `~/.config/nvim/init.lua`                      |
+| WezTerm (optional) | `tools/wezterm.lua` | `~/.wezterm.lua`                            |
 
 ### Windows
 
@@ -164,6 +166,21 @@ Prompts let you pick which dotfiles to install. Existing files trigger an overwr
 | PowerShell profile | `tools/powershell-profile.ps1` | `$PROFILE`                                                   |
 | nvm                | —                              | prepares `%LOCALAPPDATA%\nvm` for NVM for Windows            |
 | vimrc              | `tools/vimrc`                  | `%USERPROFILE%\.vimrc`                                       |
+| Neovim             | `tools/nvim/init.lua`          | `%LOCALAPPDATA%\nvim\init.lua`                              |
+| WezTerm (optional) | `tools/wezterm.lua`            | `%USERPROFILE%\.wezterm.lua`                                 |
+
+### Portable terminal workflow
+
+The portable workflow is **Neovim + tmux**, not a specific terminal emulator. The
+included tmux configuration owns pane navigation, resize keys, scrollback, and
+vi-style copy mode, so it works in macOS Terminal, iTerm2, Windows Terminal,
+WezTerm, and most remote shells.
+
+WezTerm is offered as an unchecked optional devtool. Its config is intentionally
+limited to appearance and scrollback; it does not define panes or workspaces that
+would make the workflow depend on WezTerm. Install it when you want a consistent,
+Lua-configured terminal on machines where you are allowed to add one. Otherwise,
+use the built-in terminal and retain the same tmux and Neovim workflow.
 
 ## AI agent starter files
 
@@ -185,13 +202,23 @@ Installed only when selected in the devtools checkbox. The installer checks whet
 
 ### macOS (Homebrew)
 
-`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `docker`, `github cli`
+`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `neovim`, `wezterm` (optional), `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `docker`, `github cli`, `claude code` (optional), `opencode` (optional), `codex` (optional)
 
 `react` appears in the menu but has no install step yet.
 
 ### Windows (winget)
 
-`git`, `winget` (verification only), `node`, `php`, `python`, `starship`, `nvm-windows`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `docker` (CLI only), `github cli`
+`git`, `winget` (verification only), `node`, `php`, `python`, `neovim`, `wezterm` (optional), `starship`, `nvm-windows`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `docker` (CLI only), `github cli`, `claude code` (optional), `opencode` (optional), `codex` (optional)
+
+Optional AI CLIs are unchecked by default:
+
+| Tool | macOS | Windows |
+| ---- | ----- | ------- |
+| Claude Code | `brew install --cask claude-code` | `winget` `Anthropic.ClaudeCode` |
+| OpenCode | `brew install anomalyco/tap/opencode` | `npm install -g opencode-ai` |
+| Codex | `brew install --cask codex` | `npm install -g @openai/codex` |
+
+Starter config files under `agents/` are still a separate install flow from installing these CLIs.
 
 ## Desktop apps (macOS only)
 

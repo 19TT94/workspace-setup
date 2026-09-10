@@ -25,10 +25,5 @@ tmux source-file ~/.tmux.conf
 touch .vimrc
 # copy over .vimrc
 cat .vimrc > ~/.vimrc
-# vim package manager ~ pathogen
-mkdir -p ~/.vim/autoload ~/.vim/bundle && \
-curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
-# install NERDTree
-git clone https://github.com/scrooloose/nerdtree.git ~/.vim/bundle/nerdtree
 # link .vimrc
 source ~/.vimrc

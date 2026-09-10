@@ -1,12 +1,24 @@
 # !/bin/bash
 
 # Load NVM
-export NVM_DIR="$HOME/.nvm"	export NVM_DIR=~/.nvm
-  [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm	source $(brew --prefix nvm)/nvm.sh
-  [ -s "/usr/local/opt/nvm/etc/bash_completion" ] && . "/usr/local/opt/nvm/etc/bash_completion"  # This loads nvm bash_completion
+export NVM_DIR="$HOME/.nvm"
+if command -v brew >/dev/null 2>&1; then
+  NVM_PREFIX="$(brew --prefix nvm 2>/dev/null)"
+  if [ -n "$NVM_PREFIX" ] && [ -s "$NVM_PREFIX/nvm.sh" ]; then
+    . "$NVM_PREFIX/nvm.sh"
+  fi
+  if [ -n "$NVM_PREFIX" ] && [ -s "$NVM_PREFIX/etc/bash_completion" ]; then
+    . "$NVM_PREFIX/etc/bash_completion"
+  fi
+fi
 
 # Setting PATH for Python 3.6
 export PATH="/Library/Frameworks/Python.framework/Versions/3.6/bin:${PATH}"
 
 # Setting PATH for VSCode
 export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+
+# Starship prompt
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi

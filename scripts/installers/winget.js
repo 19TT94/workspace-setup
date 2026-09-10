@@ -101,6 +101,28 @@ async function installSelectedDevtools(selected, helpers) {
             });
         }
 
+        if (tool === 'neovim') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('nvim --version'),
+                install: () => wingetInstall('Neovim.Neovim'),
+                command: wingetCommand('Neovim.Neovim'),
+                installed,
+                exist
+            });
+        }
+
+        if (tool === 'wezterm') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => wingetList('wez.wezterm'),
+                install: () => wingetInstall('wez.wezterm'),
+                command: wingetCommand('wez.wezterm'),
+                installed,
+                exist
+            });
+        }
+
         if (tool === 'starship') {
             await installIfMissing({
                 label: tool,
@@ -203,6 +225,39 @@ async function installSelectedDevtools(selected, helpers) {
                 isInstalled: () => commandExists('gh --version'),
                 install: () => wingetInstall('GitHub.cli'),
                 command: wingetCommand('GitHub.cli'),
+                installed,
+                exist
+            });
+        }
+
+        if (tool === 'claude code') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('claude --version'),
+                install: () => wingetInstall('Anthropic.ClaudeCode'),
+                command: wingetCommand('Anthropic.ClaudeCode'),
+                installed,
+                exist
+            });
+        }
+
+        if (tool === 'opencode') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('opencode --version'),
+                install: () => shell.exec('npm install -g opencode-ai'),
+                command: 'npm install -g opencode-ai',
+                installed,
+                exist
+            });
+        }
+
+        if (tool === 'codex') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('codex --version'),
+                install: () => shell.exec('npm install -g @openai/codex'),
+                command: 'npm install -g @openai/codex',
                 installed,
                 exist
             });

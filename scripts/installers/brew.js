@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const shell = require('../shell');
 const { homePath } = require('../platform');
@@ -7,6 +8,12 @@ const REPO_ROOT = path.resolve(__dirname, '../..');
 
 function appendStarshipToZshrc() {
     const zshrcPath = homePath('.zshrc');
+    if (fs.existsSync(zshrcPath)) {
+        const existing = fs.readFileSync(zshrcPath, 'utf8');
+        if (existing.includes('starship init zsh')) {
+            return;
+        }
+    }
     const block = '\n\nif command -v starship >/dev/null 2>&1; then\n  eval "$(starship init zsh)"\nfi\n';
     shell.ShellString(block).toEnd(zshrcPath);
 }
@@ -74,6 +81,28 @@ async function installSelectedDevtools(selected, helpers) {
                 isInstalled: () => commandExists('python --version'),
                 install: () => shell.exec('brew install python'),
                 command: 'brew install python',
+                installed,
+                exist
+            });
+        }
+
+        if (tool === 'neovim') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('nvim --version'),
+                install: () => shell.exec('brew install neovim'),
+                command: 'brew install neovim',
+                installed,
+                exist
+            });
+        }
+
+        if (tool === 'wezterm') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => shell.exec('brew list --cask wezterm', { silent: true }).code === 0,
+                install: () => shell.exec('brew install --cask wezterm'),
+                command: 'brew install --cask wezterm',
                 installed,
                 exist
             });
@@ -197,6 +226,39 @@ async function installSelectedDevtools(selected, helpers) {
                 isInstalled: () => commandExists('gh --version'),
                 install: () => shell.exec('brew install gh'),
                 command: 'brew install gh',
+                installed,
+                exist
+            });
+        }
+
+        if (tool === 'claude code') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('claude --version'),
+                install: () => shell.exec('brew install --cask claude-code'),
+                command: 'brew install --cask claude-code',
+                installed,
+                exist
+            });
+        }
+
+        if (tool === 'opencode') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('opencode --version'),
+                install: () => shell.exec('brew install anomalyco/tap/opencode'),
+                command: 'brew install anomalyco/tap/opencode',
+                installed,
+                exist
+            });
+        }
+
+        if (tool === 'codex') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('codex --version'),
+                install: () => shell.exec('brew install --cask codex'),
+                command: 'brew install --cask codex',
                 installed,
                 exist
             });

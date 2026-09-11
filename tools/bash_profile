@@ -24,7 +24,7 @@ fi
 export EDITOR=nvim
 export VISUAL=nvim
 
-# P: fuzzy find + preview + open any file (Cmd+P style)
+# Ctrl+P (Cmd+P in WezTerm): fuzzy find + preview + open any file
 fzf-open() {
   local IFS=$'\n'
   local f
@@ -33,7 +33,7 @@ fzf-open() {
   f=$(rg --files --hidden --follow -g '!*/.git/*' | fzf --height 80% --layout reverse --border --preview-window 'right:50%:wrap' --preview "$prev" --multi)
   [ -n "$f" ] && ${EDITOR:-vim} $f
 }
-bind -x '"p": fzf-open'        # 'p' opens fzf; replaces default self-insert
+bind -x '"\C-p": fzf-open'    # Ctrl+P opens fzf (WezTerm Cmd+P sends it)
 
 # lf: minimal file manager; lfcd lets `cd` work on quit (needs: brew install lf)
 lfcd() {

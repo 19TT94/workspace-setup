@@ -24,7 +24,7 @@ fi
 export EDITOR=nvim
 export VISUAL=nvim
 
-# P: fuzzy find + preview + open any file (Cmd+P style)
+# Ctrl+P (Cmd+P in WezTerm): fuzzy find + preview + open any file
 fzf-open() {
   local f
   local prev='bat --style=numbers --color=always --line-range=:200 {}'
@@ -34,7 +34,7 @@ fzf-open() {
   zle redisplay
 }
 zle -N fzf-open
-bindkey 'p' fzf-open        # 'p' opens fzf; replaces default self-insert
+bindkey '^p' fzf-open        # Ctrl+P opens fzf (WezTerm Cmd+P sends it)
 
 # lf: minimal file manager; lfcd lets `cd` work on quit (needs: brew install lf)
 lfcd() {

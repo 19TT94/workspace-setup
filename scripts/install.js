@@ -11,7 +11,8 @@ const {
     getAgentChoices,
     getAgentInstallPaths,
     getGitignoreEntries,
-    getPowerShellProfilePath
+    getPowerShellProfilePath,
+    getNeovimConfigPath
 } = require('./platform');
 const { installSelectedDevtools: installBrewDevtools, installSelectedApps } = require('./installers/brew');
 const { installSelectedDevtools: installWingetDevtools } = require('./installers/winget');
@@ -56,7 +57,64 @@ function dryRunExec(description) {
     return null;
 }
 
-async function promptOverwrite(message) {
+function shellQuote(filepath) {
+    return `"${String(filepath).replace(/"/g, '\\"')}"`;
+}
+
+function printOverwriteDiff(existingPath, incomingPath, label) {
+    console.log(`\nDiff for ${label} (existing → incoming):`);
+
+    const existing = shellQuote(existingPath);
+    const incoming = shellQuote(incomingPath);
+    const colorFlag = process.stdout.isTTY ? '-c color.ui=always ' : '';
+    let result = shell.execCapture(
+        `git ${colorFlag}--no-pager diff --no-index -- ${existing} ${incoming}`
+    );
+
+    const gitMissing = result.code === 127
+        || /command not found|not recognized|is not recognized/i.test(result.stderr);
+
+    if (gitMissing && !isWindows) {
+        result = shell.execCapture(`diff -u ${existing} ${incoming}`);
+    }
+
+    if (result.code === 0 && !result.stdout.trim()) {
+        console.log('(no differences)\n');
+        return;
+    }
+
+    if (result.stdout.trim()) {
+        console.log(result.stdout.replace(/\n$/, ''));
+        console.log('');
+        return;
+    }
+
+    console.log('(could not generate diff)\n');
+}
+
+async function promptOverwrite(message, diffOptions = null) {
+    if (diffOptions) {
+        const { existingPath, incomingPath, incomingContent, label } = diffOptions;
+        let tempPath = null;
+
+        try {
+            if (incomingContent != null) {
+                tempPath = path.join(
+                    os.tmpdir(),
+                    `workspace-setup-incoming-${Date.now()}-${path.basename(existingPath)}`
+                );
+                fs.writeFileSync(tempPath, incomingContent, 'utf8');
+                printOverwriteDiff(existingPath, tempPath, label || message);
+            } else if (existingPath && incomingPath) {
+                printOverwriteDiff(existingPath, incomingPath, label || message);
+            }
+        } finally {
+            if (tempPath && fs.existsSync(tempPath)) {
+                fs.unlinkSync(tempPath);
+            }
+        }
+    }
+
     const response = await prompt([
         {
             type: 'expand',
@@ -105,7 +163,11 @@ async function copyFileWithPrompt(source, target, label) {
     ensureDir(path.dirname(resolvedTarget));
 
     if (fs.existsSync(resolvedTarget)) {
-        if (!await promptOverwrite(`File exists: Overwrite ${label}?`)) {
+        if (!await promptOverwrite(`File exists: Overwrite ${label}?`, {
+            existingPath: resolvedTarget,
+            incomingPath: resolvedSource,
+            label
+        })) {
             if (isDryRun()) {
                 log(`Would skip ${label}`);
             } else {
@@ -153,7 +215,11 @@ async function copyDirContentsWithPrompt(sourceDir, targetDir, label) {
 
         if (entry.isDirectory()) {
             if (fs.existsSync(targetPath)) {
-                if (!await promptOverwrite(`Directory exists: Overwrite ${entryLabel}?`)) {
+                if (!await promptOverwrite(`Directory exists: Overwrite ${entryLabel}?`, {
+                    existingPath: targetPath,
+                    incomingPath: sourcePath,
+                    label: entryLabel
+                })) {
                     if (isDryRun()) {
                         log(`Would skip ${entryLabel}`);
                     } else {
@@ -225,7 +291,12 @@ async function installGitignore() {
         return;
     }
 
-    if (await promptOverwrite('File exists: Overwrite .gitignore?')) {
+    const proposed = `${getGitignoreEntries().join('\n')}\n`;
+    if (await promptOverwrite('File exists: Overwrite .gitignore?', {
+        existingPath: gitignorePath,
+        incomingContent: proposed,
+        label: '.gitignore'
+    })) {
         setupGitignore(true);
     }
 }
@@ -282,6 +353,23 @@ async function installTmuxConfig() {
     }
 }
 
+async function installWeztermConfig() {
+    await copyFileWithPrompt(
+        path.join(REPO_ROOT, 'tools/wezterm.lua'),
+        homePath('.config', 'wezterm', 'wezterm.lua'),
+        'wezterm.lua'
+    );
+}
+
+async function installLfConfig() {
+    ensureDir(homePath('.config', 'lf'));
+    await copyFileWithPrompt(
+        path.join(REPO_ROOT, 'tools/lfrc'),
+        homePath('.config', 'lf', 'lfrc'),
+        'lfrc'
+    );
+}
+
 async function installVimConfig() {
     if (await copyFileWithPrompt(
         path.join(REPO_ROOT, 'tools/vimrc'),
@@ -289,18 +377,23 @@ async function installVimConfig() {
         '.vimrc'
     )) {
         ensureDir(homePath('.vim', 'autoload'));
-        ensureDir(homePath('.vim', 'bundle'));
-        dryRunExec(`curl pathogen.vim -> ${homePath('.vim', 'autoload', 'pathogen.vim')}`);
+        dryRunExec(`curl vim-plug -> ${homePath('.vim', 'autoload', 'plug.vim')}`);
         if (!isDryRun()) {
-            shell.exec(`curl -LSso "${homePath('.vim', 'autoload', 'pathogen.vim')}" https://tpo.pe/pathogen.vim`);
+            shell.exec(`curl -fsSLo "${homePath('.vim', 'autoload', 'plug.vim')}" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim`);
         }
-        if (!fs.existsSync(homePath('.vim', 'bundle', 'nerdtree'))) {
-            dryRunExec(`git clone nerdtree -> ${homePath('.vim', 'bundle', 'nerdtree')}`);
-            if (!isDryRun()) {
-                shell.exec(`git clone https://github.com/scrooloose/nerdtree.git "${homePath('.vim', 'bundle', 'nerdtree')}"`);
-            }
+        dryRunExec(`vim +PlugInstall`);
+        if (!isDryRun()) {
+            shell.exec(`vim -es -u "${homePath('.vimrc')}" -i NONE -c 'silent! PlugInstall --sync' -c qa`);
         }
     }
+}
+
+async function installNeovimConfig() {
+    await copyFileWithPrompt(
+        path.join(REPO_ROOT, 'tools', 'nvim', 'init.lua'),
+        getNeovimConfigPath(),
+        'Neovim config'
+    );
 }
 
 async function install_config() {
@@ -334,8 +427,20 @@ async function install_config() {
             await installTmuxConfig();
         }
 
+        if (item === 'lf') {
+            await installLfConfig();
+        }
+
         if (item === 'vimrc') {
             await installVimConfig();
+        }
+
+        if (item === 'neovim config') {
+            await installNeovimConfig();
+        }
+
+        if (item === 'wezterm config') {
+            await installWeztermConfig();
         }
     }
 }
@@ -419,6 +524,7 @@ async function install_apps() {
                 { name: 'firefox', value: 'firefox', checked: true },
                 { name: 'brave', value: 'brave', checked: false },
                 { name: 'mark text', value: 'mark text', checked: false },
+                { name: 'wezterm', value: 'wezterm', checked: false },
                 { name: 'iterm2', value: 'iterm2', checked: false }
             ]
         }

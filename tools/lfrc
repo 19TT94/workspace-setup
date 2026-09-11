@@ -1,0 +1,5 @@
+cmd open $nvim "$f"
+cmd q quit
+cmd exit quit
+
+map <enter> open

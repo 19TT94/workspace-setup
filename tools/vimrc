@@ -1,11 +1,14 @@
 syntax on
 filetype plugin indent on
 
+" Quit helpers: :q is the default; :exit behaves the same
+cnoreabbrev exit q
+
 " Enable mouse clicks
-:set mouse=a
+set mouse=a
 
 " Line number
-:set number
+set number
 
 " show existing tab with 4 spaces width
 set tabstop=4
@@ -15,3 +18,17 @@ set shiftwidth=4
 
 " On pressing tab, insert 4 spaces
 set expandtab
+
+" Plugins managed by vim-plug (downloaded to ~/.vim/autoload/plug.vim by the installer)
+if glob('~/.vim/autoload/plug.vim') != ''
+    call plug#begin('~/.vim/plugged')
+    " fzf is installed as a devtool (brew/winget); fzf#install() only needed if not
+    Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+    " :Files fuzzy file finder, :Rg grep via ripgrep
+    Plug 'junegunn/fzf.vim'
+    call plug#end()
+
+    " Ctrl+p: file explorer, <Leader>r: grep
+    nnoremap <silent> <C-p> :Files<CR>
+    nnoremap <silent> <Leader>r :Rg<CR>
+endif

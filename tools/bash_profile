@@ -1,20 +1,49 @@
 #!/bin/bash
 
-if [ -r ~/.profile ]; then ~/.profile; fi
-case "$-" in *i*) if [ -r ~/.bashrc ]; then . ~/.bashrc; fi;; esac
+# Load NVM
+export NVM_DIR="$HOME/.nvm"
+if command -v brew >/dev/null 2>&1; then
+  NVM_PREFIX="$(brew --prefix nvm 2>/dev/null)"
+  if [ -n "$NVM_PREFIX" ] && [ -s "$NVM_PREFIX/nvm.sh" ]; then
+    . "$NVM_PREFIX/nvm.sh"
+  fi
+  if [ -n "$NVM_PREFIX" ] && [ -s "$NVM_PREFIX/etc/bash_completion" ]; then
+    . "$NVM_PREFIX/etc/bash_completion"
+  fi
+fi
 
-# General
-export PS1="\e[034m\]⚓\e[0m\] [ \e[33m\]\u\e[0m\] ]:\W\e[36m\]`__git_ps1`\[e[0m\]\n\$ "
-export CLICOLOR=1
-export LSCOlORS=ExFxCxDxBxegedabagacad
+# Setting PATH for VSCode
+export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
 
-# Shortcuts
-alias home='cd ~/Desktop'
+# Starship prompt
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init bash)"
+fi
 
-# Application Commands
-alias server='python3 -m http.server'
-alias open='open .'
-alias atom='atom .'
-alias code='code .'
+# Default editor (used by lf and the P finder)
+export EDITOR=nvim
+export VISUAL=nvim
 
-export PATH="/usr/local/sbin:$PATH"
+# Ctrl+P (Cmd+P in WezTerm): fuzzy find + preview + open any file
+fzf-open() {
+  local IFS=$'\n'
+  local f
+  local prev='bat --style=numbers --color=always --line-range=:200 {}'
+  command -v bat >/dev/null 2>&1 || prev='cat {}'
+  f=$(rg --files --hidden --follow -g '!*/.git/*' | fzf --height 80% --layout reverse --border --preview-window 'right:50%:wrap' --preview "$prev" --multi)
+  [ -n "$f" ] && ${EDITOR:-vim} $f
+}
+bind -x '"\C-p": fzf-open'    # Ctrl+P opens fzf (WezTerm Cmd+P sends it)
+
+# lf: minimal file manager; lfcd lets `cd` work on quit (needs: brew install lf)
+lfcd() {
+  local tmp dir
+  tmp="$(mktemp)"
+  lf -last-dir-path="$tmp" "$@"
+  if [ -f "$tmp" ]; then
+    dir="$(cat "$tmp")"
+    rm -f "$tmp"
+    [ -d "$dir" ] && cd "$dir"
+  fi
+}
+alias sf=lfcd

@@ -1,0 +1,57 @@
+---
+description: Workspace Setup repo conventions — installer code vs seed files, platform parity, and dry-run testing
+alwaysApply: true
+---
+
+# Workspace Setup Project Rules
+
+## Scope
+
+- `index.js` orchestrates the interactive install flows (`--all`, `--devtools`, `--dry-run`) via `scripts/install.js`.
+- `scripts/platform.js` owns all menu/registry data: `AGENT_INSTALL_PATHS`, `getConfigChoices`, `getDevtoolChoices`.
+- `scripts/installers/brew.js` and `scripts/installers/winget.js` install tools per platform.
+- `scripts/audit-seeds.js` is the source of truth for the seed → home-directory mapping.
+- `agents/` and `tools/` are **seed content** copied into the user’s home directory. Edit them to change machine defaults.
+- `shells/` is legacy shell script content — `index.js` never calls it. Do not extend it.
+
+Keep diffs focused; match existing 4-space indent and CommonJS `require` style.
+
+## Two kinds of content
+
+- **Installer code** — `index.js`, `run.sh` / `run.ps1`, `scripts/`. Behavior: prompts, copying, installing, dry-run logging.
+- **Seed content** — `agents/`, `tools/`. Templates: dotfiles and global Cursor/Codex/Claude config copied verbatim.
+
+Do not mix them. Agent rules for working on this repo live in `.cursor/` — never under `agents/` (that seeds every user’s global config).
+
+## Adding or changing a seed
+
+1. Edit the template in `agents/` or `tools/`.
+2. If the file is new, register the source→target in the installer this way:
+   - Config file (dotfile): add a `copyFileWithPrompt` call in `scripts/install.js`.
+   - Agent file: add an entry in `AGENT_INSTALL_PATHS` in `scripts/platform.js`.
+3. Add/update the source→target row in `scripts/audit-seeds.js` and the README tables.
+4. Never install to test — use `npm run dry-run` / `node ./index.js --dry-run`.
+
+## Platform parity
+
+- macOS: apps + devtools + config + agents flow. Windows: devtools + config + agents in `--all`; **no apps**.
+- `isWindows` branches must stay symmetric with `isMac` behavior for shared tools and seeds.
+- Keep `brew.js` and `winget.js` aligned for install/uninstall/indent behavior where the tool exists on both.
+
+## Dry run
+
+- Anything that changes the machine must branch on `isDryRun()` and log `Would ...` via `log()` from `scripts/dry-run.js`.
+- Read-only checks (e.g. `node --version`) may run and are not wrapped.
+- Re-verify flows with `npm run dry-run` after any prompt/menu change.
+
+## Auditing local drift
+
+- Installed home files (`~/.zshrc`, `~/.codex/AGENTS.md`, …) drift from repo seeds over time. Run `node scripts/audit-seeds.js` (or the `audit-local-config` skill) instead of editing seeds from memory.
+- Classify drift as **machine-local** (leave), **template-worthy** (copy back to the matching seed under `agents/`/`tools/`), or **undetermined** (ask the user).
+- Do not overwrite installed files from seeds without prompting, and do not commit local files wholesale.
+
+## General
+
+- Syntax-check every edited JS file: `node --check scripts/foo.js`.
+- Prefer the existing `shell.exec` helpers in `scripts/installers/` over new abstractions.
+- Only commit when explicitly asked.

@@ -157,7 +157,7 @@ Prompts let you pick which dotfiles to install. Existing files trigger an overwr
 | tmux.conf           | `tools/tmux.conf`         | `~/.tmux.conf`                                        |
 | vimrc               | `tools/vimrc`             | `~/.vimrc` (+ vim-plug, fzf, and ripgrep when selected) |
 | lf                  | `tools/lfrc`              | `~/.config/lf/lfrc` (Enter/l opens files in nvim; `q`, `:q`, or `exit` quits) |
-| Neovim              | `tools/nvim/init.lua`     | `~/.config/nvim/init.lua`                             |
+| Neovim              | `tools/nvim/init.lua`     | `~/.config/nvim/init.lua` (plugin setup bootstraps on first launch) |
 | wezterm (optional)  | `tools/wezterm.lua`       | `~/.config/wezterm/wezterm.lua`                       |
 
 ### Windows
@@ -168,7 +168,7 @@ Prompts let you pick which dotfiles to install. Existing files trigger an overwr
 | PowerShell profile  | `tools/powershell-profile.ps1` | `$PROFILE`                                             |
 | nvm                 | —                              | prepares `%LOCALAPPDATA%\nvm` for NVM for Windows      |
 | vimrc               | `tools/vimrc`                  | `%USERPROFILE%\.vimrc` (+ vim-plug, fzf, and ripgrep when selected) |
-| Neovim              | `tools/nvim/init.lua`          | `%LOCALAPPDATA%\nvim\init.lua`                        |
+| Neovim              | `tools/nvim/init.lua`          | `%LOCALAPPDATA%\nvim\init.lua` (plugin setup bootstraps on first launch) |
 | wezterm (optional)  | `tools/wezterm.lua`            | `%USERPROFILE%\.config\wezterm\wezterm.lua`           |
 
 ### Portable terminal workflow
@@ -178,6 +178,17 @@ pane navigation, resize keys, scrollback, and vi-style copy mode, so it works in
 macOS Terminal, iTerm2, Windows Terminal, WezTerm, and most remote shells. The
 `.vimrc` seed installs vim-plug and, when selected, symlinks vim to the Neovim
 keymap via fzf and ripgrep.
+
+The `init.lua` seed is plugin-based (via [lazy.nvim](https://lazy.folke.io)) with
+a Cursor-style workflow: tree-sitter highlighting themed with tokyonight-night
+(overridden to match opencode's ANSI rules: cyan types/operators, red builtins,
+yellow numbers, magenta italic keywords), Mason-installed LSP servers
+(TypeScript/Vue via `vtsls`, Terraform, YAML with GitHub Actions schemas, Python,
+JSON/CSS, Lua), nvim-cmp autocomplete with LuaSnip + friendly-snippets (React),
+Prettier/StyLua/terraform-fmt on save via conform, and TODO/FIXME highlighting.
+The first `nvim` launch needs git + network once to bootstrap plugins and LSP
+servers; after that it works offline. Update plugins with `:Lazy`, servers with
+`:MasonInstallAll`.
 
 WezTerm is offered as an **unchecked optional** devtool/config — install it when
 you want a consistent, Lua-configured terminal. If you don't install it, the same

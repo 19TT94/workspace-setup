@@ -134,6 +134,7 @@ workspace-setup/
     install.js             # Install orchestration and file-copy helpers
     platform.js            # OS detection and platform-specific menus
     dry-run.js             # Dry-run mode
+    audit-seeds.js         # Diff installed home files vs repo seeds (npm run audit)
     installers/
       brew.js              # macOS Homebrew installs
       winget.js            # Windows winget installs
@@ -153,17 +154,20 @@ Prompts let you pick which dotfiles to install. Existing files trigger an overwr
 | gitignore | generated         | `~/.gitignore` (`*.DS_Store`)                      |
 | zshrc     | `tools/zshrc`     | `~/.zshrc` (+ git shell completions in `~/.zsh/`)  |
 | nvm       | —                 | creates `~/.nvm`                                   |
-| tmux.conf | `tools/tmux.conf` | `~/.tmux.conf`                                     |
-| vimrc     | `tools/vimrc`     | `~/.vimrc` (+ pathogen and NERDTree when selected) |
+| tmux.conf | `tools/tmux.conf` | `~/.tmux.conf` |
+| wezterm   | `tools/wezterm.lua` | `~/.config/wezterm/wezterm.lua` |
+| lf        | `tools/lfrc`       | `~/.config/lf/lfrc` (Enter/l opens files in nvim; `q`, `:q`, or `exit` quits) |
+| vimrc     | `tools/vimrc`     | `~/.vimrc` (+ vim-plug, fzf, and ripgrep when selected) |
 
 ### Windows
 
 | Option             | Source                         | Target                                                       |
 | ------------------ | ------------------------------ | ------------------------------------------------------------ |
 | gitignore          | generated                      | `%USERPROFILE%\.gitignore` (`Thumbs.db`, `desktop.ini`, ...) |
-| PowerShell profile | `tools/powershell-profile.ps1` | `$PROFILE`                                                   |
-| nvm                | —                              | prepares `%LOCALAPPDATA%\nvm` for NVM for Windows            |
-| vimrc              | `tools/vimrc`                  | `%USERPROFILE%\.vimrc`                                       |
+| PowerShell profile | `tools/powershell-profile.ps1` | `$PROFILE` |
+| wezterm            | `tools/wezterm.lua`             | `%USERPROFILE%\.config\wezterm\wezterm.lua` |
+| nvm                | —                              | prepares `%LOCALAPPDATA%\nvm` for NVM for Windows          |
+| vimrc              | `tools/vimrc`                  | `%USERPROFILE%\.vimrc`                                     |
 
 ## AI agent starter files
 
@@ -185,19 +189,19 @@ Installed only when selected in the devtools checkbox. The installer checks whet
 
 ### macOS (Homebrew)
 
-`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `docker`, `github cli`
+`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `docker`, `github cli`, `fzf`, `ripgrep`
 
 `react` appears in the menu but has no install step yet.
 
 ### Windows (winget)
 
-`git`, `winget` (verification only), `node`, `php`, `python`, `starship`, `nvm-windows`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `docker` (CLI only), `github cli`
+`git`, `winget` (verification only), `node`, `php`, `python`, `starship`, `nvm-windows`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `docker` (CLI only), `github cli`, `wezterm`, `fzf`, `ripgrep`
 
 ## Desktop apps (macOS only)
 
 Installed via `brew install --cask` when selected:
 
-`virtualbox`, `vagrant`, `docker desktop`, `slack`, `atom`, `vscode`, `sublime text`, `sequel pro`, `postman`, `cyberduck`, `spotify`, `android studio`, `google chrome`, `firefox`, `brave`, `mark text`, `iterm2`
+`virtualbox`, `vagrant`, `docker desktop`, `slack`, `atom`, `vscode`, `sublime text`, `sequel pro`, `postman`, `cyberduck`, `spotify`, `android studio`, `google chrome`, `firefox`, `brave`, `mark text`, `wezterm`, `iterm2`
 
 ## After installation
 
@@ -240,6 +244,16 @@ npm run dry-run   # safe way to test prompt changes
 ```
 
 The global `setup` bin is registered in `package.json` and points at `index.js`.
+
+### Auditing local drift
+
+After a machine has been running for a while, its installed dotfiles and agent files may have been edited locally. Compare them against the repo seeds:
+
+```bash
+npm run audit       # or: node scripts/audit-seeds.js
+```
+
+The audit classifies each seeded file as `identical`, `DIFFERS` (local drift), `NOT INSTALLED`, or `LOCAL ONLY`. It is a read-only report — it never overwrites files. Use the `audit-local-config` skill in `.cursor/skills/` to decide which local changes belong back in `agents/` or `tools/`.
 
 ## Legacy scripts
 

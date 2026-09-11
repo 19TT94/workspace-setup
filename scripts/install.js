@@ -282,6 +282,23 @@ async function installTmuxConfig() {
     }
 }
 
+async function installWeztermConfig() {
+    await copyFileWithPrompt(
+        path.join(REPO_ROOT, 'tools/wezterm.lua'),
+        homePath('.config', 'wezterm', 'wezterm.lua'),
+        'wezterm.lua'
+    );
+}
+
+async function installLfConfig() {
+    ensureDir(homePath('.config', 'lf'));
+    await copyFileWithPrompt(
+        path.join(REPO_ROOT, 'tools/lfrc'),
+        homePath('.config', 'lf', 'lfrc'),
+        'lfrc'
+    );
+}
+
 async function installVimConfig() {
     if (await copyFileWithPrompt(
         path.join(REPO_ROOT, 'tools/vimrc'),
@@ -289,16 +306,13 @@ async function installVimConfig() {
         '.vimrc'
     )) {
         ensureDir(homePath('.vim', 'autoload'));
-        ensureDir(homePath('.vim', 'bundle'));
-        dryRunExec(`curl pathogen.vim -> ${homePath('.vim', 'autoload', 'pathogen.vim')}`);
+        dryRunExec(`curl vim-plug -> ${homePath('.vim', 'autoload', 'plug.vim')}`);
         if (!isDryRun()) {
-            shell.exec(`curl -LSso "${homePath('.vim', 'autoload', 'pathogen.vim')}" https://tpo.pe/pathogen.vim`);
+            shell.exec(`curl -fsSLo "${homePath('.vim', 'autoload', 'plug.vim')}" https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim`);
         }
-        if (!fs.existsSync(homePath('.vim', 'bundle', 'nerdtree'))) {
-            dryRunExec(`git clone nerdtree -> ${homePath('.vim', 'bundle', 'nerdtree')}`);
-            if (!isDryRun()) {
-                shell.exec(`git clone https://github.com/scrooloose/nerdtree.git "${homePath('.vim', 'bundle', 'nerdtree')}"`);
-            }
+        dryRunExec(`vim +PlugInstall`);
+        if (!isDryRun()) {
+            shell.exec(`vim -es -u "${homePath('.vimrc')}" -i NONE -c 'silent! PlugInstall --sync' -c qa`);
         }
     }
 }
@@ -332,6 +346,14 @@ async function install_config() {
 
         if (item === 'tmux.conf') {
             await installTmuxConfig();
+        }
+
+        if (item === 'wezterm') {
+            await installWeztermConfig();
+        }
+
+        if (item === 'lf') {
+            await installLfConfig();
         }
 
         if (item === 'vimrc') {
@@ -419,6 +441,7 @@ async function install_apps() {
                 { name: 'firefox', value: 'firefox', checked: true },
                 { name: 'brave', value: 'brave', checked: false },
                 { name: 'mark text', value: 'mark text', checked: false },
+                { name: 'wezterm', value: 'wezterm', checked: false },
                 { name: 'iterm2', value: 'iterm2', checked: false }
             ]
         }

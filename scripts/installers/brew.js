@@ -201,6 +201,28 @@ async function installSelectedDevtools(selected, helpers) {
                 exist
             });
         }
+
+        if (tool === 'fzf') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('fzf --version'),
+                install: () => shell.exec('brew install fzf'),
+                command: 'brew install fzf',
+                installed,
+                exist
+            });
+        }
+
+        if (tool === 'ripgrep') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('rg --version'),
+                install: () => shell.exec('brew install ripgrep'),
+                command: 'brew install ripgrep',
+                installed,
+                exist
+            });
+        }
     }
 
     logInstallSummary(installed, exist);
@@ -228,6 +250,7 @@ async function installSelectedApps(selected) {
         brave: 'brave-browser',
         'mark text': 'mark-text',
         '1password': '1password',
+        wezterm: 'wezterm',
         iterm2: 'iterm2'
     };
 

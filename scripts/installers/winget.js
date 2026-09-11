@@ -207,6 +207,39 @@ async function installSelectedDevtools(selected, helpers) {
                 exist
             });
         }
+
+        if (tool === 'wezterm') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('wezterm --version'),
+                install: () => wingetInstall('WezTerm.WezTerm'),
+                command: wingetCommand('WezTerm.WezTerm'),
+                installed,
+                exist
+            });
+        }
+
+        if (tool === 'fzf') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('fzf --version'),
+                install: () => wingetInstall('junegunn.Fzf'),
+                command: wingetCommand('junegunn.Fzf'),
+                installed,
+                exist
+            });
+        }
+
+        if (tool === 'ripgrep') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('rg --version'),
+                install: () => wingetInstall('BurntSushi.ripgrep.MSVC'),
+                command: wingetCommand('BurntSushi.ripgrep.MSVC'),
+                installed,
+                exist
+            });
+        }
     }
 
     logInstallSummary(installed, exist);

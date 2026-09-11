@@ -43,14 +43,13 @@ function getGitignoreEntries() {
 
 function getConfigChoices() {
     if (isWindows) {
-        return [
-            { name: 'gitignore', value: 'gitignore', checked: true },
-            { name: 'powershell profile', value: 'powershell profile', checked: true },
-            { name: 'nvm', value: 'nvm', checked: true },
-            { name: 'vimrc', value: 'vimrc', checked: true },
-            { name: 'pathogen', value: 'pathogen', checked: false },
-            { name: 'NERDTree', value: 'NERDTree', checked: false }
-        ];
+return [
+        { name: 'gitignore', value: 'gitignore', checked: true },
+        { name: 'powershell profile', value: 'powershell profile', checked: true },
+        { name: 'nvm', value: 'nvm', checked: true },
+        { name: 'vimrc', value: 'vimrc', checked: true },
+        { name: 'wezterm', value: 'wezterm', checked: false }
+    ];
     }
 
     return [
@@ -59,8 +58,8 @@ function getConfigChoices() {
         { name: 'nvm', value: 'nvm', checked: true },
         { name: 'tmux.conf', value: 'tmux.conf', checked: true },
         { name: 'vimrc', value: 'vimrc', checked: true },
-        { name: 'pathogen', value: 'pathogen', checked: false },
-        { name: 'NERDTree', value: 'NERDTree', checked: false }
+        { name: 'lf', value: 'lf', checked: true },
+        { name: 'wezterm', value: 'wezterm', checked: false }
     ];
 }
 
@@ -80,7 +79,10 @@ function getDevtoolChoices() {
             { name: 'vue', value: 'vue', checked: true },
             { name: 'laravel', value: 'laravel', checked: true },
             { name: 'docker', value: 'docker', checked: true },
-            { name: 'github cli', value: 'github cli', checked: true }
+            { name: 'github cli', value: 'github cli', checked: true },
+            { name: 'fzf', value: 'fzf', checked: true },
+            { name: 'ripgrep', value: 'ripgrep', checked: true },
+            { name: 'wezterm', value: 'wezterm', checked: false }
         ];
     }
 
@@ -101,7 +103,9 @@ function getDevtoolChoices() {
         { name: 'laravel', value: 'laravel', checked: true },
         { name: 'tmux', value: 'tmux', checked: true },
         { name: 'docker', value: 'docker', checked: true },
-        { name: 'github cli', value: 'github cli', checked: true }
+        { name: 'github cli', value: 'github cli', checked: true },
+        { name: 'fzf', value: 'fzf', checked: true },
+        { name: 'ripgrep', value: 'ripgrep', checked: true }
     ];
 }
 

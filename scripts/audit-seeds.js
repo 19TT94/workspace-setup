@@ -228,6 +228,7 @@ function audit() {
         { label: '.tmux.conf', seed: 'tools/tmux.conf', target: () => homePath('.tmux.conf'), platforms: ['darwin'] },
         { label: 'wezterm.lua', seed: 'tools/wezterm.lua', target: () => homePath('.config', 'wezterm', 'wezterm.lua'), platforms: ['darwin', 'win32'] },
         { label: '.vimrc', seed: 'tools/vimrc', target: () => homePath('.vimrc'), platforms: ['darwin', 'win32'] },
+        { label: 'nvim init.lua', seed: 'tools/nvim/init.lua', target: () => isWindows ? path.join(process.env.LOCALAPPDATA || homePath('AppData', 'Local'), 'nvim', 'init.lua') : homePath('.config', 'nvim', 'init.lua'), platforms: ['darwin', 'win32'] },
         { label: 'lfrc', seed: 'tools/lfrc', target: () => homePath('.config', 'lf', 'lfrc'), platforms: ['darwin'] }
     ];
 

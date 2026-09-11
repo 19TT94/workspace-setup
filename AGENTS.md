@@ -45,6 +45,7 @@ Never add repo-dev rules under `agents/` — that would push them into every use
 | `tools/wezterm.lua` | `~/.config/wezterm/wezterm.lua` |
 | `tools/lfrc` | `~/.config/lf/lfrc` |
 | `tools/vimrc` | `~/.vimrc` |
+| `tools/nvim/init.lua` | `~/.config/nvim/init.lua` (macOS) / `%LOCALAPPDATA%\nvim\init.lua` (Windows) |
 | `agents/cursor/rules/` (dir) | `~/.cursor/rules/` |
 | `agents/cursor/README.md` | `~/.cursor/rules/README.md` |
 | `agents/codex/AGENTS.md` | `~/.codex/AGENTS.md` |

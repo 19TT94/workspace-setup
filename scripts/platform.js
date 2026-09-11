@@ -34,6 +34,17 @@ function getShellConfigPath() {
     return homePath('.zshrc');
 }
 
+function getNeovimConfigPath() {
+    if (isWindows) {
+        return path.join(process.env.LOCALAPPDATA || homePath('AppData', 'Local'), 'nvim', 'init.lua');
+    }
+    return homePath('.config', 'nvim', 'init.lua');
+}
+
+function getWezTermConfigPath() {
+    return homePath('.wezterm.lua');
+}
+
 function getGitignoreEntries() {
     if (isWindows) {
         return ['Thumbs.db', 'desktop.ini', 'ehthumbs.db'];
@@ -43,13 +54,14 @@ function getGitignoreEntries() {
 
 function getConfigChoices() {
     if (isWindows) {
-return [
-        { name: 'gitignore', value: 'gitignore', checked: true },
-        { name: 'powershell profile', value: 'powershell profile', checked: true },
-        { name: 'nvm', value: 'nvm', checked: true },
-        { name: 'vimrc', value: 'vimrc', checked: true },
-        { name: 'wezterm', value: 'wezterm', checked: false }
-    ];
+        return [
+            { name: 'gitignore', value: 'gitignore', checked: true },
+            { name: 'powershell profile', value: 'powershell profile', checked: true },
+            { name: 'nvm', value: 'nvm', checked: true },
+            { name: 'vimrc', value: 'vimrc', checked: true },
+            { name: 'neovim config', value: 'neovim config', checked: true },
+            { name: 'wezterm config (optional)', value: 'wezterm config', checked: false }
+        ];
     }
 
     return [
@@ -59,7 +71,8 @@ return [
         { name: 'tmux.conf', value: 'tmux.conf', checked: true },
         { name: 'vimrc', value: 'vimrc', checked: true },
         { name: 'lf', value: 'lf', checked: true },
-        { name: 'wezterm', value: 'wezterm', checked: false }
+        { name: 'neovim config', value: 'neovim config', checked: true },
+        { name: 'wezterm config (optional)', value: 'wezterm config', checked: false }
     ];
 }
 
@@ -71,6 +84,8 @@ function getDevtoolChoices() {
             { name: 'node', value: 'node', checked: true },
             { name: 'php', value: 'php', checked: true },
             { name: 'python', value: 'python', checked: true },
+            { name: 'neovim', value: 'neovim', checked: true },
+            { name: 'wezterm (optional terminal)', value: 'wezterm', checked: false },
             { name: 'starship', value: 'starship', checked: true },
             { name: 'nvm-windows', value: 'nvm-windows', checked: true },
             { name: 'npm', value: 'npm', checked: true },
@@ -82,7 +97,9 @@ function getDevtoolChoices() {
             { name: 'github cli', value: 'github cli', checked: true },
             { name: 'fzf', value: 'fzf', checked: true },
             { name: 'ripgrep', value: 'ripgrep', checked: true },
-            { name: 'wezterm', value: 'wezterm', checked: false }
+            { name: 'claude code (optional CLI)', value: 'claude code', checked: false },
+            { name: 'opencode (optional CLI)', value: 'opencode', checked: false },
+            { name: 'codex (optional CLI)', value: 'codex', checked: false }
         ];
     }
 
@@ -93,6 +110,8 @@ function getDevtoolChoices() {
         { name: 'node', value: 'node', checked: true },
         { name: 'php', value: 'php', checked: true },
         { name: 'python', value: 'python', checked: true },
+        { name: 'neovim', value: 'neovim', checked: true },
+        { name: 'wezterm (optional terminal)', value: 'wezterm', checked: false },
         { name: 'starship', value: 'starship', checked: true },
         { name: 'nvm', value: 'nvm', checked: true },
         { name: 'npm', value: 'npm', checked: true },
@@ -105,7 +124,10 @@ function getDevtoolChoices() {
         { name: 'docker', value: 'docker', checked: true },
         { name: 'github cli', value: 'github cli', checked: true },
         { name: 'fzf', value: 'fzf', checked: true },
-        { name: 'ripgrep', value: 'ripgrep', checked: true }
+        { name: 'ripgrep', value: 'ripgrep', checked: true },
+        { name: 'claude code (optional CLI)', value: 'claude code', checked: false },
+        { name: 'opencode (optional CLI)', value: 'opencode', checked: false },
+        { name: 'codex (optional CLI)', value: 'codex', checked: false }
     ];
 }
 
@@ -253,6 +275,8 @@ module.exports = {
     displayHome,
     getPowerShellProfilePath,
     getShellConfigPath,
+    getNeovimConfigPath,
+    getWezTermConfigPath,
     getGitignoreEntries,
     getConfigChoices,
     getDevtoolChoices,

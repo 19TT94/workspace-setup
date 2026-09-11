@@ -15,6 +15,23 @@ function exec(command, options = {}) {
     }
 }
 
+function execCapture(command) {
+    try {
+        const stdout = execSync(command, {
+            encoding: 'utf8',
+            shell: true,
+            stdio: ['pipe', 'pipe', 'pipe']
+        });
+        return { code: 0, stdout: stdout || '', stderr: '' };
+    } catch (error) {
+        return {
+            code: error.status ?? 1,
+            stdout: error.stdout ? error.stdout.toString() : '',
+            stderr: error.stderr ? error.stderr.toString() : ''
+        };
+    }
+}
+
 function mkdir(...args) {
     const dir = args[0] === '-p' ? args[1] : args[0];
 
@@ -70,6 +87,7 @@ function ShellString(content) {
 
 module.exports = {
     exec,
+    execCapture,
     mkdir,
     cp,
     rm,

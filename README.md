@@ -10,7 +10,7 @@ This repository is a **starting template for organization developer onboarding**
 
 Fork it for you or your team, then customize the seed files and install lists to match how your org works:
 
-- **`tools/`** — shell profiles, editor config, and other dotfiles every developer should get
+- **`tools/`** — shell profiles, Vim/Neovim config, terminal config, and other dotfiles every developer should get
 - **`agents/`** — global Cursor, Codex, and Claude rules and skills that reflect your coding standards
 - **`scripts/install.js`** and **`scripts/installers/`** — which devtools and apps are offered during setup
 
@@ -129,7 +129,7 @@ workspace-setup/
   index.js                 # CLI entry point
   run.sh / run.ps1         # Platform bootstrap scripts
   agents/                  # AI agent starter files (Cursor, Codex, Claude)
-  tools/                   # Dotfile templates (zshrc, vimrc, starship, PowerShell profile, ...)
+  tools/                   # Dotfile templates (zshrc, vimrc, nvim/, wezterm.lua, starship, ...)
   scripts/
     install.js             # Install orchestration and file-copy helpers
     platform.js            # OS detection and platform-specific menus
@@ -154,20 +154,34 @@ Prompts let you pick which dotfiles to install. Existing files trigger an overwr
 | gitignore | generated         | `~/.gitignore` (`*.DS_Store`)                      |
 | zshrc     | `tools/zshrc`     | `~/.zshrc` (+ git shell completions in `~/.zsh/`)  |
 | nvm       | —                 | creates `~/.nvm`                                   |
-| tmux.conf | `tools/tmux.conf` | `~/.tmux.conf` |
-| wezterm   | `tools/wezterm.lua` | `~/.config/wezterm/wezterm.lua` |
-| lf        | `tools/lfrc`       | `~/.config/lf/lfrc` (Enter/l opens files in nvim; `q`, `:q`, or `exit` quits) |
-| vimrc     | `tools/vimrc`     | `~/.vimrc` (+ vim-plug, fzf, and ripgrep when selected) |
+| tmux.conf           | `tools/tmux.conf`         | `~/.tmux.conf`                                        |
+| vimrc               | `tools/vimrc`             | `~/.vimrc` (+ vim-plug, fzf, and ripgrep when selected) |
+| lf                  | `tools/lfrc`              | `~/.config/lf/lfrc` (Enter/l opens files in nvim; `q`, `:q`, or `exit` quits) |
+| Neovim              | `tools/nvim/init.lua`     | `~/.config/nvim/init.lua`                             |
+| wezterm (optional)  | `tools/wezterm.lua`       | `~/.config/wezterm/wezterm.lua`                       |
 
 ### Windows
 
 | Option             | Source                         | Target                                                       |
 | ------------------ | ------------------------------ | ------------------------------------------------------------ |
 | gitignore          | generated                      | `%USERPROFILE%\.gitignore` (`Thumbs.db`, `desktop.ini`, ...) |
-| PowerShell profile | `tools/powershell-profile.ps1` | `$PROFILE` |
-| wezterm            | `tools/wezterm.lua`             | `%USERPROFILE%\.config\wezterm\wezterm.lua` |
-| nvm                | —                              | prepares `%LOCALAPPDATA%\nvm` for NVM for Windows          |
-| vimrc              | `tools/vimrc`                  | `%USERPROFILE%\.vimrc`                                     |
+| PowerShell profile  | `tools/powershell-profile.ps1` | `$PROFILE`                                             |
+| nvm                 | —                              | prepares `%LOCALAPPDATA%\nvm` for NVM for Windows      |
+| vimrc               | `tools/vimrc`                  | `%USERPROFILE%\.vimrc` (+ vim-plug, fzf, and ripgrep when selected) |
+| Neovim              | `tools/nvim/init.lua`          | `%LOCALAPPDATA%\nvim\init.lua`                        |
+| wezterm (optional)  | `tools/wezterm.lua`            | `%USERPROFILE%\.config\wezterm\wezterm.lua`           |
+
+### Portable terminal workflow
+
+The portable workflow is **Neovim + tmux**. The included tmux configuration owns
+pane navigation, resize keys, scrollback, and vi-style copy mode, so it works in
+macOS Terminal, iTerm2, Windows Terminal, WezTerm, and most remote shells. The
+`.vimrc` seed installs vim-plug and, when selected, symlinks vim to the Neovim
+keymap via fzf and ripgrep.
+
+WezTerm is offered as an **unchecked optional** devtool/config — install it when
+you want a consistent, Lua-configured terminal. If you don't install it, the same
+tmux and Neovim workflow works in the built-in terminal.
 
 ## AI agent starter files
 
@@ -189,13 +203,23 @@ Installed only when selected in the devtools checkbox. The installer checks whet
 
 ### macOS (Homebrew)
 
-`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `docker`, `github cli`, `fzf`, `ripgrep`
+`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `neovim`, `wezterm` (optional), `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `docker`, `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional)
 
 `react` appears in the menu but has no install step yet.
 
 ### Windows (winget)
 
-`git`, `winget` (verification only), `node`, `php`, `python`, `starship`, `nvm-windows`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `docker` (CLI only), `github cli`, `wezterm`, `fzf`, `ripgrep`
+`git`, `winget` (verification only), `node`, `php`, `python`, `neovim`, `wezterm` (optional), `starship`, `nvm-windows`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `docker` (CLI only), `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional)
+
+Optional AI CLIs are unchecked by default:
+
+| Tool | macOS | Windows |
+| ---- | ----- | ------- |
+| Claude Code | `brew install --cask claude-code` | `winget` `Anthropic.ClaudeCode` |
+| OpenCode | `brew install anomalyco/tap/opencode` | `npm install -g opencode-ai` |
+| Codex | `brew install --cask codex` | `npm install -g @openai/codex` |
+
+Starter config files under `agents/` are still a separate install flow from installing these CLIs.
 
 ## Desktop apps (macOS only)
 

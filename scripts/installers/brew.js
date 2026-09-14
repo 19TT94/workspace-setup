@@ -285,6 +285,17 @@ async function installSelectedDevtools(selected, helpers) {
                 exist
             });
         }
+
+        if (tool === 'cursor') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('cursor-agent --version'),
+                install: () => shell.exec('brew install --cask cursor-cli'),
+                command: 'brew install --cask cursor-cli',
+                installed,
+                exist
+            });
+        }
     }
 
     logInstallSummary(installed, exist);

@@ -284,6 +284,17 @@ async function installSelectedDevtools(selected, helpers) {
                 exist
             });
         }
+
+        if (tool === 'cursor') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('agent --version'),
+                install: () => shell.exec('powershell -NoProfile -Command "irm \'https://cursor.com/install?win32=true\' | iex"'),
+                command: "powershell -NoProfile -Command \"irm 'https://cursor.com/install?win32=true' | iex\"",
+                installed,
+                exist
+            });
+        }
     }
 
     logInstallSummary(installed, exist);

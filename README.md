@@ -214,13 +214,13 @@ Installed only when selected in the devtools checkbox. The installer checks whet
 
 ### macOS (Homebrew)
 
-`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `neovim`, `wezterm` (optional), `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `docker`, `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional)
+`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `neovim`, `wezterm` (optional), `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `docker`, `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional), `cursor` (optional)
 
 `react` appears in the menu but has no install step yet.
 
 ### Windows (winget)
 
-`git`, `winget` (verification only), `node`, `php`, `python`, `neovim`, `wezterm` (optional), `starship`, `nvm-windows`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `docker` (CLI only), `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional)
+`git`, `winget` (verification only), `node`, `php`, `python`, `neovim`, `wezterm` (optional), `starship`, `nvm-windows`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `docker` (CLI only), `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional), `cursor` (optional)
 
 Optional AI CLIs are unchecked by default:
 
@@ -229,6 +229,7 @@ Optional AI CLIs are unchecked by default:
 | Claude Code | `brew install --cask claude-code` | `winget` `Anthropic.ClaudeCode` |
 | OpenCode | `brew install anomalyco/tap/opencode` | `npm install -g opencode-ai` |
 | Codex | `brew install --cask codex` | `npm install -g @openai/codex` |
+| Cursor CLI | `brew install --cask cursor-cli` | `powershell -NoProfile -Command "irm 'https://cursor.com/install?win32=true' \| iex"` |
 
 Starter config files under `agents/` are still a separate install flow from installing these CLIs.
 

@@ -99,7 +99,8 @@ function getDevtoolChoices() {
             { name: 'ripgrep', value: 'ripgrep', checked: true },
             { name: 'claude code (optional CLI)', value: 'claude code', checked: false },
             { name: 'opencode (optional CLI)', value: 'opencode', checked: false },
-            { name: 'codex (optional CLI)', value: 'codex', checked: false }
+            { name: 'codex (optional CLI)', value: 'codex', checked: false },
+            { name: 'cursor (optional CLI)', value: 'cursor', checked: false }
         ];
     }
 
@@ -127,7 +128,8 @@ function getDevtoolChoices() {
         { name: 'ripgrep', value: 'ripgrep', checked: true },
         { name: 'claude code (optional CLI)', value: 'claude code', checked: false },
         { name: 'opencode (optional CLI)', value: 'opencode', checked: false },
-        { name: 'codex (optional CLI)', value: 'codex', checked: false }
+        { name: 'codex (optional CLI)', value: 'codex', checked: false },
+        { name: 'cursor (optional CLI)', value: 'cursor', checked: false }
     ];
 }
 

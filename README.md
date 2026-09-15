@@ -157,6 +157,7 @@ Prompts let you pick which dotfiles to install. Existing files trigger an overwr
 | tmux.conf           | `tools/tmux.conf`         | `~/.tmux.conf`                                        |
 | vimrc               | `tools/vimrc`             | `~/.vimrc` (+ vim-plug, fzf, and ripgrep when selected) |
 | lf                  | `tools/lfrc`              | `~/.config/lf/lfrc` (Enter/l opens files in nvim; `q`, `:q`, or `exit` quits) |
+| hints               | `tools/hints.md`          | `~/.config/shell/hints.md` (open with `hint`; `rfind` searches this dir) |
 | Neovim              | `tools/nvim/init.lua`     | `~/.config/nvim/init.lua` (plugin setup bootstraps on first launch) |
 | wezterm (optional)  | `tools/wezterm.lua`       | `~/.config/wezterm/wezterm.lua`                       |
 
@@ -169,6 +170,7 @@ Prompts let you pick which dotfiles to install. Existing files trigger an overwr
 | nvm                 | —                              | prepares `%LOCALAPPDATA%\nvm` for NVM for Windows      |
 | vimrc               | `tools/vimrc`                  | `%USERPROFILE%\.vimrc` (+ vim-plug, fzf, and ripgrep when selected) |
 | Neovim              | `tools/nvim/init.lua`          | `%LOCALAPPDATA%\nvim\init.lua` (plugin setup bootstraps on first launch) |
+| hints               | `tools/hints.md`               | `%USERPROFILE%\.config\shell\hints.md`                                  |
 | wezterm (optional)  | `tools/wezterm.lua`            | `%USERPROFILE%\.config\wezterm\wezterm.lua`           |
 
 ### Portable terminal workflow

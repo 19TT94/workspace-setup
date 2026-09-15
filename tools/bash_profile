@@ -36,10 +36,11 @@ fzf-open() {
 bind -x '"\C-p": fzf-open'    # Ctrl+P opens fzf (WezTerm Cmd+P sends it)
 
 # lf: minimal file manager; lfcd lets `cd` work on quit (needs: brew install lf)
+# `command lf` avoids infinite recursion if `lf` is aliased to lfcd.
 lfcd() {
   local tmp dir
   tmp="$(mktemp)"
-  lf -last-dir-path="$tmp" "$@"
+  command lf -last-dir-path="$tmp" "$@"
   if [ -f "$tmp" ]; then
     dir="$(cat "$tmp")"
     rm -f "$tmp"
@@ -47,3 +48,32 @@ lfcd() {
   fi
 }
 alias sf=lfcd
+alias lf=lfcd
+
+# hint: open your personal tool/alias cheat sheet in the editor (edit ~/.config/shell/hints.md)
+HINTS_FILE="$HOME/.config/shell/hints.md"
+hint() {
+    if [ ! -f "$HINTS_FILE" ]; then
+        echo "No hints file yet - create $HINTS_FILE"
+        return 1
+    fi
+    "${EDITOR:-vim}" "$HINTS_FILE"
+}
+
+# rfind: global text search in the current directory (needs: ripgrep + fzf).
+#   rfind <term>  -> search for <term> now, pick a match to open at that line
+#   rfind         -> live search: type to filter matches across the whole tree
+rfind() {
+    local query="$*"
+    local pick
+    local preview='p=$(echo {} | cut -d: -f1); l=$(echo {} | cut -d: -f2); if command -v bat >/dev/null 2>&1; then bat --style=numbers --color=always --line-range="$((l-5)):$((l+5))" --paging=never "$p" 2>/dev/null; else sed -n "$((l-5)),$((l+5))p" "$p" 2>/dev/null; fi'
+    if [ -n "$query" ]; then
+        pick=$(rg -i --hidden --follow -g '!*/.git/*' --line-number -e "$query" \
+            | fzf --height 80% --layout reverse --border --preview-window 'right:50%:wrap' --preview "$preview")
+    else
+        pick=$(fzf --height 80% --layout reverse --border \
+            --preview-window 'right:50%:wrap' --preview "$preview" \
+            --bind 'change:reload:rg -i --hidden --follow -g "!*/.git/*" --line-number {q} || true')
+    fi
+    [ -n "$pick" ] && "${EDITOR:-nvim}" "+$(echo "$pick" | cut -d: -f2)" "$(echo "$pick" | cut -d: -f1)"
+}

@@ -60,6 +60,7 @@ function getConfigChoices() {
             { name: 'nvm', value: 'nvm', checked: true },
             { name: 'vimrc', value: 'vimrc', checked: true },
             { name: 'neovim config', value: 'neovim config', checked: true },
+            { name: 'hints', value: 'hints', checked: true },
             { name: 'wezterm config (optional)', value: 'wezterm config', checked: false }
         ];
     }
@@ -71,6 +72,7 @@ function getConfigChoices() {
         { name: 'tmux.conf', value: 'tmux.conf', checked: true },
         { name: 'vimrc', value: 'vimrc', checked: true },
         { name: 'lf', value: 'lf', checked: true },
+        { name: 'hints', value: 'hints', checked: true },
         { name: 'neovim config', value: 'neovim config', checked: true },
         { name: 'wezterm config (optional)', value: 'wezterm config', checked: false }
     ];

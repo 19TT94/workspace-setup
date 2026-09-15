@@ -370,6 +370,15 @@ async function installLfConfig() {
     );
 }
 
+async function installHintsConfig() {
+    ensureDir(homePath('.config', 'shell'));
+    await copyFileWithPrompt(
+        path.join(REPO_ROOT, 'tools/hints.md'),
+        homePath('.config', 'shell', 'hints.md'),
+        'hints.md'
+    );
+}
+
 async function installVimConfig() {
     if (await copyFileWithPrompt(
         path.join(REPO_ROOT, 'tools/vimrc'),
@@ -429,6 +438,10 @@ async function install_config() {
 
         if (item === 'lf') {
             await installLfConfig();
+        }
+
+        if (item === 'hints') {
+            await installHintsConfig();
         }
 
         if (item === 'vimrc') {

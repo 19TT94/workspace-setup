@@ -237,7 +237,7 @@ Starter config files under `agents/` are still a separate install flow from inst
 
 Installed via `brew install --cask` when selected:
 
-`virtualbox`, `vagrant`, `docker desktop`, `slack`, `atom`, `vscode`, `sublime text`, `sequel pro`, `postman`, `cyberduck`, `spotify`, `android studio`, `google chrome`, `firefox`, `brave`, `mark text`, `wezterm`, `iterm2`
+`virtualbox`, `vagrant`, `docker desktop`, `slack`, `atom`, `vscode`, `sublime text`, `sequel pro`, `beekeeper studio`, `postman`, `cyberduck`, `spotify`, `android studio`, `google chrome`, `firefox`, `brave`, `mark text`, `wezterm`, `iterm2`
 
 ## After installation
 

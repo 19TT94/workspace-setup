@@ -253,7 +253,7 @@ function getInstallChoices() {
             value: 'devtools'
         },
         {
-            name: 'Install apps only (slack, vscode, sequel-pro ...)',
+            name: 'Install apps only (slack, vscode, sequel-pro, beekeeper studio ...)',
             value: 'apps'
         },
         {

@@ -303,6 +303,7 @@ async function installSelectedApps(selected) {
         vscode: 'visual-studio-code',
         'sublime text': 'sublime-text',
         'sequel pro': 'sequel-pro',
+        'beekeeper studio': 'beekeeper-studio',
         postman: 'postman',
         cyberduck: 'cyberduck',
         spotify: 'spotify',

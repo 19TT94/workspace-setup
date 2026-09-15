@@ -516,6 +516,7 @@ async function install_apps() {
                 { name: 'vscode', value: 'vscode', checked: true },
                 { name: 'sublime text', value: 'sublime text', checked: false },
                 { name: 'sequel pro', value: 'sequel pro', checked: true },
+                { name: 'beekeeper studio', value: 'beekeeper studio', checked: false },
                 { name: 'postman', value: 'postman', checked: true },
                 { name: 'cyberduck', value: 'cyberduck', checked: true },
                 { name: 'spotify', value: 'spotify', checked: true },

@@ -236,9 +236,11 @@ function audit() {
     const agentSeeds = [
         { label: 'Cursor rules', seed: 'agents/cursor/rules', target: () => homePath('.cursor', 'rules'), dir: true },
         { label: 'cursor README', seed: 'agents/cursor/README.md', target: () => homePath('.cursor', 'rules', 'README.md') },
+        { label: 'cursor skills', seed: 'agents/cursor/skills', target: () => homePath('.cursor', 'skills'), dir: true },
         { label: 'codex AGENTS.md', seed: 'agents/codex/AGENTS.md', target: () => homePath('.codex', 'AGENTS.md') },
         { label: 'codex skills', seed: 'agents/codex/skills', target: () => homePath('.codex', 'skills'), dir: true, ignoreTargetTopDirs: ['.system'] },
-        { label: 'claude CLAUDE.md', seed: 'agents/claude/CLAUDE.md', target: () => homePath('.claude', 'CLAUDE.md') }
+        { label: 'claude CLAUDE.md', seed: 'agents/claude/CLAUDE.md', target: () => homePath('.claude', 'CLAUDE.md') },
+        { label: 'claude skills', seed: 'agents/claude/skills', target: () => homePath('.claude', 'skills'), dir: true }
     ];
 
     const platform = isWindows ? 'win32' : 'darwin';

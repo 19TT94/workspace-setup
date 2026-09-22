@@ -7,6 +7,17 @@ These preferences apply to every project unless overridden by a repository `CLAU
 - Match existing naming, structure, and tooling in the repo
 - Run relevant tests or syntax checks when available
 
+## Global skills
+
+Seeded to `~/.claude/skills/` (see `agents/claude/skills/`):
+
+| Skill | Purpose |
+| --- | --- |
+| `pr-prepare` | Draft PR title/body from the default or repo template; CLI/IDE copy handoff |
+| `feature-planning` | Triage work and draft concise (or full) tickets |
+
+Default PR body: `skills/pr-prepare/pull_request_template.md`. Configure ticket key / tracker URL in `skills/feature-planning/reference.md`.
+
 ## GitHub issue access
 
 When asked to implement or select a GitHub issue:

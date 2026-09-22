@@ -59,9 +59,11 @@ Workspace-setup is a template: `agents/` and `tools/` are seeds that the install
 | `tools/vimrc` | `~/.vimrc` |
 | `agents/cursor/rules/` (dir) | `~/.cursor/rules/` |
 | `agents/cursor/README.md` | `~/.cursor/rules/README.md` |
+| `agents/cursor/skills/` (dir) | `~/.cursor/skills/` |
 | `agents/codex/AGENTS.md` | `~/.codex/AGENTS.md` |
 | `agents/codex/skills/` (dir) | `~/.codex/skills/` |
 | `agents/claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
+| `agents/claude/skills/` (dir) | `~/.claude/skills/` |
 
 Not seed-backed (not audited as diffs): `~/.gitignore` is generated; `~/.nvm` and `~/.zsh/` git completions are created/downloaded; `~/.codex/skills/.system/` is Codex built-in content.
 

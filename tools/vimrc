@@ -26,6 +26,9 @@ if glob('~/.vim/autoload/plug.vim') != ''
     Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
     " :Files fuzzy file finder, :Rg grep via ripgrep
     Plug 'junegunn/fzf.vim'
+    " JS + React/JSX syntax highlighting (vim-jsx-pretty must load after the JS plugin)
+    Plug 'pangloss/vim-javascript'
+    Plug 'MaxMEllon/vim-jsx-pretty'
     call plug#end()
 
     " Ctrl+p: file explorer, <Leader>r: grep

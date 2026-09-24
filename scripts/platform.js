@@ -45,6 +45,20 @@ function getWezTermConfigPath() {
     return homePath('.wezterm.lua');
 }
 
+function getVSCodeSettingsPath() {
+    if (isWindows) {
+        return path.join(process.env.APPDATA || homePath('AppData', 'Roaming'), 'Code', 'User', 'settings.json');
+    }
+    return homePath('Library', 'Application Support', 'Code', 'User', 'settings.json');
+}
+
+function getCursorSettingsPath() {
+    if (isWindows) {
+        return path.join(process.env.APPDATA || homePath('AppData', 'Roaming'), 'Cursor', 'User', 'settings.json');
+    }
+    return homePath('Library', 'Application Support', 'Cursor', 'User', 'settings.json');
+}
+
 function getGitignoreEntries() {
     if (isWindows) {
         return ['Thumbs.db', 'desktop.ini', 'ehthumbs.db'];
@@ -61,6 +75,8 @@ function getConfigChoices() {
             { name: 'vimrc', value: 'vimrc', checked: true },
             { name: 'neovim config', value: 'neovim config', checked: true },
             { name: 'hints', value: 'hints', checked: true },
+            { name: 'vscode settings', value: 'vscode settings', checked: true },
+            { name: 'cursor settings', value: 'cursor settings', checked: true },
             { name: 'wezterm config (optional)', value: 'wezterm config', checked: false }
         ];
     }
@@ -74,6 +90,8 @@ function getConfigChoices() {
         { name: 'lf', value: 'lf', checked: true },
         { name: 'hints', value: 'hints', checked: true },
         { name: 'neovim config', value: 'neovim config', checked: true },
+        { name: 'vscode settings', value: 'vscode settings', checked: true },
+        { name: 'cursor settings', value: 'cursor settings', checked: true },
         { name: 'wezterm config (optional)', value: 'wezterm config', checked: false }
     ];
 }
@@ -281,6 +299,8 @@ module.exports = {
     getShellConfigPath,
     getNeovimConfigPath,
     getWezTermConfigPath,
+    getVSCodeSettingsPath,
+    getCursorSettingsPath,
     getGitignoreEntries,
     getConfigChoices,
     getDevtoolChoices,

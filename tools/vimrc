@@ -1,6 +1,34 @@
 syntax on
 filetype plugin indent on
 
+" Cursor Dark palette (matches tools/wezterm.lua and the editors' Cursor Dark theme)
+set background=dark
+hi Comment        guifg=#989898 ctermfg=245 gui=italic cterm=italic
+hi String         guifg=#e394dc ctermfg=213
+hi Keyword        guifg=#82D2CE ctermfg=80
+hi Statement      guifg=#82D2CE ctermfg=80
+hi Identifier     guifg=#87C3FF ctermfg=117
+hi Function       guifg=#efb080 ctermfg=179
+hi Type           guifg=#efb080 ctermfg=179
+hi Number         guifg=#ebc88d ctermfg=222
+hi Constant       guifg=#AAA0FA ctermfg=141
+hi Boolean        guifg=#82D2CE ctermfg=80
+hi Operator       guifg=#d6d6dd ctermfg=253
+hi PreProc        guifg=#82D2CE ctermfg=80
+hi LineNr         guifg=#666666 ctermfg=242
+hi CursorLineNr   guifg=#F0F0F0 ctermfg=255
+hi CursorLine     guibg=#262626 ctermbg=236
+hi SignColumn     guibg=NONE ctermbg=NONE
+hi Visual         guibg=#3a3a3a ctermbg=237
+hi Search         guibg=#404040 guifg=#F0F0F0 ctermbg=238 ctermfg=255
+hi StatusLine     guibg=#141414 guifg=#F0F0F0 ctermbg=233 ctermfg=255
+hi StatusLineNC   guibg=#141414 guifg=#989898 ctermbg=233 ctermfg=245
+hi TabLine        guibg=#141414 guifg=#989898 ctermbg=233 ctermfg=245
+hi TabLineSel     guibg=#181818 guifg=#F0F0F0 ctermbg=234 ctermfg=255
+hi TabLineFill    guibg=#141414 ctermbg=233
+hi Pmenu          guibg=#141414 guifg=#d6d6dd ctermbg=233 ctermfg=253
+hi PmenuSel       guibg=#3a3a3a guifg=#F0F0F0 ctermbg=237 ctermfg=255
+
 " Quit helpers: :q is the default; :exit behaves the same
 cnoreabbrev exit q
 

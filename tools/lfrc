@@ -1,5 +1,32 @@
-cmd open $nvim "$f"
+# Enter: new WezTerm/tmux tab (dirs: quit into that dir)
+# l: open in current pane (dirs: enter directory)
+map <enter> open-tab
+map l open-here
+
 cmd q quit
 cmd exit quit
 
-map <enter> open
+cmd open-here ${{
+  if [ -d "$f" ]; then
+    lf -remote "send $id cd \"$f\""
+  else
+    ${EDITOR:-nvim} "$f"
+  fi
+}}
+
+cmd open-tab ${{
+  if [ -d "$f" ]; then
+    lf -remote "send $id cd \"$f\""
+    lf -remote "send $id quit"
+  else
+    title="$(basename "$f")"
+    if [ -n "${WEZTERM_PANE:-}" ] && command -v wezterm >/dev/null 2>&1; then
+      pane=$(wezterm cli spawn -- ${EDITOR:-nvim} "$f")
+      wezterm cli set-tab-title "$title" --pane-id "$pane"
+    elif [ -n "${TMUX:-}" ] && command -v tmux >/dev/null 2>&1; then
+      tmux new-window -n "$title" -- ${EDITOR:-nvim} "$f"
+    else
+      ${EDITOR:-nvim} -p -- "$f"
+    fi
+  fi
+}}

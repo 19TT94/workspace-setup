@@ -63,14 +63,81 @@ require("lazy").setup({
   },
 
   {
+    "nvim-tree/nvim-web-devicons",
+    lazy = true,
+  },
+
+  {
+    "akinsho/bufferline.nvim",
+    version = "*",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    event = "VeryLazy",
+    config = function()
+      vim.opt.showtabline = 2
+      require("bufferline").setup({
+        options = {
+          -- gopen / nvim -p use real vim tab pages
+          mode = "tabs",
+          numbers = "ordinal",
+          diagnostics = "nvim_lsp",
+          always_show_bufferline = true,
+          show_close_icon = false,
+          show_buffer_close_icons = false,
+          separator_style = "slant",
+          max_name_length = 28,
+          tab_size = 18,
+          color_icons = true,
+          show_tab_indicators = true,
+        },
+      })
+    end,
+  },
+
+  {
+    "numToStr/Comment.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("Comment").setup()
+      local api = require("Comment.api")
+      -- Ctrl+/ (terminals often send <C-_>); WezTerm maps Cmd+/ → Ctrl+/
+      local function toggle_line()
+        api.toggle.linewise.current()
+      end
+      local function toggle_visual()
+        local esc = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+        vim.api.nvim_feedkeys(esc, "nx", false)
+        api.toggle.linewise(vim.fn.visualmode())
+      end
+      for _, lhs in ipairs({ "<C-_>", "<C-/>" }) do
+        vim.keymap.set("n", lhs, toggle_line, { desc = "Toggle comment" })
+        vim.keymap.set("x", lhs, toggle_visual, { desc = "Toggle comment" })
+        vim.keymap.set("i", lhs, function()
+          vim.api.nvim_feedkeys(
+            vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false
+          )
+          toggle_line()
+          vim.cmd("startinsert!")
+        end, { desc = "Toggle comment" })
+      end
+    end,
+  },
+
+  {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
+    lazy = false,
     config = function()
       require("nvim-treesitter").install({
         "bash", "css", "dockerfile", "go", "html", "javascript", "json",
         "lua", "markdown", "markdown_inline", "python", "query", "sql",
         "terraform", "toml", "tsx", "typescript", "vim", "vimdoc", "vue", "yaml",
       }):wait(300000)
+      -- New nvim-treesitter does not enable highlighting by default.
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function()
+          pcall(vim.treesitter.start)
+        end,
+      })
     end,
   },
 
@@ -106,6 +173,10 @@ require("lazy").setup({
       local function on_attach(_, bufnr)
         local opts = { buffer = bufnr }
         vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+        vim.keymap.set("n", "<leader>gt", function()
+          vim.cmd("tab split")
+          vim.lsp.buf.definition()
+        end, opts)
         vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
         vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
         vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
@@ -179,6 +250,17 @@ require("lazy").setup({
               fallback()
             end
           end, { "i", "s" }),
+          ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            elseif luasnip.jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              vim.api.nvim_feedkeys(
+                vim.api.nvim_replace_termcodes("<C-d>", true, false, true), "n", false
+              )
+            end
+          end, { "i", "s" }),
         }),
         sources = cmp.config.sources({
           { name = "nvim_lsp" },
@@ -221,6 +303,78 @@ require("lazy").setup({
     dependencies = { "nvim-lua/plenary.nvim" },
     event = "BufReadPost",
     opts = {},
+  },
+
+  {
+    "lewis6991/gitsigns.nvim",
+    event = "BufReadPost",
+    config = function()
+      local gs = require("gitsigns")
+      gs.setup({
+        signs = {
+          add = { text = "┃" },
+          change = { text = "┃" },
+          delete = { text = "_" },
+          topdelete = { text = "‾" },
+          changedelete = { text = "~" },
+        },
+        signcolumn = true,
+        numhl = true,
+        linehl = false,
+        word_diff = false,
+        current_line_blame = true,
+        current_line_blame_opts = { delay = 400, virt_text_pos = "eol" },
+        preview_config = { border = "rounded" },
+        on_attach = function(bufnr)
+          local opts = { buffer = bufnr }
+          vim.keymap.set("n", "]c", function()
+            if vim.wo.diff then
+              vim.cmd.normal({ "]c", bang = true })
+            else
+              gs.nav_hunk("next")
+            end
+          end, opts)
+          vim.keymap.set("n", "[c", function()
+            if vim.wo.diff then
+              vim.cmd.normal({ "[c", bang = true })
+            else
+              gs.nav_hunk("prev")
+            end
+          end, opts)
+          -- float preview of the hunk under the cursor
+          vim.keymap.set("n", "<leader>hp", gs.preview_hunk, opts)
+          -- side-by-side diff (index on the left / right split)
+          vim.keymap.set("n", "<leader>hd", gs.diffthis, opts)
+          vim.keymap.set("n", "<leader>hs", gs.stage_hunk, opts)
+          vim.keymap.set("n", "<leader>hr", gs.reset_hunk, opts)
+        end,
+      })
+      vim.keymap.set("n", "<leader>gs", function()
+        gs.setqflist("all")
+        vim.cmd("copen")
+      end, { desc = "Git hunks (repo-wide)" })
+    end,
+  },
+
+  {
+    "lewis6991/satellite.nvim",
+    event = "BufReadPost",
+    dependencies = { "lewis6991/gitsigns.nvim" },
+    config = function()
+      require("satellite").setup({
+        width = 2,
+        handlers = {
+          cursor = { enable = true },
+          search = { enable = true },
+          diagnostic = { enable = true },
+          gitsigns = {
+            enable = true,
+            signs = { add = "│", change = "│", delete = "-" },
+          },
+          marks = { enable = false },
+        },
+      })
+    end,
   },
 
   {

@@ -47,6 +47,8 @@ config.leader = { key = 'b', mods = 'CTRL', timeout_milliseconds = 1000 }
 config.keys = {
     -- Cmd+P: send Ctrl+P (triggers the zsh/bash fuzzy file finder)
     { key = 'P', mods = 'CMD', action = wezterm.action.SendKey { key = 'P', mods = 'CTRL' } },
+    -- Cmd+/: toggle comment in nvim (sends Ctrl+_ which terminals use for Ctrl+/)
+    { key = '/', mods = 'CMD', action = wezterm.action.SendKey { key = '_', mods = 'CTRL' } },
 
     -- Splits (tmux: prefix % / prefix ")
     { key = '%', mods = 'LEADER', action = wezterm.action.SplitHorizontal { domain = 'CurrentPaneDomain' } },

@@ -159,6 +159,8 @@ Prompts let you pick which dotfiles to install. Existing files trigger an overwr
 | lf                  | `tools/lfrc`              | `~/.config/lf/lfrc` (Enter/l opens files in nvim; `q`, `:q`, or `exit` quits) |
 | hints               | `tools/hints.md`          | `~/.config/shell/hints.md` (open with `hint`; `rfind` searches this dir) |
 | Neovim              | `tools/nvim/init.lua`     | `~/.config/nvim/init.lua` (plugin setup bootstraps on first launch) |
+| vscode settings     | `tools/vscode-settings.json` | VS Code `User/settings.json` (Cursor Dark via the "Anysphere Dark" port + Spline Sans Mono 14; installs `hkeric.theme-anysphere`) |
+| cursor settings     | `tools/cursor-settings.json` | Cursor `User/settings.json` (built-in "Cursor Dark"; Spline Sans Mono 14) |
 | wezterm (optional)  | `tools/wezterm.lua`       | `~/.config/wezterm/wezterm.lua`                       |
 
 ### Windows
@@ -171,6 +173,8 @@ Prompts let you pick which dotfiles to install. Existing files trigger an overwr
 | vimrc               | `tools/vimrc`                  | `%USERPROFILE%\.vimrc` (+ vim-plug, fzf, and ripgrep when selected) |
 | Neovim              | `tools/nvim/init.lua`          | `%LOCALAPPDATA%\nvim\init.lua` (plugin setup bootstraps on first launch) |
 | hints               | `tools/hints.md`               | `%USERPROFILE%\.config\shell\hints.md`                                  |
+| vscode settings     | `tools/vscode-settings.json`   | `%APPDATA%\Code\User\settings.json` (Cursor Dark via "Anysphere Dark" + Spline Sans Mono 14) |
+| cursor settings     | `tools/cursor-settings.json`   | `%APPDATA%\Cursor\User\settings.json` (same appearance)                |
 | wezterm (optional)  | `tools/wezterm.lua`            | `%USERPROFILE%\.config\wezterm\wezterm.lua`           |
 
 ### Portable terminal workflow
@@ -182,9 +186,9 @@ macOS Terminal, iTerm2, Windows Terminal, WezTerm, and most remote shells. The
 keymap via fzf and ripgrep.
 
 The `init.lua` seed is plugin-based (via [lazy.nvim](https://lazy.folke.io)) with
-a Cursor-style workflow: tree-sitter highlighting themed with tokyonight-night
-(overridden to match opencode's ANSI rules: cyan types/operators, red builtins,
-yellow numbers, magenta italic keywords), Mason-installed LSP servers
+a Cursor-style workflow: an inline Cursor Dark colorscheme (editor canvas
+`#181818`, teal keywords, pink strings, cream numbers, blue identifiers — the
+same palette as WezTerm and the editors), Mason-installed LSP servers
 (TypeScript/Vue via `vtsls`, Terraform, YAML with GitHub Actions schemas, Python,
 JSON/CSS, Lua), nvim-cmp autocomplete with LuaSnip + friendly-snippets (React),
 Prettier/StyLua/terraform-fmt on save via conform, and TODO/FIXME highlighting.

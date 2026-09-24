@@ -25,6 +25,102 @@ vim.filetype.add({
   extension = { tf = "terraform", tfvars = "terraform" },
 })
 
+-- Cursor Dark inline colorscheme (matches Cursor / VS Code 'Cursor Dark'
+-- and tools/wezterm.lua). No colorscheme plugin required.
+vim.opt.background = "dark"
+local p = {
+  bg = "#181818", chrome = "#141414", fg = "#d6d6dd", fg_bright = "#f0f0f0",
+  comment = "#989898", line_nr = "#666666", line_hl = "#262626", sel = "#3a3a3a",
+  teal = "#82D2CE", pink = "#e394dc", cream = "#ebc88d", orange = "#efb080",
+  blue = "#87C3FF", purple = "#AAA0FA", rose = "#CC7C8A",
+  red = "#F14C4C", green = "#3FA266", yellow = "#D2943E",
+}
+vim.cmd.colorscheme("default")
+do
+  local hl = function(name, spec)
+    vim.api.nvim_set_hl(0, name, spec)
+  end
+  hl("Normal", { fg = p.fg, bg = p.bg })
+  hl("NormalFloat", { fg = p.fg, bg = p.chrome })
+  hl("Comment", { fg = p.comment, italic = true })
+  hl("LineNr", { fg = p.line_nr })
+  hl("CursorLineNr", { fg = p.fg_bright })
+  hl("CursorLine", { bg = p.line_hl })
+  hl("CursorColumn", { bg = p.line_hl })
+  hl("SignColumn", { bg = p.bg })
+  hl("Visual", { bg = p.sel })
+  hl("Search", { bg = "#404040", fg = p.fg_bright })
+  hl("CurSearch", { bg = p.teal, fg = p.bg })
+  hl("Pmenu", { bg = p.chrome, fg = p.fg })
+  hl("PmenuSel", { bg = p.sel, fg = p.fg_bright })
+  hl("PmenuSbar", { bg = p.chrome })
+  hl("StatusLine", { bg = p.chrome, fg = p.fg_bright })
+  hl("StatusLineNC", { bg = p.chrome, fg = p.comment })
+  hl("TabLine", { bg = p.chrome, fg = p.comment })
+  hl("TabLineSel", { bg = p.bg, fg = p.fg_bright })
+  hl("TabLineFill", { bg = p.chrome })
+  hl("WinSeparator", { fg = p.line_hl })
+  hl("VertSplit", { fg = p.line_hl })
+  hl("FloatBorder", { fg = p.line_hl })
+  hl("FoldColumn", { bg = p.bg, fg = p.line_nr })
+  hl("DiagnosticError", { fg = p.red })
+  hl("DiagnosticWarn", { fg = p.yellow })
+  hl("DiagnosticInfo", { fg = p.blue })
+  hl("DiagnosticHint", { fg = p.comment })
+  hl("DiagnosticUnderlineError", { undercurl = true, sp = p.red })
+  hl("DiagnosticUnderlineWarn", { undercurl = true, sp = p.yellow })
+  -- Treesitter tokens mapped to the Cursor Dark syntax palette
+  hl("@keyword", { fg = p.teal })
+  hl("@keyword.conditional", { fg = p.teal })
+  hl("@keyword.repeat", { fg = p.teal })
+  hl("@keyword.return", { fg = p.teal })
+  hl("@keyword.exception", { fg = p.teal })
+  hl("@keyword.import", { fg = p.teal })
+  hl("@keyword.function", { fg = p.teal })
+  hl("@function", { fg = p.orange })
+  hl("@function.call", { fg = p.orange })
+  hl("@function.builtin", { fg = p.purple })
+  hl("@function.macro", { fg = p.purple })
+  hl("@method", { fg = p.orange })
+  hl("@method.call", { fg = p.orange })
+  hl("@type", { fg = p.orange })
+  hl("@type.builtin", { fg = p.teal })
+  hl("@type.qualifier", { fg = p.teal })
+  hl("@variable", { fg = p.blue })
+  hl("@variable.member", { fg = p.blue })
+  hl("@variable.builtin", { fg = p.rose })
+  hl("@variable.parameter", { fg = p.fg })
+  hl("@constant", { fg = p.purple })
+  hl("@constant.builtin", { fg = p.purple })
+  hl("@constant.macro", { fg = p.cream })
+  hl("@string", { fg = p.pink })
+  hl("@string.documentation", { fg = p.pink })
+  hl("@string.escape", { fg = p.cream })
+  hl("@string.regexp", { fg = p.cream })
+  hl("@number", { fg = p.cream })
+  hl("@float", { fg = p.cream })
+  hl("@boolean", { fg = p.teal })
+  hl("@operator", { fg = p.fg })
+  hl("@punctuation.delimiter", { fg = p.fg })
+  hl("@punctuation.bracket", { fg = p.fg })
+  hl("@property", { fg = p.purple })
+  hl("@field", { fg = p.blue })
+  hl("@parameter", { fg = p.fg })
+  hl("@label", { fg = p.yellow })
+  hl("@include", { fg = p.teal })
+  hl("@namespace", { fg = p.orange })
+  hl("@constructor", { fg = p.orange })
+  hl("@tag", { fg = p.blue })
+  hl("@tag.attribute", { fg = p.purple })
+  hl("@tag.delimiter", { fg = p.fg })
+  hl("@attribute", { fg = p.purple })
+  hl("@character", { fg = p.cream })
+  hl("@comment", { fg = p.comment, italic = true })
+  hl("GitSignsAdd", { fg = p.green })
+  hl("GitSignsChange", { fg = p.yellow })
+  hl("GitSignsDelete", { fg = p.red })
+end
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   vim.fn.system({
@@ -35,33 +131,6 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-  {
-    "folke/tokyonight.nvim",
-    priority = 1000,
-    config = function()
-      require("tokyonight").setup({
-        styles = {
-          comments = { italic = true },
-        },
-        on_highlights = function(hl, c)
-          hl["@keyword"] = { fg = c.magenta, italic = true }
-          hl["@keyword.return"] = { fg = c.magenta, italic = true }
-          hl["@keyword.conditional"] = { fg = c.magenta, italic = true }
-          hl["@type"] = { fg = c.cyan }
-          hl["@type.builtin"] = { fg = c.red }
-          hl["@variable.builtin"] = { fg = c.red }
-          hl["@function.builtin"] = { fg = c.red }
-          hl["@constant.builtin"] = { fg = c.red }
-          hl["@module.builtin"] = { fg = c.red }
-          hl["@number"] = { fg = c.yellow }
-          hl["@boolean"] = { fg = c.yellow }
-          hl["@operator"] = { fg = c.cyan }
-        end,
-      })
-      vim.cmd.colorscheme("tokyonight-night")
-    end,
-  },
-
   {
     "nvim-tree/nvim-web-devicons",
     lazy = true,

@@ -1,0 +1,12 @@
+{
+  "workbench.colorTheme": "Cursor Dark",
+  "editor.fontFamily": "Monaco",
+  "editor.fontSize": 13,
+  "editor.lineHeight": 16,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": true,
+  "editor.lineNumbers": "relative",
+  "editor.cursorStyle": "block",
+  "editor.minimap.enabled": false
+}

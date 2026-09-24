@@ -1,41 +1,70 @@
--- WezTerm config: tmux-style keybindings + personal theme.
+-- WezTerm config: tmux-style keybindings + Cursor Dark palette.
+-- Colors match the Cursor / VS Code 'Cursor Dark' theme so the terminal
+-- and text editors look consistent.
 
 local wezterm = require 'wezterm'
 local config = wezterm.config_builder()
 
 -- Appearance -----------------------------------------------------------
-config.color_scheme = 'tokyonight_night'
-config.font = wezterm.font("Spline Sans Mono")
-config.font_size = 16
+local p = {
+    bg       = '#181818',  -- editor canvas
+    chrome   = '#141414',  -- titlebar / tab bar / terminal bg
+    fg       = '#f0f0f0',
+    fg_dim   = '#989898',  -- ~#F0F0F099 on chrome (inactive text)
+    line_hl  = '#262626',
+    red      = '#FC6B83',
+    green    = '#3FA266',
+    yellow   = '#D2943E',
+    blue     = '#81A1C1',
+    magenta  = '#B48EAD',
+    cyan     = '#88C0D0',
+}
+
+config.font = wezterm.font("Monaco")
+config.font_size = 13
 config.line_height = 1.2
 
 config.window_frame = {
-    active_titlebar_bg = '#1a1b26',
-    inactive_titlebar_bg = '#1a1b26',
+    active_titlebar_bg = p.chrome,
+    inactive_titlebar_bg = p.chrome,
 }
 
 config.colors = {
+    foreground = p.fg,
+    background = p.chrome,
+    cursor_bg = p.fg,
+    cursor_fg = p.bg,
+    selection_bg = '#3a3a3a',
+    split = p.line_hl,
+    ansi = {
+        '#242424', p.red, p.green, p.yellow,
+        p.blue, p.magenta, p.cyan, p.fg,
+    },
+    brights = {
+        '#9a9a9a', p.red, '#70B489', '#F1B467',
+        '#87A6C4', p.magenta, p.cyan, '#FFFFFF',
+    },
     tab_bar = {
-        background = '#1a1b26',
+        background = p.chrome,
         active_tab = {
-            bg_color = '#24283b',
-            fg_color = '#a9b1d6',
+            bg_color = p.bg,
+            fg_color = p.fg,
         },
         inactive_tab = {
-            bg_color = '#1a1b26',
-            fg_color = '#565f89',
+            bg_color = p.chrome,
+            fg_color = p.fg_dim,
         },
         inactive_tab_hover = {
-            bg_color = '#24283b',
-            fg_color = '#a9b1d6',
+            bg_color = p.line_hl,
+            fg_color = p.fg,
         },
         new_tab = {
-            bg_color = '#1a1b26',
-            fg_color = '#565f89',
+            bg_color = p.chrome,
+            fg_color = p.fg_dim,
         },
         new_tab_hover = {
-            bg_color = '#24283b',
-            fg_color = '#a9b1d6',
+            bg_color = p.line_hl,
+            fg_color = p.fg,
         },
     },
 }

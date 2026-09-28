@@ -22,7 +22,10 @@ local p = {
 
 config.font = wezterm.font("Monaco")
 config.font_size = 13
-config.line_height = 1.2
+-- line_height multiplies the font's NATURAL line box, not font_size.
+-- Monaco's hhea box is 1.25em (asc 2048 + desc 512 @ 2048upm), so anything
+-- under 1.25 shaves ascenders/descenders. Keep this at Monaco's natural 1.0.
+config.line_height = 1.0
 
 config.window_frame = {
     active_titlebar_bg = p.chrome,

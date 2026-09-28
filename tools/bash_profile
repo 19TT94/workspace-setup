@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# Homebrew: put brew first on PATH (Apple Silicon + Intel)
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# Unversioned python/pip (Homebrew keeps these off PATH by default)
+if [ -d "${HOMEBREW_PREFIX:-}/opt/python/libexec/bin" ]; then
+  export PATH="${HOMEBREW_PREFIX}/opt/python/libexec/bin:$PATH"
+fi
+
 # Load NVM
 export NVM_DIR="$HOME/.nvm"
 if command -v brew >/dev/null 2>&1; then

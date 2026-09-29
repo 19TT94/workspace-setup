@@ -1,3 +1,6 @@
+# Keep selections alive when leaving a directory
+set hidden
+
 # Enter: new WezTerm/tmux tab (dirs: quit into that dir)
 # l: open in current pane (dirs: enter directory)
 map <enter> open-tab

@@ -115,36 +115,24 @@ async function promptOverwrite(message, diffOptions = null) {
         }
     }
 
+    // Skip is listed first so a bare Enter can never overwrite a real file.
     const response = await prompt([
         {
             type: 'expand',
             message: promptMessage(message),
             name: 'overwrite',
-            choices: isDryRun()
-                ? [
-                    {
-                        key: 'Y',
-                        name: 'Preview overwrite (no changes)',
-                        value: 'overwrite'
-                    },
-                    {
-                        key: 'n',
-                        name: 'Skip',
-                        value: 'skip'
-                    }
-                ]
-                : [
-                    {
-                        key: 'Y',
-                        name: 'Overwrite',
-                        value: 'overwrite'
-                    },
-                    {
-                        key: 'n',
-                        name: 'Skip',
-                        value: 'skip'
-                    }
-                ]
+            choices: [
+                {
+                    key: 'n',
+                    name: isDryRun() ? 'Skip (no changes)' : 'Skip',
+                    value: 'skip'
+                },
+                {
+                    key: 'Y',
+                    name: isDryRun() ? 'Preview overwrite (no changes)' : 'Overwrite',
+                    value: 'overwrite'
+                }
+            ]
         }
     ]);
 
@@ -520,17 +508,19 @@ async function install_apps() {
             type: 'checkbox',
             name: 'config',
             message: promptMessage('Unselect any apps to skip'),
+            // Hypervisors, Docker, and API clients are opt-in so `--all` never
+            // queues multi-GB downloads without an explicit selection.
             choices: [
-                { name: 'virtualbox', value: 'virtualbox', checked: true },
-                { name: 'vagrant', value: 'vagrant', checked: true },
-                { name: 'docker desktop', value: 'docker desktop', checked: true },
+                { name: 'virtualbox', value: 'virtualbox', checked: false },
+                { name: 'vagrant', value: 'vagrant', checked: false },
+                { name: 'docker desktop', value: 'docker desktop', checked: false },
                 { name: 'slack', value: 'slack', checked: true },
                 { name: 'atom', value: 'atom', checked: false },
                 { name: 'vscode', value: 'vscode', checked: true },
                 { name: 'sublime text', value: 'sublime text', checked: false },
                 { name: 'sequel pro', value: 'sequel pro', checked: true },
                 { name: 'beekeeper studio', value: 'beekeeper studio', checked: false },
-                { name: 'postman', value: 'postman', checked: true },
+                { name: 'postman', value: 'postman', checked: false },
                 { name: 'cyberduck', value: 'cyberduck', checked: true },
                 { name: 'spotify', value: 'spotify', checked: true },
                 { name: 'android studio', value: 'android studio', checked: false },

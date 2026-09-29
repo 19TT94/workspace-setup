@@ -107,36 +107,24 @@ async function choose_install() {
 }
 
 async function keep() {
+    // Keep is listed first so a bare Enter can never delete the repo.
     const response = await prompt([
         {
             type: 'expand',
             message: promptMessage('Do you want to DELETE workspace-setup?'),
             name: 'selection',
-            choices: isDryRun()
-                ? [
-                    {
-                        key: 'Y',
-                        name: 'Preview delete (no changes)',
-                        value: 'delete'
-                    },
-                    {
-                        key: 'n',
-                        name: 'Keep',
-                        value: 'keep'
-                    }
-                ]
-                : [
-                    {
-                        key: 'Y',
-                        name: 'Delete',
-                        value: 'delete'
-                    },
-                    {
-                        key: 'n',
-                        name: 'Keep',
-                        value: 'keep'
-                    }
-                ]
+            choices: [
+                {
+                    key: 'n',
+                    name: 'Keep',
+                    value: 'keep'
+                },
+                {
+                    key: 'Y',
+                    name: isDryRun() ? 'Preview delete (no changes)' : 'Delete',
+                    value: 'delete'
+                }
+            ]
         }
     ]);
 

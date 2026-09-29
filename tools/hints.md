@@ -39,12 +39,15 @@ Git branch Tab-completion is enabled (`git switch <Tab>`, `git checkout <Tab>`, 
 | `Cmd+/` / `gcc` | toggle comment line (visual: select then `Cmd+/` or `gc`) |
 | `gd` | go to definition / open file from import (LSP) |
 | `<leader>gt` | definition in a new tab |
+| `<leader>gd` | pick from all definition candidates (Telescope) |
+| `gr` | go to references (LSP) |
 | `]c` / `[c` | next / prev git hunk (gutter signs + line number highlight) |
 | right scrollbar | satellite.nvim: map of git changes / diagnostics / search |
 | `<leader>hp` | float preview of hunk under cursor |
 | `<leader>hd` | side-by-side diff (right/left split vs index) |
 | `<leader>hs` / `hr` | stage / reset hunk |
 | `<leader>gs` | all git hunks repo-wide (quickfix) |
+| `<leader>gm` | pick from modified files (Telescope `git_status`) |
 | `Tab` / `Shift-Tab` | next/prev completion (or indent / unindent) |
 | `Ctrl+V` → `Shift+I` → `Esc` | visual block mode: insert text at the front of multiple lines |
 | `0` | jump to start of line |

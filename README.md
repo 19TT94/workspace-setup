@@ -191,7 +191,9 @@ a Cursor-style workflow: an inline Cursor Dark colorscheme (editor canvas
 same palette as WezTerm and the editors), Mason-installed LSP servers
 (TypeScript/Vue via `vtsls`, Terraform, YAML with GitHub Actions schemas, Python,
 JSON/CSS, Lua), nvim-cmp autocomplete with LuaSnip + friendly-snippets (React),
-Prettier/StyLua/terraform-fmt on save via conform, and TODO/FIXME highlighting.
+Prettier/StyLua/terraform-fmt on save via conform, Telescope pickers for
+definition candidates (`<leader>gd`) and modified files (`<leader>gm`), and
+TODO/FIXME highlighting.
 The first `nvim` launch needs git + network once to bootstrap plugins and LSP
 servers; after that it works offline. Update plugins with `:Lazy`, servers with
 `:MasonInstallAll`.

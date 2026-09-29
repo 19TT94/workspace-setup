@@ -50,6 +50,8 @@ Never add repo-dev rules under `agents/` — that would push them into every use
 | `tools/vimrc` | `~/.vimrc` |
 | `tools/nvim/init.lua` | `~/.config/nvim/init.lua` (macOS) / `%LOCALAPPDATA%\nvim\init.lua` (Windows) |
 | `tools/hints.md` | `~/.config/shell/hints.md` |
+| `tools/vscode-settings.json` | VS Code User `settings.json` (`~/Library/Application Support/Code/User/` on macOS, `%APPDATA%\Code\User\` on Windows) |
+| `tools/cursor-settings.json` | Cursor User `settings.json` (`~/Library/Application Support/Cursor/User/` on macOS, `%APPDATA%\Cursor\User\` on Windows) |
 | `agents/cursor/rules/` (dir) | `~/.cursor/rules/` |
 | `agents/cursor/README.md` | `~/.cursor/rules/README.md` |
 | `agents/cursor/skills/` (dir) | `~/.cursor/skills/` |

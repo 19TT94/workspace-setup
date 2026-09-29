@@ -12,7 +12,9 @@ const {
     getAgentInstallPaths,
     getGitignoreEntries,
     getPowerShellProfilePath,
-    getNeovimConfigPath
+    getNeovimConfigPath,
+    getVSCodeSettingsPath,
+    getCursorSettingsPath
 } = require('./platform');
 const { installSelectedDevtools: installBrewDevtools, installSelectedApps } = require('./installers/brew');
 const { installSelectedDevtools: installWingetDevtools } = require('./installers/winget');
@@ -405,6 +407,55 @@ async function installNeovimConfig() {
     );
 }
 
+async function installThemeExtension(cliName, extension) {
+    if (!extension) {
+        return;
+    }
+    const check = shell.execCapture(`command -v ${cliName} >/dev/null 2>&1 && echo found`);
+    if (check.code !== 0 || check.stdout.trim() !== 'found') {
+        console.log(`Skipped theme extension for ${cliName}: command not found`);
+        return;
+    }
+    dryRunExec(`${cliName} --install-extension ${extension}`);
+    if (!isDryRun()) {
+        const result = shell.exec(`${cliName} --install-extension ${extension}`);
+        if (result.code !== 0) {
+            console.error(`Failed to install theme extension for ${cliName}`);
+        }
+    }
+}
+
+async function installEditorSettings(seedName, targetPath, cliName, extension, label) {
+    const installed = await copyFileWithPrompt(
+        path.join(REPO_ROOT, 'tools', seedName),
+        targetPath,
+        label
+    );
+    if (installed) {
+        await installThemeExtension(cliName, extension);
+    }
+}
+
+async function installVSCodeSettings() {
+    await installEditorSettings(
+        'vscode-settings.json',
+        getVSCodeSettingsPath(),
+        'code',
+        'hkeric.theme-anysphere',
+        'vscode settings'
+    );
+}
+
+async function installCursorSettings() {
+    await installEditorSettings(
+        'cursor-settings.json',
+        getCursorSettingsPath(),
+        'cursor',
+        null,
+        'cursor settings'
+    );
+}
+
 async function install_config() {
     const response = await prompt([
         {
@@ -454,6 +505,14 @@ async function install_config() {
 
         if (item === 'wezterm config') {
             await installWeztermConfig();
+        }
+
+        if (item === 'vscode settings') {
+            await installVSCodeSettings();
+        }
+
+        if (item === 'cursor settings') {
+            await installCursorSettings();
         }
     }
 }

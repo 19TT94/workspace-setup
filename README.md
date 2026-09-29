@@ -282,6 +282,23 @@ npm run dry-run
 - Read-only checks (e.g. whether `node` is installed) still run so summaries are realistic
 - Choosing to delete the repo at the end logs the action instead of removing files
 
+Dry run is enforced in two places. Every mutating helper in `scripts/shell.js`
+(`exec`, `mkdir`, `cp`, `rm`, `ShellString.toEnd`) refuses to run and logs
+`Would ... (blocked by dry run)` when dry run is active, so a call site that
+forgets its own check still cannot change the machine. Read-only probes go
+through `shell.execProbe` / `shell.execCapture` and keep running.
+
+Two safety defaults also apply in both modes: the `expand` prompts list
+**Keep/Skip first**, so pressing Enter never overwrites a file or deletes the
+repo, and heavy apps (VirtualBox, Vagrant, Docker Desktop, Postman) are
+unchecked by default so `--all` does not queue multi-GB downloads.
+
+> **Do not script the installer with `yes`.** Piping `yes ""` into a pty
+> (`yes "" | script -q /dev/null node ./index.js --all --dry-run`) makes the
+> terminal echo every injected newline while inquirer re-renders a full screen
+> per keypress. The feedback loop saturates the CPU and can freeze the machine.
+> Use bounded keystrokes instead: `printf '\n\n\n' | node ./index.js --dry-run`.
+
 ## Contributing / local development
 
 ```bash

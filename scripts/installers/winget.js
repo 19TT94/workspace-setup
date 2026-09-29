@@ -3,12 +3,13 @@ const path = require('path');
 const shell = require('../shell');
 const { homePath, getShellConfigPath } = require('../platform');
 const { commandExists, installIfMissing, logInstallSummary } = require('./common');
+const { isDryRun, log } = require('../dry-run');
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const WINGET_FLAGS = '--accept-package-agreements --accept-source-agreements';
 
 function wingetList(packageId) {
-    return shell.exec(`winget list --id ${packageId} -e`, { silent: true }).code === 0;
+    return shell.execProbe(`winget list --id ${packageId} -e`).code === 0;
 }
 
 function wingetInstall(packageId) {
@@ -20,12 +21,22 @@ function wingetCommand(packageId) {
 }
 
 function appendToFile(filePath, content) {
+    if (isDryRun()) {
+        log(`Would append to ${filePath} (blocked by dry run)`);
+        return;
+    }
+
     fs.appendFileSync(filePath, content, 'utf8');
 }
 
 function appendStarshipToProfile() {
     const profilePath = getShellConfigPath();
     const profileDir = path.dirname(profilePath);
+
+    if (isDryRun()) {
+        log(`Would append starship init to ${profilePath} (blocked by dry run)`);
+        return;
+    }
 
     if (!fs.existsSync(profileDir)) {
         fs.mkdirSync(profileDir, { recursive: true });

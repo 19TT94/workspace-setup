@@ -2,7 +2,7 @@ const shell = require('../shell');
 const { isDryRun, log, PREFIX } = require('../dry-run');
 
 function commandExists(command) {
-    return shell.exec(command, { silent: true }).code === 0;
+    return shell.execProbe(command).code === 0;
 }
 
 async function installIfMissing({ label, isInstalled, install, installed, exist, command }) {

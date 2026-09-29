@@ -3,10 +3,16 @@ const path = require('path');
 const shell = require('../shell');
 const { homePath } = require('../platform');
 const { commandExists, installIfMissing, logInstallSummary } = require('./common');
+const { isDryRun, log } = require('../dry-run');
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
 
 function appendStarshipToZshrc() {
+    if (isDryRun()) {
+        log(`Would append starship init to ${homePath('.zshrc')} (blocked by dry run)`);
+        return;
+    }
+
     const zshrcPath = homePath('.zshrc');
     if (fs.existsSync(zshrcPath)) {
         const existing = fs.readFileSync(zshrcPath, 'utf8');
@@ -100,7 +106,7 @@ async function installSelectedDevtools(selected, helpers) {
         if (tool === 'wezterm') {
             await installIfMissing({
                 label: tool,
-                isInstalled: () => shell.exec('brew list --cask wezterm', { silent: true }).code === 0,
+                isInstalled: () => shell.execProbe('brew list --cask wezterm').code === 0,
                 install: () => shell.exec('brew install --cask wezterm'),
                 command: 'brew install --cask wezterm',
                 installed,
@@ -336,7 +342,7 @@ async function installSelectedApps(selected) {
 
         await installIfMissing({
             label: app,
-            isInstalled: () => shell.exec(`brew list --cask ${cask}`, { silent: true }).code === 0,
+            isInstalled: () => shell.execProbe(`brew list --cask ${cask}`).code === 0,
             install: () => shell.exec(`brew install --cask ${cask}`),
             command: `brew install --cask ${cask}`,
             installed,

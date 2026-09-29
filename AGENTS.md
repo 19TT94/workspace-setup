@@ -28,8 +28,11 @@ The legacy `shells/` directory is **not** called by `index.js`; do not extend it
 | --- | --- | --- |
 | `AGENTS.md` (this file) + `.cursor/rules/` | Rules for agents working **on this repo** | No |
 | `agents/cursor/rules/` | Global Cursor rules seeded to `~/.cursor/rules/` | Yes |
+| `agents/cursor/skills/` | Global Cursor skills seeded to `~/.cursor/skills/` | Yes |
 | `agents/codex/` | Global Codex `AGENTS.md` + skills seeded to `~/.codex/` | Yes |
 | `agents/claude/CLAUDE.md` | Global Claude config seeded to `~/.claude/CLAUDE.md` | Yes |
+| `agents/claude/skills/` | Global Claude skills seeded to `~/.claude/skills/` | Yes |
+| `agents/templates/` | Shared defaults (e.g. PR template); copied into skill dirs, not installed alone | No |
 
 Never add repo-dev rules under `agents/` — that would push them into every user’s global config. Keep repo-dev config in `.cursor/` and this file.
 
@@ -49,9 +52,11 @@ Never add repo-dev rules under `agents/` — that would push them into every use
 | `tools/hints.md` | `~/.config/shell/hints.md` |
 | `agents/cursor/rules/` (dir) | `~/.cursor/rules/` |
 | `agents/cursor/README.md` | `~/.cursor/rules/README.md` |
+| `agents/cursor/skills/` (dir) | `~/.cursor/skills/` |
 | `agents/codex/AGENTS.md` | `~/.codex/AGENTS.md` |
 | `agents/codex/skills/` (dir) | `~/.codex/skills/` |
 | `agents/claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
+| `agents/claude/skills/` (dir) | `~/.claude/skills/` |
 
 `~/.gitignore` is generated (not a repo seed); `~/.nvm` and git completions in `~/.zsh/` are created/downloaded, not copied. Keep this list in sync whenever seeds change.
 

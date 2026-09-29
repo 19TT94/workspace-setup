@@ -202,13 +202,17 @@ Available on both platforms as a standalone flow or as part of Windows `--all`.
 
 | Agent        | Source                      | Target (macOS)                    | Target (Windows)                                      |
 | ------------ | --------------------------- | --------------------------------- | ----------------------------------------------------- |
-| Cursor rules | `agents/cursor/rules/`      | `~/.cursor/rules/`                | `%USERPROFILE%\.cursor\rules\`                        |
-| Cursor docs  | `agents/cursor/README.md`   | `~/.cursor/rules/README.md`       | `%USERPROFILE%\.cursor\rules\README.md`               |
-| Codex        | `agents/codex/AGENTS.md`    | `~/.codex/AGENTS.md`              | `%USERPROFILE%\.codex\AGENTS.md`                      |
-| Codex skills | `agents/codex/skills/`      | `~/.codex/skills/`                | `%USERPROFILE%\.codex\skills\`                        |
-| Claude Code  | `agents/claude/CLAUDE.md`   | `~/.claude/CLAUDE.md`             | `%USERPROFILE%\.claude\CLAUDE.md`                     |
+| Cursor rules  | `agents/cursor/rules/`     | `~/.cursor/rules/`                 | `%USERPROFILE%\.cursor\rules\`                         |
+| Cursor docs   | `agents/cursor/README.md`  | `~/.cursor/rules/README.md`        | `%USERPROFILE%\.cursor\rules\README.md`                |
+| Cursor skills | `agents/cursor/skills/`    | `~/.cursor/skills/`                | `%USERPROFILE%\.cursor\skills\`                        |
+| Codex         | `agents/codex/AGENTS.md`   | `~/.codex/AGENTS.md`               | `%USERPROFILE%\.codex\AGENTS.md`                       |
+| Codex skills  | `agents/codex/skills/`     | `~/.codex/skills/`                 | `%USERPROFILE%\.codex\skills\`                         |
+| Claude Code   | `agents/claude/CLAUDE.md`  | `~/.claude/CLAUDE.md`              | `%USERPROFILE%\.claude\CLAUDE.md`                      |
+| Claude skills | `agents/claude/skills/`    | `~/.claude/skills/`                | `%USERPROFILE%\.claude\skills\`                        |
 
-Customize the files under `agents/` before running the installer to change what gets copied.
+Shared defaults (not installed on their own): `agents/templates/pull_request_template.md` is the canonical PR body. The `pr-prepare` skill ships a copy and prefers a repo `.github/pull_request_template.md` when present.
+
+Customize the files under `agents/` before running the installer to change what gets copied. Edit `agents/templates/pull_request_template.md` (and the matching copies under each `pr-prepare` skill) to change the global PR default. Edit `feature-planning/reference.md` to set your tracker project key and browse URL.
 
 ## Devtools
 

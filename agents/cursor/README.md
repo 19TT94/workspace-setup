@@ -1,5 +1,20 @@
 # Cursor starter files
 
-These files install to `~/.cursor/rules/` as global rule files (`.mdc`).
+These files install as global Cursor config:
 
-Cursor also supports project-scoped rules in `.cursor/rules/` inside each repository. Copy or adapt these files there when you want team-shared rules in version control.
+| Seed | Target |
+| --- | --- |
+| `rules/` | `~/.cursor/rules/` |
+| `README.md` | `~/.cursor/rules/README.md` |
+| `skills/` | `~/.cursor/skills/` |
+
+Cursor also supports project-scoped rules and skills under `.cursor/` inside each repository. Copy or adapt these files there when you want team-shared config in version control.
+
+## Seeded global skills
+
+| Skill | Purpose |
+| --- | --- |
+| `pr-prepare` | Draft PR title/body from the default or repo template; CLI/IDE copy handoff |
+| `feature-planning` | Triage work and draft concise (or full) tickets |
+
+Default PR body: `skills/pr-prepare/pull_request_template.md` (canonical seed also at `agents/templates/pull_request_template.md`). Configure ticket key / tracker URL in `skills/feature-planning/reference.md`.

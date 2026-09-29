@@ -138,7 +138,7 @@ function getDevtoolChoices() {
 const AGENT_INSTALL_PATHS = {
     cursor: {
         label: 'Cursor',
-        summary: 'global rules',
+        summary: 'global rules + skills',
         paths: [
             {
                 type: 'dir',
@@ -151,6 +151,12 @@ const AGENT_INSTALL_PATHS = {
                 source: ['agents', 'cursor', 'README.md'],
                 target: ['.cursor', 'rules', 'README.md'],
                 label: 'cursor README'
+            },
+            {
+                type: 'dir',
+                source: ['agents', 'cursor', 'skills'],
+                target: ['.cursor', 'skills'],
+                label: 'cursor skills'
             }
         ]
     },
@@ -174,13 +180,19 @@ const AGENT_INSTALL_PATHS = {
     },
     claude: {
         label: 'Claude Code',
-        summary: 'CLAUDE.md',
+        summary: 'CLAUDE.md + skills',
         paths: [
             {
                 type: 'file',
                 source: ['agents', 'claude', 'CLAUDE.md'],
                 target: ['.claude', 'CLAUDE.md'],
                 label: 'claude CLAUDE.md'
+            },
+            {
+                type: 'dir',
+                source: ['agents', 'claude', 'skills'],
+                target: ['.claude', 'skills'],
+                label: 'claude skills'
             }
         ]
     }

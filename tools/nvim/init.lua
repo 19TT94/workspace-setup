@@ -447,6 +447,32 @@ require("lazy").setup({
   },
 
   {
+    "nvim-telescope/telescope.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = "Telescope",
+    -- Declared in the spec, not in config(): `config()` only runs once the
+    -- plugin has loaded, so keymaps set there stay dead until `:Telescope` is
+    -- first typed. `keys` registers them at startup and lazy-loads on press.
+    keys = {
+      {
+        "<leader>gd",
+        function() require("telescope.builtin").lsp_definitions() end,
+        desc = "Definition picker",
+      },
+      {
+        -- `<leader>gs` is gitsigns' repo-wide hunk quickfix. Telescope's
+        -- git_status is available here as `gm` so the two never collide.
+        "<leader>gm",
+        function() require("telescope.builtin").git_status() end,
+        desc = "Git modified files",
+      },
+    },
+    config = function()
+      require("telescope").setup({})
+    end,
+  },
+
+  {
     "MeanderingProgrammer/render-markdown.nvim",
     dependencies = { "nvim-treesitter/nvim-treesitter" },
     ft = "markdown",

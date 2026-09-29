@@ -1,7 +1,7 @@
 # Shell hints
 
 Personal cheat sheet for aliases, keybindings, and tools to integrate into your workflow.
-Run `hint` to open this file in your editor (vim/nvim).
+Run `hint` to open this file in your default markdown app.
 
 > Add a new reminder quickly:
 > `printf -- "- %s\n" "note text" >> ~/.config/shell/hints.md`
@@ -10,16 +10,22 @@ Run `hint` to open this file in your editor (vim/nvim).
 
 | Command | What it does |
 | --- | --- |
-| `lf` | file manager; opens files in the editor, quits into the selected dir |
+| `lf` | file manager; Enter = new WezTerm tab, `l` = open in current pane |
 | `sf` | same as `lf` (alias of lfcd) |
-| `hint` | open this file in the editor for viewing/editing in place |
-| `rfind` | global search in the current dir: `rfind <term>` searches now, bare `rfind` searches as you type |
+| `hint` | open this file in the default markdown app |
+| `rfind` | global search: Enter = new tab, Ctrl-L = current pane |
+| `gopen` | dirty git files → one new WezTerm/tmux tab (nvim tabs inside) |
+| `topen` | open file(s) in a new WezTerm/tmux tab: `topen path` |
+| `edit-tab` / `edit-here` | open file(s) in a new WezTerm/tmux tab / current pane |
+
+Git branch Tab-completion is enabled (`git switch <Tab>`, `git checkout <Tab>`, etc.).
+
 
 ## Keybindings
 
 | Keys | What it does |
 | --- | --- |
-| Cmd+P | fuzzy find + preview + open any file (sends Ctrl+P to the shell) |
+| Cmd+P | fuzzy find: Enter = new WezTerm tab, Ctrl-L = current pane |
 | Ctrl+Shift+P / Cmd+Shift+P | WezTerm command palette |
 | Leader `b` `%` / `b` `"` | split pane horizontal / vertical |
 | Leader `b` c / `b` n / `b` p | new tab / next tab / previous tab |
@@ -29,6 +35,17 @@ Run `hint` to open this file in your editor (vim/nvim).
 
 | Keys | What it does |
 | --- | --- |
+| `gt` / `gT` / `2gt` | next / prev / jump to nvim tab (styled by bufferline) |
+| `Cmd+/` / `gcc` | toggle comment line (visual: select then `Cmd+/` or `gc`) |
+| `gd` | go to definition / open file from import (LSP) |
+| `<leader>gt` | definition in a new tab |
+| `]c` / `[c` | next / prev git hunk (gutter signs + line number highlight) |
+| right scrollbar | satellite.nvim: map of git changes / diagnostics / search |
+| `<leader>hp` | float preview of hunk under cursor |
+| `<leader>hd` | side-by-side diff (right/left split vs index) |
+| `<leader>hs` / `hr` | stage / reset hunk |
+| `<leader>gs` | all git hunks repo-wide (quickfix) |
+| `Tab` / `Shift-Tab` | next/prev completion (or indent / unindent) |
 | `Ctrl+V` → `Shift+I` → `Esc` | visual block mode: insert text at the front of multiple lines |
 | `0` | jump to start of line |
 | `Shift+4` (`$`) | jump to end of line |

@@ -24,13 +24,74 @@ fi
 export EDITOR=nvim
 export VISUAL=nvim
 
+# Git tab completion (installer downloads ~/.zsh/_git + git-completion.bash)
+if [ -d "$HOME/.zsh" ]; then
+  fpath=("$HOME/.zsh" $fpath)
+  [ -f "$HOME/.zsh/git-completion.bash" ] && \
+    zstyle ':completion:*:*:git:*' script "$HOME/.zsh/git-completion.bash"
+fi
+autoload -Uz compinit
+compinit -u
+
+# edit-here / edit-tab: open file(s) in the current pane, or a new WezTerm/tmux tab.
+# (fzf cannot bind bare `l` without breaking search — use ctrl-l there; lf uses `l`.)
+edit-here() {
+  if [ $# -eq 0 ]; then
+    echo "Usage: edit-here <file>..."
+    return 1
+  fi
+  "${EDITOR:-nvim}" -- "$@"
+}
+edit-tab() {
+  if [ $# -eq 0 ]; then
+    echo "Usage: edit-tab <file>..."
+    return 1
+  fi
+  # Absolute paths: wezterm spawn uses the pane's recorded cwd, which can lag behind `cd`.
+  local f title editor
+  local -a abs=()
+  for f in "$@"; do
+    case "$f" in
+      +* | /*) abs+=("$f") ;;
+      *) abs+=("$(pwd)/$f") ;;
+    esac
+  done
+  title="$(basename "${abs[-1]}")"
+  [[ "$title" == +* ]] && title="$(basename "${abs[-2]}")"
+
+  # Prefer the real binary (whence -p ignores aliases like nvim=vim).
+  editor="$(whence -p "${EDITOR:-nvim}" 2>/dev/null || command -v "${EDITOR:-nvim}" || echo nvim)"
+
+  if [ -n "${WEZTERM_PANE:-}" ] && command -v wezterm >/dev/null 2>&1; then
+    local pane
+    pane=$(wezterm cli spawn --cwd "$(pwd)" -- "$editor" -p -- "${abs[@]}") || return
+    [ -n "$pane" ] && wezterm cli set-tab-title "$title" --pane-id "$pane" 2>/dev/null
+  elif [ -n "${TMUX:-}" ] && command -v tmux >/dev/null 2>&1; then
+    tmux new-window -c "$(pwd)" -n "$title" -- "$editor" -p -- "${abs[@]}"
+  else
+    "$editor" -p -- "${abs[@]}"
+  fi
+}
+
 # Ctrl+P (Cmd+P in WezTerm): fuzzy find + preview + open any file
+# enter = new WezTerm tab; ctrl-l = current pane (lf uses enter / l)
 fzf-open() {
-  local f
+  local out key files
   local prev='bat --style=numbers --color=always --line-range=:200 {}'
   command -v bat >/dev/null 2>&1 || prev='cat {}'
-  f=$(rg --files --hidden --follow -g '!*/.git/*' | fzf --height 80% --layout reverse --border --preview-window 'right:50%:wrap' --preview "$prev" --multi)
-  [ -n "$f" ] && ${EDITOR:-vim} ${(f)f}
+  out=$(rg --files --hidden --follow -g '!*/.git/*' | fzf --height 80% --layout reverse --border \
+    --preview-window 'right:50%:wrap' --preview "$prev" --multi \
+    --header 'enter: new tab  |  ctrl-l: here' \
+    --expect=ctrl-l)
+  key=$(printf '%s\n' "$out" | head -n1)
+  files=$(printf '%s\n' "$out" | tail -n +2)
+  if [ -n "$files" ]; then
+    if [ "$key" = "ctrl-l" ]; then
+      edit-here ${(f)files}
+    else
+      edit-tab ${(f)files}
+    fi
+  fi
   zle redisplay
 }
 zle -N fzf-open
@@ -51,30 +112,76 @@ lfcd() {
 alias sf=lfcd
 alias lf=lfcd
 
-# hint: open your personal tool/alias cheat sheet in the editor (edit ~/.config/shell/hints.md)
+# hint: open your personal tool/alias cheat sheet in the default markdown app
 HINTS_FILE="$HOME/.config/shell/hints.md"
 hint() {
     if [ ! -f "$HINTS_FILE" ]; then
         echo "No hints file yet - create $HINTS_FILE"
         return 1
     fi
-    "${EDITOR:-vim}" "$HINTS_FILE"
+    if command -v open >/dev/null 2>&1; then
+        open "$HINTS_FILE"
+    elif command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$HINTS_FILE"
+    else
+        "${EDITOR:-nvim}" "$HINTS_FILE"
+    fi
 }
 
 # rfind: global text search in the current directory (needs: ripgrep + fzf).
 #   rfind <term>  -> search for <term> now, pick a match to open at that line
 #   rfind         -> live search: type to filter matches across the whole tree
+# enter = new WezTerm tab; ctrl-l = current pane
 rfind() {
     local query="$*"
-    local pick
+    local out key pick file line
     local preview='p=$(echo {} | cut -d: -f1); l=$(echo {} | cut -d: -f2); if command -v bat >/dev/null 2>&1; then bat --style=numbers --color=always --line-range="$((l-5)):$((l+5))" --paging=never "$p" 2>/dev/null; else sed -n "$((l-5)),$((l+5))p" "$p" 2>/dev/null; fi'
+    local fzf_opts=(--height 80% --layout reverse --border --preview-window 'right:50%:wrap' --preview "$preview" --header 'enter: new tab  |  ctrl-l: here' --expect=ctrl-l)
     if [ -n "$query" ]; then
-        pick=$(rg -i --hidden --follow -g '!*/.git/*' --line-number -e "$query" \
-            | fzf --height 80% --layout reverse --border --preview-window 'right:50%:wrap' --preview "$preview")
+        out=$(rg -i --hidden --follow -g '!*/.git/*' --line-number -e "$query" | fzf "${fzf_opts[@]}")
     else
-        pick=$(fzf --height 80% --layout reverse --border \
-            --preview-window 'right:50%:wrap' --preview "$preview" \
+        out=$(fzf "${fzf_opts[@]}" \
             --bind 'change:reload:rg -i --hidden --follow -g "!*/.git/*" --line-number {q} || true')
     fi
-    [ -n "$pick" ] && "${EDITOR:-nvim}" "+$(echo "$pick" | cut -d: -f2)" "$(echo "$pick" | cut -d: -f1)"
+    key=$(printf '%s\n' "$out" | head -n1)
+    pick=$(printf '%s\n' "$out" | tail -n +2)
+    [ -z "$pick" ] && return
+    file=$(echo "$pick" | cut -d: -f1)
+    line=$(echo "$pick" | cut -d: -f2)
+    if [ "$key" = "ctrl-l" ]; then
+        edit-here "+$line" "$file"
+    else
+        edit-tab "+$line" "$file"
+    fi
+}
+
+# gopen: dirty git files → one new WezTerm/tmux tab, files as nvim tabs
+gopen() {
+  local root file
+  local -a files=()
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "Not a git repository"
+    return 1
+  fi
+  root="$(git rev-parse --show-toplevel)"
+  while IFS= read -r file; do
+    [ -n "$file" ] && files+=("$root/$file")
+  done < <({
+    git -C "$root" diff --name-only HEAD
+    git -C "$root" ls-files --others --exclude-standard
+  } | sort -u)
+  if [ ${#files[@]} -eq 0 ]; then
+    echo "No dirty files"
+    return 0
+  fi
+  edit-tab "${files[@]}"
+}
+
+# topen: open file(s) in a new WezTerm/tmux tab (nvim -p inside)
+topen() {
+  if [ $# -eq 0 ]; then
+    echo "Usage: topen <file> [file...]"
+    return 1
+  fi
+  edit-tab "$@"
 }

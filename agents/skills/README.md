@@ -6,7 +6,7 @@ changes here apply everywhere.
 
 | Skill | Purpose |
 | --- | --- |
-| `pr-prepare` | Draft a PR title/body from the repo or shared template; CLI/IDE copy handoff |
+| `pr-prepare` | Draft a PR title/body from the repo or shared template, ask before creating, comment the PR; CLI/IDE copy handoff |
 | `feature-planning` | Triage work and draft concise (or full) tickets |
 
 Customize here, not in a single agent's folder. Agent-only skills belong in that

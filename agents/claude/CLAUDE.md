@@ -13,7 +13,7 @@ Seeded to `~/.claude/skills/` (see `agents/skills/` for shared ones):
 
 | Skill | Purpose |
 | --- | --- |
-| `pr-prepare` | Draft PR title/body from the default or repo template; CLI/IDE copy handoff |
+| `pr-prepare` | Draft PR title/body from the default or repo template, ask before creating, comment the PR; CLI/IDE copy handoff |
 | `feature-planning` | Triage work and draft concise (or full) tickets |
 
 Default PR body: `~/.config/agent-templates/pull_request_template.md`. Configure ticket key / tracker URL in `skills/feature-planning/reference.md`.

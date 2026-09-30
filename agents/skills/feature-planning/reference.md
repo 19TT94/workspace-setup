@@ -4,7 +4,7 @@ Templates for **full draft** / copy-paste into Jira (or similar). Concise mode b
 
 ## Configure these defaults
 
-Edit this file after install (`~/.claude/skills/feature-planning/reference.md`) so ticket keys and links match your tracker.
+Edit this file after install (it lands in your agent’s `skills/feature-planning/` directory) so ticket keys and links match your tracker.
 
 | Setting | Value | Notes |
 | ------- | ----- | ----- |

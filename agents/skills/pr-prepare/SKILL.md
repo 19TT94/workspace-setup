@@ -12,14 +12,13 @@ disable-model-invocation: true
 # Prepare pull request
 
 Generic global skill. Prefer a **repo** template when present; otherwise use the
-bundled default. Customize ticket key / testing checkboxes in
-[pull_request_template.md](pull_request_template.md) (or the shared seed at
-`agents/templates/pull_request_template.md` in workspace-setup).
+bundled default. Customize ticket key / testing checkboxes in the shared
+template installed at `~/.config/agent-templates/pull_request_template.md`.
 
 ## Template resolution
 
 1. If the repo has `.github/pull_request_template.md` (or `.github/PULL_REQUEST_TEMPLATE.md` / a file under `.github/PULL_REQUEST_TEMPLATE/`), use that.
-2. Else use this skill’s [pull_request_template.md](pull_request_template.md) (installed at `~/.claude/skills/pr-prepare/pull_request_template.md`).
+2. Else use the shared default at `~/.config/agent-templates/pull_request_template.md`. If that file is missing, fall back to the structure in “Required output” below.
 
 Draft the title and body from that template. Checklist notes (tests, lint, review) go **above** the payload, never inside it.
 

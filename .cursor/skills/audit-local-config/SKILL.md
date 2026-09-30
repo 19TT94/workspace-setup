@@ -59,11 +59,14 @@ Workspace-setup is a template: `agents/` and `tools/` are seeds that the install
 | `tools/vimrc` | `~/.vimrc` |
 | `agents/cursor/rules/` (dir) | `~/.cursor/rules/` |
 | `agents/cursor/README.md` | `~/.cursor/rules/README.md` |
-| `agents/cursor/skills/` (dir) | `~/.cursor/skills/` |
+| `agents/skills/` + `agents/cursor/skills/` (dirs) | `~/.cursor/skills/` |
 | `agents/codex/AGENTS.md` | `~/.codex/AGENTS.md` |
-| `agents/codex/skills/` (dir) | `~/.codex/skills/` |
+| `agents/skills/` + `agents/codex/skills/` (dirs) | `~/.codex/skills/` |
 | `agents/claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
-| `agents/claude/skills/` (dir) | `~/.claude/skills/` |
+| `agents/skills/` + `agents/claude/skills/` (dirs) | `~/.claude/skills/` |
+| `agents/templates/` (dir) | `~/.config/agent-templates/` |
+
+Each agent skills dir has two seeds; the agent-specific one wins on conflict, matching install order. A local edit to a shared skill should go back into `agents/skills/`, not one agent's folder.
 
 Not seed-backed (not audited as diffs): `~/.gitignore` is generated; `~/.nvm` and `~/.zsh/` git completions are created/downloaded; `~/.codex/skills/.system/` is Codex built-in content.
 

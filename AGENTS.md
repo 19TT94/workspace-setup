@@ -27,14 +27,26 @@ The legacy `shells/` directory is **not** called by `index.js`; do not extend it
 | Path | Role | Installed? |
 | --- | --- | --- |
 | `AGENTS.md` (this file) + `.cursor/rules/` | Rules for agents working **on this repo** | No |
+| `agents/skills/` | Shared skills seeded to every agent's `skills/` dir | Yes |
+| `agents/templates/` | Shared templates (e.g. PR body) seeded to `~/.config/agent-templates/` | Yes |
 | `agents/cursor/rules/` | Global Cursor rules seeded to `~/.cursor/rules/` | Yes |
-| `agents/cursor/skills/` | Global Cursor skills seeded to `~/.cursor/skills/` | Yes |
-| `agents/codex/` | Global Codex `AGENTS.md` + skills seeded to `~/.codex/` | Yes |
+| `agents/cursor/skills/` | Cursor-only skills seeded to `~/.cursor/skills/` | Yes |
+| `agents/codex/` | Global Codex `AGENTS.md` + Codex-only skills seeded to `~/.codex/` | Yes |
 | `agents/claude/CLAUDE.md` | Global Claude config seeded to `~/.claude/CLAUDE.md` | Yes |
-| `agents/claude/skills/` | Global Claude skills seeded to `~/.claude/skills/` | Yes |
-| `agents/templates/` | Shared defaults (e.g. PR template); copied into skill dirs, not installed alone | No |
+| `agents/claude/skills/` | Claude-only skills seeded to `~/.claude/skills/` | Yes |
 
 Never add repo-dev rules under `agents/` — that would push them into every user’s global config. Keep repo-dev config in `.cursor/` and this file.
+
+## Shared vs agent-specific seeds
+
+A skill or template goes in **one** of two places:
+
+- `agents/skills/` — works for every agent. Installed to all three skills dirs. Never name a specific agent's home path in here; describe your own location generically instead.
+- `agents/<agent>/skills/` — only that agent. Use for Cursor/Codex/Claude-specific behavior.
+
+**A skill name must live in exactly one seed.** `agents/skills/foo/` and `agents/cursor/skills/foo/` both target `~/.cursor/skills/foo/`, so one copy silently overwrites the other. Shared seeds are installed first, then the agent-specific ones; `install_agents` warns when it finds a collision.
+
+Shared templates in `agents/templates/` install once to `~/.config/agent-templates/` rather than being copied into each skill, so a skill points at one path instead of carrying a private duplicate.
 
 ## Seed → home mapping (source of truth: `scripts/audit-seeds.js`)
 
@@ -54,13 +66,14 @@ Never add repo-dev rules under `agents/` — that would push them into every use
 | `tools/cursor-settings.json` | Cursor User `settings.json` (`~/Library/Application Support/Cursor/User/` on macOS, `%APPDATA%\Cursor\User\` on Windows) |
 | `agents/cursor/rules/` (dir) | `~/.cursor/rules/` |
 | `agents/cursor/README.md` | `~/.cursor/rules/README.md` |
-| `agents/cursor/skills/` (dir) | `~/.cursor/skills/` |
+| `agents/skills/` + `agents/cursor/skills/` (dirs) | `~/.cursor/skills/` |
 | `agents/codex/AGENTS.md` | `~/.codex/AGENTS.md` |
-| `agents/codex/skills/` (dir) | `~/.codex/skills/` |
+| `agents/skills/` + `agents/codex/skills/` (dirs) | `~/.codex/skills/` |
 | `agents/claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
-| `agents/claude/skills/` (dir) | `~/.claude/skills/` |
+| `agents/skills/` + `agents/claude/skills/` (dirs) | `~/.claude/skills/` |
+| `agents/templates/` (dir) | `~/.config/agent-templates/` |
 
-`~/.gitignore` is generated (not a repo seed); `~/.nvm` and git completions in `~/.zsh/` are created/downloaded, not copied. Keep this list in sync whenever seeds change.
+Rows that list two seeds are installed shared-first, agent-specific-second. `~/.gitignore` is generated (not a repo seed); `~/.nvm` and git completions in `~/.zsh/` are created/downloaded, not copied. Keep this list in sync whenever seeds change.
 
 ## Drift policy — local edits vs repo seeds
 

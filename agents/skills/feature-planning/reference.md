@@ -237,5 +237,5 @@ This global skill has no product-specific path table. When paths matter:
 After implementation:
 
 - Branch / PR title: `PROJ-123 Short description` (or the project’s convention)
-- PR body: link the ticket per [pr-prepare](../pr-prepare/SKILL.md) and the default [pull_request_template.md](../pr-prepare/pull_request_template.md)
+- PR body: link the ticket per [pr-prepare](../pr-prepare/SKILL.md) and the default [pull_request_template.md](../../templates/pull_request_template.md)
 - Prefer the repo’s `.github/pull_request_template.md` when present

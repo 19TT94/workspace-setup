@@ -2,10 +2,10 @@
 name: pr-prepare
 description: >-
   Prepares a branch for pull request: run project checks, draft a PR title/body
-  from the default or repo template, and hand off a copy-ready payload. Use when
-  the user is about to open a PR, asks to prepare for merge, wants a PR message,
-  or wants a pre-PR checklist. CLI copies the body to the clipboard; IDE and GUI
-  show a copy box.
+  from the default or repo template, ask before creating anything, then hand off
+  a copy-ready payload and comment the PR. Use when the user is about to open a
+  PR, asks to prepare for merge, wants a PR message, or wants a pre-PR
+  checklist. CLI copies the body to the clipboard; IDE and GUI show a copy box.
 disable-model-invocation: true
 ---
 
@@ -142,8 +142,125 @@ View [PROJ-XXX](link_to_ticket)
 - Title: match the template pattern (e.g. `PROJ-XXX [short description]`) when the project uses ticket keys; otherwise a short imperative summary
 - CLI: paste from the clipboard. IDE or GUI: paste from the copy box
 
+## Ask before you create
+
+Pasting is always safe. Publishing is not. **Stop by default.**
+
+Before any write — creating a branch, staging, committing, pushing, or
+opening a PR — assemble one packet and ask:
+
+| Field | Notes |
+|-------|-------|
+| Branch | `<type>/<short-description>` unless the project has its own convention |
+| Commit message | Subject plus why |
+| PR title / body | From the chosen template |
+| Summary comment | Drafted, editable — this is the one most worth reading closely |
+| Inline comments | Drafted content with file references. Line anchors resolve later |
+
+Present it in chat, ask once, apply edits, then proceed.
+
+**Skip the pause only when the user already said to take it through** —
+“open the PR”, “take it all the way”, “ship it”, “just create it”. Unambiguous
+wording only. Anything hedged, or a request that came before the packet
+existed, still stops and asks.
+
+Approval covers one run and one scope. If more files are added or the approach
+changes afterward, assemble a fresh packet and ask again — do not carry
+approval forward across a scope change.
+
+## Comment the PR
+
+Once the PR exists, post a summary comment plus inline comments where the
+diff cannot speak for itself. This is what saves the reviewer from
+reconstructing your reasoning by reading five files.
+
+**One call posts both.** The review body is the general comment; the
+`comments` array is the inline set:
+
+```bash
+gh api "repos/$REPO/pulls/$PR/reviews" --method POST --input - <<'JSON'
+{
+  "body": "## Summary\n\nWhat changed and why…",
+  "event": "COMMENT",
+  "comments": [
+    {
+      "path": "scripts/install.js",
+      "line": 118,
+      "side": "RIGHT",
+      "body": "Why this branch, and what was rejected."
+    }
+  ]
+}
+JSON
+```
+
+`event: "COMMENT"` posts without approving. Never use `APPROVE` — an agent
+approving its own work is not a review.
+
+Post **one** review object per PR. Do not create a second review to add
+comments you forgot; edit the first with `PUT` on the same review id, or put
+the addition in the summary body. A trail of self-reviews makes the PR
+harder to read, not easier.
+
+### When to comment
+
+Comment where a reviewer would otherwise have to dig:
+
+- **Non-obvious why** — the constraint that forced the choice, and what you
+  rejected
+- **Depends on code outside the diff** — a caller, config, or sibling module
+  that this diff does not show
+- **Sharp edges** — behavior that is safe only under a condition
+- **Rollback / migration** — how to undo it, what has to happen in order
+- **Intentional omissions** — what you chose not to change, and why
+
+Do **not** comment on what the diff already shows plainly, formatting, or
+anything you would answer with “yes, that’s right”. Those train reviewers to
+skim.
+
+Aim for **five inline comments or fewer**. Past that, PRs get skimmed. Fold
+the remainder into the summary body instead of posting them.
+
+### Anchors resolve after push
+
+An inline comment needs a `line` that exists in the PR diff. That line
+number does not exist until the branch is pushed, because the diff *is* the
+push. Sequence it:
+
+1. Draft the comment **content** before pushing (part of the packet)
+2. Push, open the PR
+3. Read the diff back — `gh pr diff $PR`
+4. Resolve each comment to a real line in that output
+5. Post
+
+**Resolve `line` by counting new-file lines, not by counting diff lines.**
+`@@ -2,92 +2,12 @@` means the hunk’s first line is line 2 of the new file.
+From there, count forward, and apply these rules:
+
+- A `+` or ` ` (context) line **advances** the new-file counter.
+- A `-` (deleted) line **does not**. It is absent from the new file.
+- `\ No newline at end of file` **does not** advance it either. This marker
+  follows the last line of a file that lacks a trailing newline, so counting
+  it shifts every subsequent anchor by one.
+
+When a file ends without a newline, the marker is easy to misread as a line
+and every comment below it lands on the wrong row. Verify the resolved
+number against the real file — `grep -n` on the working copy is a cheap
+cross-check.
+
+`side` is `RIGHT` for a line in the new file, `LEFT` for a line in the old.
+A deleted line anchors on `LEFT` at its original number.
+
+**If a comment has no anchorable line** — you are describing context outside
+the diff — fold it into the summary body. Never silently drop it.
+
 ## Do not
 
+- Open a PR, push, or post a comment before the user approves the packet
+- Treat approval for one scope as approval for a changed scope
+- Self-approve: `event` is always `COMMENT`
+- Post more than ~5 inline comments; fold the rest into the summary
+- Drop a comment that could not be anchored — move it into the summary
 - Commit secrets or `.env` files
 - Skip the clipboard copy when running in a CLI
 - Put `========== COPY BOX ==========` or `========== END COPY BOX ==========` on the clipboard

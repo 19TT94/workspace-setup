@@ -47,6 +47,17 @@ set shiftwidth=4
 " On pressing tab, insert 4 spaces
 set expandtab
 
+" Tab navigation. These shadow Vim's T{char} till-backwards motion for the
+" characters n, p, and the digits -- motions nobody uses in practice. Note the
+" count for {count}T{char} precedes the T, so T1..T9 cannot collide with it.
+" Kept outside the vim-plug block: these need no plugin.
+nnoremap <silent> Tn :tabnext<CR>
+nnoremap <silent> Tp :tabprevious<CR>
+for s:tab in range(1, 9)
+    execute 'nnoremap <silent> T' . s:tab . ' :' . s:tab . 'tabnext<CR>'
+endfor
+unlet s:tab
+
 " Plugins managed by vim-plug (downloaded to ~/.vim/autoload/plug.vim by the installer)
 if glob('~/.vim/autoload/plug.vim') != ''
     call plug#begin('~/.vim/plugged')

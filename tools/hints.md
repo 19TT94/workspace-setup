@@ -36,6 +36,9 @@ Git branch Tab-completion is enabled (`git switch <Tab>`, `git checkout <Tab>`, 
 | Keys | What it does |
 | --- | --- |
 | `gt` / `gT` / `2gt` | next / prev / jump to nvim tab (styled by bufferline) |
+| `Tn` / `Tp` | next / previous tab (vim + nvim) |
+| `T1` … `T9` | jump straight to tab 1-9 (vim + nvim) |
+| `:tabedit {file}` | open a file in a new tab |
 | `Cmd+/` / `gcc` | toggle comment line (visual: select then `Cmd+/` or `gc`) |
 | `gd` | go to definition / open file from import (LSP) |
 | `<leader>gt` | definition in a new tab |

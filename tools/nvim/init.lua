@@ -21,6 +21,15 @@ vim.opt.signcolumn = "yes"
 vim.keymap.set("n", "<leader>w", "<cmd>write<cr>", { desc = "Write file" })
 vim.keymap.set("n", "<leader>q", "<cmd>quit<cr>", { desc = "Quit window" })
 
+-- Tab navigation. These shadow Vim's T{char} till-backwards motion for the
+-- characters n, p, and the digits -- motions nobody uses in practice. The count
+-- for {count}T{char} precedes the T, so T1..T9 cannot collide with it.
+vim.keymap.set("n", "Tn", "<cmd>tabnext<cr>", { desc = "Next tab" })
+vim.keymap.set("n", "Tp", "<cmd>tabprevious<cr>", { desc = "Previous tab" })
+for tab = 1, 9 do
+  vim.keymap.set("n", "T" .. tab, "<cmd>" .. tab .. "tabnext<cr>", { desc = "Go to tab " .. tab })
+end
+
 vim.filetype.add({
   extension = { tf = "terraform", tfvars = "terraform" },
 })

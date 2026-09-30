@@ -4,7 +4,7 @@ Templates for **full draft** / copy-paste into Jira (or similar). Concise mode b
 
 ## Configure these defaults
 
-Edit this file after install (`~/.claude/skills/feature-planning/reference.md`) so ticket keys and links match your tracker.
+Edit this file after install (it lands in your agent’s `skills/feature-planning/` directory) so ticket keys and links match your tracker.
 
 | Setting | Value | Notes |
 | ------- | ----- | ----- |
@@ -237,5 +237,5 @@ This global skill has no product-specific path table. When paths matter:
 After implementation:
 
 - Branch / PR title: `PROJ-123 Short description` (or the project’s convention)
-- PR body: link the ticket per [pr-prepare](../pr-prepare/SKILL.md) and the default [pull_request_template.md](../pr-prepare/pull_request_template.md)
+- PR body: link the ticket per [pr-prepare](../pr-prepare/SKILL.md) and the default [pull_request_template.md](../../templates/pull_request_template.md)
 - Prefer the repo’s `.github/pull_request_template.md` when present

@@ -17,7 +17,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execSync } = require('child_process');
-const { isWindows, getPowerShellProfilePath, getVSCodeSettingsPath, getCursorSettingsPath } = require('./platform');
+const { isWindows, getPowerShellProfilePath, getVSCodeSettingsPath, getCursorSettingsPath, getAgentTemplatesPath } = require('./platform');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const FULL_DIFFS = process.argv.includes('--full');
@@ -147,26 +147,43 @@ function auditConfigEntry(entry) {
     return { count, statusCounts: count };
 }
 
+// An agent's skills dir is seeded by more than one repo dir (agents/skills/ plus
+// its own agents/<agent>/skills/), and the agent-specific one wins on conflict,
+// matching the installer's copy order. Later seeds overwrite earlier ones in the
+// seedPath map, so a relative path resolves to the seed that actually wins.
+function collectSeedFiles(seedDirs) {
+    const seedPathByRel = new Map();
+
+    for (const seedDir of seedDirs) {
+        for (const rel of walkFiles(seedDir)) {
+            seedPathByRel.set(rel, path.join(seedDir, rel));
+        }
+    }
+
+    return seedPathByRel;
+}
+
 function auditDirEntry(entry) {
-    const seedDir = resolveSeed(entry.seed);
+    const seedDirs = (entry.seeds || [entry.seed]).map((seed) => resolveSeed(seed));
     const targetDir = normalize(entry.target());
 
-    if (!fs.existsSync(seedDir)) {
-        console.log(`  [WARN] seed directory missing at ${seedDir}`);
+    const existingSeeds = seedDirs.filter((dir) => fs.existsSync(dir));
+    if (existingSeeds.length === 0) {
+        console.log(`  [WARN] seed directory missing at ${seedDirs.join(', ')}`);
         return { count: { identical: 0, differs: 0, missing: 0 } };
     }
 
-    const seedFiles = walkFiles(seedDir);
+    const seedPathByRel = collectSeedFiles(existingSeeds);
     const targetFiles = walkFiles(targetDir, entry.ignoreTargetTopDirs);
-    const allFiles = [...new Set([...seedFiles, ...targetFiles])];
+    const allFiles = [...new Set([...seedPathByRel.keys(), ...targetFiles])];
 
     const count = { identical: 0, differs: 0, missing: 0 };
     let localOnly = 0;
 
     for (const rel of allFiles) {
-        const seedPath = path.join(seedDir, rel);
+        const seedPath = seedPathByRel.get(rel);
         const targetPath = path.join(targetDir, rel);
-        const seedExists = fs.existsSync(seedPath);
+        const seedExists = Boolean(seedPath);
         const targetExists = fs.existsSync(targetPath);
         const displayPath = path.join(entry.label, rel);
 
@@ -193,7 +210,7 @@ function auditDirEntry(entry) {
         }
     }
 
-    if (seedFiles.length === 0) {
+    if (seedPathByRel.size === 0) {
         count.missing++;
     }
 
@@ -235,14 +252,17 @@ function audit() {
         { label: 'cursor settings', seed: 'tools/cursor-settings.json', target: () => getCursorSettingsPath(), platforms: ['darwin', 'win32'] }
     ];
 
+    // seeds: shared first, agent-specific second - later entries win, matching
+    // the installer's copy order in scripts/install.js.
     const agentSeeds = [
         { label: 'Cursor rules', seed: 'agents/cursor/rules', target: () => homePath('.cursor', 'rules'), dir: true },
         { label: 'cursor README', seed: 'agents/cursor/README.md', target: () => homePath('.cursor', 'rules', 'README.md') },
-        { label: 'cursor skills', seed: 'agents/cursor/skills', target: () => homePath('.cursor', 'skills'), dir: true },
+        { label: 'cursor skills', seeds: ['agents/skills', 'agents/cursor/skills'], target: () => homePath('.cursor', 'skills'), dir: true },
         { label: 'codex AGENTS.md', seed: 'agents/codex/AGENTS.md', target: () => homePath('.codex', 'AGENTS.md') },
-        { label: 'codex skills', seed: 'agents/codex/skills', target: () => homePath('.codex', 'skills'), dir: true, ignoreTargetTopDirs: ['.system'] },
+        { label: 'codex skills', seeds: ['agents/skills', 'agents/codex/skills'], target: () => homePath('.codex', 'skills'), dir: true, ignoreTargetTopDirs: ['.system'] },
         { label: 'claude CLAUDE.md', seed: 'agents/claude/CLAUDE.md', target: () => homePath('.claude', 'CLAUDE.md') },
-        { label: 'claude skills', seed: 'agents/claude/skills', target: () => homePath('.claude', 'skills'), dir: true }
+        { label: 'claude skills', seeds: ['agents/skills', 'agents/claude/skills'], target: () => homePath('.claude', 'skills'), dir: true },
+        { label: 'agent templates', seed: 'agents/templates', target: () => getAgentTemplatesPath(), dir: true }
     ];
 
     const platform = isWindows ? 'win32' : 'darwin';
@@ -285,6 +305,8 @@ function audit() {
     console.log('  ~/.gitignore is generated (not a repo seed). ~/.nvm and ~/.zsh/');
     console.log('  git completions are created/downloaded, so they are not audited.');
     console.log('  ~/.codex/skills/.system/ holds Codex built-in skills and is skipped.');
+    console.log('  Each agent skills dir is seeded by agents/skills/ + its own');
+    console.log('  agents/<agent>/skills/; the agent-specific seed wins on conflict.');
     console.log('  LOCAL ONLY files usually belong to a single machine - do not copy');
     console.log('  them into agents/ or tools/ without reviewing them first.');
     console.log('');

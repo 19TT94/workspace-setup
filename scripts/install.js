@@ -6,10 +6,12 @@ const shell = require('./shell');
 const {
     isWindows,
     homePath,
+    displayHome,
     getConfigChoices,
     getDevtoolChoices,
     getAgentChoices,
     getAgentInstallPaths,
+    getAgentTemplatesPath,
     getGitignoreEntries,
     getPowerShellProfilePath,
     getNeovimConfigPath,
@@ -505,6 +507,39 @@ async function install_config() {
     }
 }
 
+function listDirNames(dirPath) {
+    if (!fs.existsSync(dirPath)) {
+        return [];
+    }
+    return fs.readdirSync(dirPath, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => entry.name);
+}
+
+// agents/skills/ is copied to every agent, so a skill name present in both the
+// shared dir and an agent-specific dir means one copy silently overwrites the
+// other.
+function warnOnSkillNameCollisions(agent, targetSegments) {
+    const shared = listDirNames(path.join(REPO_ROOT, 'agents', 'skills'));
+    const specific = listDirNames(path.join(REPO_ROOT, 'agents', agent, 'skills'));
+    const collisions = shared.filter((name) => specific.includes(name));
+
+    for (const name of collisions) {
+        const target = [...targetSegments, name].join('/');
+        console.warn(`\nWarning: skill "${name}" exists in both agents/skills/ and agents/${agent}/skills/.`);
+        console.warn(`Both install to ${displayHome(`${target}/`)} - one will overwrite the other.`);
+        console.warn(`Keep the skill in exactly one location.\n`);
+    }
+}
+
+async function install_agent_templates() {
+    await copyDirContentsWithPrompt(
+        path.join(REPO_ROOT, 'agents', 'templates'),
+        getAgentTemplatesPath(),
+        'agent templates'
+    );
+}
+
 async function install_agents() {
     const response = await prompt([
         {
@@ -515,12 +550,27 @@ async function install_agents() {
         }
     ]);
 
+    if (response.agents.length === 0) {
+        console.log('No AI agent starter files selected.');
+        return;
+    }
+
     const agentInstallPaths = getAgentInstallPaths();
+
+    await install_agent_templates();
 
     for (const agent of response.agents) {
         const config = agentInstallPaths[agent];
         if (!config) {
             continue;
+        }
+
+        const skillsTarget = config.paths
+            .filter((entry) => entry.source[0] === 'agents' && entry.source[1] === agent && entry.source[2] === 'skills')
+            .map((entry) => entry.target)[0];
+
+        if (skillsTarget) {
+            warnOnSkillNameCollisions(agent, skillsTarget);
         }
 
         for (const entry of config.paths) {

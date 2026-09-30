@@ -15,6 +15,10 @@ function displayHome(relativePath) {
     return `~/${relativePath}`;
 }
 
+function getAgentTemplatesPath() {
+    return homePath('.config', 'agent-templates');
+}
+
 function getPowerShellProfilePath() {
     const documents = path.join(os.homedir(), 'Documents');
     const ps7Profile = path.join(documents, 'PowerShell', 'Microsoft.PowerShell_profile.ps1');
@@ -172,6 +176,12 @@ const AGENT_INSTALL_PATHS = {
             },
             {
                 type: 'dir',
+                source: ['agents', 'skills'],
+                target: ['.cursor', 'skills'],
+                label: 'shared skills'
+            },
+            {
+                type: 'dir',
                 source: ['agents', 'cursor', 'skills'],
                 target: ['.cursor', 'skills'],
                 label: 'cursor skills'
@@ -190,6 +200,12 @@ const AGENT_INSTALL_PATHS = {
             },
             {
                 type: 'dir',
+                source: ['agents', 'skills'],
+                target: ['.codex', 'skills'],
+                label: 'shared skills'
+            },
+            {
+                type: 'dir',
                 source: ['agents', 'codex', 'skills'],
                 target: ['.codex', 'skills'],
                 label: 'codex skills'
@@ -205,6 +221,12 @@ const AGENT_INSTALL_PATHS = {
                 source: ['agents', 'claude', 'CLAUDE.md'],
                 target: ['.claude', 'CLAUDE.md'],
                 label: 'claude CLAUDE.md'
+            },
+            {
+                type: 'dir',
+                source: ['agents', 'skills'],
+                target: ['.claude', 'skills'],
+                label: 'shared skills'
             },
             {
                 type: 'dir',
@@ -308,6 +330,7 @@ module.exports = {
     homePath,
     displayHome,
     getPowerShellProfilePath,
+    getAgentTemplatesPath,
     getShellConfigPath,
     getNeovimConfigPath,
     getWezTermConfigPath,

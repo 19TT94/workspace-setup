@@ -128,7 +128,7 @@ node ./index.js --dry-run --devtools
 workspace-setup/
   index.js                 # CLI entry point
   run.sh / run.ps1         # Platform bootstrap scripts
-  agents/                  # AI agent starter files (Cursor, Codex, Claude)
+  agents/                  # AI agent starter files (shared skills/templates + Cursor, Codex, Claude)
   tools/                   # Dotfile templates (zshrc, vimrc, nvim/, wezterm.lua, starship, ...)
   scripts/
     install.js             # Install orchestration and file-copy helpers
@@ -142,6 +142,8 @@ workspace-setup/
 ```
 
 Seed files in `tools/` and `agents/` are copied into your home directory. Edit them in this repo first if you want to change defaults for future machines.
+
+`agents/skills/` holds skills installed to **every** agent; `agents/<agent>/skills/` holds skills only that agent gets. A skill name must live in exactly one of them.
 
 ## Configuration files
 
@@ -206,6 +208,15 @@ tmux and Neovim workflow works in the built-in terminal.
 
 Available on both platforms as a standalone flow or as part of Windows `--all`.
 
+Shared seeds install once for every selected agent:
+
+| Seed | Target (macOS) | Target (Windows) |
+| --- | --- | --- |
+| `agents/skills/` | `~/.cursor/skills/`, `~/.codex/skills/`, `~/.claude/skills/` | `%USERPROFILE%\.cursor\skills\`, `%USERPROFILE%\.codex\skills\`, `%USERPROFILE%\.claude\skills\` |
+| `agents/templates/` | `~/.config/agent-templates/` | `%USERPROFILE%\.config\agent-templates\` |
+
+Agent-specific seeds add to the same target afterwards:
+
 | Agent        | Source                      | Target (macOS)                    | Target (Windows)                                      |
 | ------------ | --------------------------- | --------------------------------- | ----------------------------------------------------- |
 | Cursor rules  | `agents/cursor/rules/`     | `~/.cursor/rules/`                 | `%USERPROFILE%\.cursor\rules\`                         |
@@ -216,9 +227,9 @@ Available on both platforms as a standalone flow or as part of Windows `--all`.
 | Claude Code   | `agents/claude/CLAUDE.md`  | `~/.claude/CLAUDE.md`              | `%USERPROFILE%\.claude\CLAUDE.md`                      |
 | Claude skills | `agents/claude/skills/`    | `~/.claude/skills/`                | `%USERPROFILE%\.claude\skills\`                        |
 
-Shared defaults (not installed on their own): `agents/templates/pull_request_template.md` is the canonical PR body. The `pr-prepare` skill ships a copy and prefers a repo `.github/pull_request_template.md` when present.
+`agents/skills/` holds skills that work for every agent; `agents/<agent>/skills/` holds skills only that agent needs. A skill name must live in exactly one of them, or one copy overwrites the other — the installer warns when it detects that.
 
-Customize the files under `agents/` before running the installer to change what gets copied. Edit `agents/templates/pull_request_template.md` (and the matching copies under each `pr-prepare` skill) to change the global PR default. Edit `feature-planning/reference.md` to set your tracker project key and browse URL.
+Customize the files under `agents/` before running the installer to change what gets copied. Edit `agents/templates/pull_request_template.md` to change the global PR default (it installs once to `~/.config/agent-templates/`; the `pr-prepare` skill prefers a repo `.github/pull_request_template.md` when present). Edit `agents/skills/feature-planning/reference.md` to set your tracker project key and browse URL.
 
 ## Devtools
 

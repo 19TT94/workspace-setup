@@ -130,6 +130,187 @@ do
   hl("GitSignsDelete", { fg = p.red })
 end
 
+-- Context agents: :Cclaude / :Ccursor / :Copencode open that agent in a split
+-- beside this window (WezTerm/tmux pane, else :terminal), seeded with this
+-- session's open tabs + dirty files. :Ccontext previews the context first.
+local function agent_root()
+  local cwd = vim.fn.getcwd()
+  local root = vim.fn.systemlist({ "git", "-C", cwd, "rev-parse", "--show-toplevel" })
+  if vim.v.shell_error == 0 and root[1] and root[1] ~= "" then
+    return root[1]
+  end
+  return cwd
+end
+
+-- Absolute paths of dirty + untracked files, or {} outside a git repo.
+-- Mirrors gopen (tools/zshrc): diff HEAD plus untracked, both from repo root.
+local function agent_dirty(root)
+  local inside = vim.fn.systemlist({ "git", "-C", root, "rev-parse", "--is-inside-work-tree" })
+  if vim.v.shell_error ~= 0 or inside[1] ~= "true" then
+    return {}
+  end
+  local function git_lines(...)
+    local out = vim.fn.systemlist({ "git", "-C", root, ... })
+    if vim.v.shell_error ~= 0 then
+      return {}
+    end
+    return out
+  end
+  local dirty = {}
+  for _, list in ipairs({ git_lines("diff", "--name-only", "HEAD"), git_lines("ls-files", "--others", "--exclude-standard") }) do
+    for _, file in ipairs(list) do
+      if file ~= "" then
+        dirty[root .. "/" .. file] = true
+      end
+    end
+  end
+  return dirty
+end
+
+local function agent_rel(root, path)
+  local prefix = root == "/" and "/" or root .. "/"
+  if vim.startswith(path, prefix) then
+    return path:sub(#prefix + 1)
+  end
+  return path
+end
+
+local function agent_context()
+  local root = agent_root()
+  local dirty = agent_dirty(root)
+  local tabs = vim.api.nvim_list_tabpages()
+  local cur = vim.api.nvim_get_current_tabpage()
+  local raw = vim.api.nvim_buf_get_name(0)
+  local path = raw == "" and "" or vim.fn.fnamemodify(raw, ":p")
+  local name = path == "" and "(unnamed)" or agent_rel(root, path)
+  local pos = path == "" and "" or (":" .. vim.api.nvim_win_get_cursor(0)[1])
+  local cur_idx = 1
+  for i, t in ipairs(tabs) do
+    if t == cur then
+      cur_idx = i
+    end
+  end
+  local out = {
+    "Context from my editor session (open in a split beside you).",
+    "Treat this as your starting point: the files below are already open in my editor.",
+    "",
+    ("Active file: %s%s (tab %d of %d)"):format(name, pos, cur_idx, #tabs),
+    "Tabs:",
+  }
+  for i, t in ipairs(tabs) do
+    local buf = vim.api.nvim_win_get_buf(vim.api.nvim_tabpage_get_win(t))
+    local p = vim.api.nvim_buf_get_name(buf)
+    local full = p == "" and "" or vim.fn.fnamemodify(p, ":p")
+    local disp = full == "" and "(unnamed)" or agent_rel(root, full)
+    out[#out + 1] = ("  %d. %s%s"):format(i, disp, dirty[full] and " *" or "")
+  end
+  if next(dirty) ~= nil then
+    out[#out + 1] = "Dirty/untracked files:"
+    local rels = {}
+    for p in pairs(dirty) do
+      rels[#rels + 1] = agent_rel(root, p)
+    end
+    table.sort(rels)
+    for _, p in ipairs(rels) do
+      out[#out + 1] = "  - " .. p
+    end
+  end
+  out[#out + 1] = "Repo root: " .. root
+  return table.concat(out, "\n")
+end
+
+-- opencode's TUI has no prompt argument: paste the context into its input box
+-- once it has booted, then send a raw Enter. Everything goes through bracketed
+-- paste, so the newlines in the context cannot submit early.
+local function agent_seed(transport, id, ctx)
+  if transport == "wezterm" then
+    vim.fn.system({ "wezterm", "cli", "send-text", "--pane-id", id, ctx })
+    vim.defer_fn(function()
+      vim.fn.system({ "wezterm", "cli", "send-text", "--no-paste", "--pane-id", id, "\r" })
+    end, 300)
+  elseif transport == "tmux" then
+    vim.fn.system({ "tmux", "load-buffer", "-b", "agentctx", "-" }, ctx)
+    vim.fn.system({ "tmux", "paste-buffer", "-p", "-b", "agentctx", "-t", id })
+    vim.defer_fn(function()
+      vim.fn.system({ "tmux", "send-keys", "-t", id, "Enter" })
+    end, 300)
+  else
+    vim.api.nvim_chan_send(id, "\27[200~" .. ctx .. "\27[201~")
+    vim.defer_fn(function()
+      vim.api.nvim_chan_send(id, "\r")
+    end, 300)
+  end
+end
+
+local function agent_open(which)
+  local root = agent_root()
+  local ctx = agent_context()
+  local cmd
+  if which == "claude" then
+    cmd = { "claude", ctx }
+  elseif which == "cursor" then
+    cmd = { "cursor-agent", ctx }
+  elseif which == "opencode" then
+    cmd = { "opencode" }
+  else
+    return
+  end
+  if vim.fn.executable(cmd[1]) ~= 1 then
+    vim.notify("Agent not installed: " .. cmd[1], vim.log.levels.ERROR)
+    return
+  end
+
+  local transport, id
+  if vim.env.WEZTERM_PANE and vim.fn.executable("wezterm") == 1 then
+    local argv = { "wezterm", "cli", "split-pane", "--right", "--percent", "45", "--cwd", root, "--" }
+    vim.list_extend(argv, cmd)
+    local out = vim.fn.systemlist(argv)
+    if vim.v.shell_error ~= 0 then
+      vim.notify("wezterm split-pane failed: " .. table.concat(out, " "), vim.log.levels.ERROR)
+      return
+    end
+    transport, id = "wezterm", vim.trim(out[1] or "")
+    vim.fn.system({ "wezterm", "cli", "activate-pane", "--pane-id", id })
+  elseif vim.env.TMUX and vim.fn.executable("tmux") == 1 then
+    local argv = { "tmux", "split-window", "-h", "-P", "-F", "#{pane_id}", "-c", root, "--" }
+    vim.list_extend(argv, cmd)
+    local out = vim.fn.systemlist(argv)
+    if vim.v.shell_error ~= 0 then
+      vim.notify("tmux split-window failed: " .. table.concat(out, " "), vim.log.levels.ERROR)
+      return
+    end
+    transport, id = "tmux", vim.trim(out[1] or "")
+  else
+    -- No WezTerm/tmux: run the agent in a :terminal split instead.
+    vim.cmd("botright split")
+    transport = "term"
+    id = vim.fn.termopen(cmd, { cwd = root })
+    if id <= 0 then
+      vim.notify("Failed to start terminal", vim.log.levels.ERROR)
+      return
+    end
+  end
+
+  if which == "opencode" then
+    vim.defer_fn(function()
+      agent_seed(transport, id, ctx)
+    end, 1500)
+  end
+end
+
+vim.api.nvim_create_user_command("Ccontext", function()
+  print(agent_context())
+end, { desc = "Preview the context an agent would receive" })
+vim.api.nvim_create_user_command("Cclaude", function()
+  agent_open("claude")
+end, { desc = "Open Claude Code in a split with session context" })
+vim.api.nvim_create_user_command("Ccursor", function()
+  agent_open("cursor")
+end, { desc = "Open Cursor Agent in a split with session context" })
+vim.api.nvim_create_user_command("Copencode", function()
+  agent_open("opencode")
+end, { desc = "Open opencode in a split with session context" })
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   vim.fn.system({

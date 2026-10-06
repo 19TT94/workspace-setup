@@ -58,6 +58,169 @@ for s:tab in range(1, 9)
 endfor
 unlet s:tab
 
+" Context agents: :Cclaude / :Ccursor / :Copencode open that agent in a split
+" beside the editor (WezTerm/tmux pane, else :terminal), seeded with this
+" session's open tabs + dirty files. :Ccontext previews the context first.
+" Kept outside the vim-plug block: these need no plugin.
+" Unlike nvim, vim's system() takes a String only, so argv lists get
+" shellescape-joined before they are run through 'shell'.
+function! s:AgentSh(cmd) abort
+    return join(map(copy(a:cmd), 'shellescape(v:val)'), ' ')
+endfunction
+
+function! s:AgentRoot() abort
+    let l:cwd = getcwd()
+    let l:root = systemlist(s:AgentSh(['git', '-C', l:cwd, 'rev-parse', '--show-toplevel']))
+    if v:shell_error == 0 && get(l:root, 0, '') !=# ''
+        return l:root[0]
+    endif
+    return l:cwd
+endfunction
+
+" Absolute paths of dirty + untracked files, or {} outside a git repo.
+" Mirrors gopen (tools/zshrc): diff HEAD plus untracked, both from repo root.
+function! s:AgentDirty(root) abort
+    let l:inside = systemlist(s:AgentSh(['git', '-C', a:root, 'rev-parse', '--is-inside-work-tree']))
+    if v:shell_error != 0 || get(l:inside, 0, '') !=# 'true'
+        return {}
+    endif
+    let l:names = systemlist(s:AgentSh(['git', '-C', a:root, 'diff', '--name-only', 'HEAD']))
+    if v:shell_error != 0
+        let l:names = []
+    endif
+    let l:extra = systemlist(s:AgentSh(['git', '-C', a:root, 'ls-files', '--others', '--exclude-standard']))
+    if v:shell_error != 0
+        let l:extra = []
+    endif
+    let l:dirty = {}
+    for l:file in l:names + l:extra
+        if l:file !=# ''
+            let l:dirty[a:root . '/' . l:file] = 1
+        endif
+    endfor
+    return l:dirty
+endfunction
+
+function! s:AgentRel(root, path) abort
+    let l:prefix = a:root ==# '/' ? '/' : a:root . '/'
+    if stridx(a:path, l:prefix) == 0
+        return a:path[len(l:prefix):]
+    endif
+    return a:path
+endfunction
+
+function! AgentContext() abort
+    let l:root = s:AgentRoot()
+    let l:dirty = s:AgentDirty(l:root)
+    let l:total = tabpagenr('$')
+    let l:path = expand('%:p')
+    let l:name = l:path ==# '' ? '(unnamed)' : s:AgentRel(l:root, l:path)
+    let l:pos = l:path ==# '' ? '' : ':' . line('.')
+    let l:lines = [
+    \   'Context from my editor session (open in a split beside you).',
+    \   'Treat this as your starting point: the files below are already open in my editor.',
+    \   '',
+    \   printf('Active file: %s%s (tab %d of %d)', l:name, l:pos, tabpagenr(), l:total),
+    \   'Tabs:',
+    \ ]
+    for l:t in range(1, l:total)
+        let l:info = get(getbufinfo(winbufnr(win_getid(tabpagewinnr(l:t), l:t))), 0, {})
+        let l:full = get(l:info, 'name', '')
+        let l:disp = l:full ==# '' ? '(unnamed)' : s:AgentRel(l:root, l:full)
+        call add(l:lines, printf('  %d. %s%s', l:t, l:disp, has_key(l:dirty, l:full) ? ' *' : ''))
+    endfor
+    if !empty(l:dirty)
+        call add(l:lines, 'Dirty/untracked files:')
+        for l:file in sort(keys(l:dirty))
+            call add(l:lines, '  - ' . s:AgentRel(l:root, l:file))
+        endfor
+    endif
+    call add(l:lines, 'Repo root: ' . l:root)
+    return join(l:lines, "\n")
+endfunction
+
+" opencode's TUI has no prompt argument: paste the context into its input box
+" once it has booted, then send a raw Enter. send-keys/paste go through
+" bracketed paste, so the newlines in the context cannot submit early.
+function! s:AgentSeed(transport, id, ctx) abort
+    if a:transport ==# 'wezterm'
+        call system(s:AgentSh(['wezterm', 'cli', 'send-text', '--pane-id', a:id, a:ctx]))
+        call timer_start(300, {-> system(s:AgentSh(['wezterm', 'cli', 'send-text', '--no-paste', '--pane-id', a:id, "\r"]))})
+    elseif a:transport ==# 'tmux'
+        call system(s:AgentSh(['tmux', 'load-buffer', '-b', 'agentctx', '-']), a:ctx)
+        call system(s:AgentSh(['tmux', 'paste-buffer', '-p', '-b', 'agentctx', '-t', a:id]))
+        call timer_start(300, {-> system(s:AgentSh(['tmux', 'send-keys', '-t', a:id, 'Enter']))})
+    else
+        call term_sendkeys(a:id, "\e[200~" . a:ctx . "\e[201~")
+        call timer_start(300, {-> term_sendkeys(a:id, "\r")})
+    endif
+endfunction
+
+function! AgentOpen(which) abort
+    let l:root = s:AgentRoot()
+    let l:ctx = AgentContext()
+    if a:which ==# 'claude'
+        let l:cmd = ['claude', l:ctx]
+    elseif a:which ==# 'cursor'
+        let l:cmd = ['cursor-agent', l:ctx]
+    elseif a:which ==# 'opencode'
+        let l:cmd = ['opencode']
+    else
+        return
+    endif
+    if !executable(l:cmd[0])
+        echohl ErrorMsg | echomsg 'Agent not installed: ' . l:cmd[0] | echohl None
+        return
+    endif
+
+    let l:transport = ''
+    let l:id = ''
+    if exists('$WEZTERM_PANE') && executable('wezterm')
+        let l:out = systemlist(s:AgentSh(['wezterm', 'cli', 'split-pane', '--right', '--percent', '45', '--cwd', l:root, '--'] + l:cmd))
+        if v:shell_error != 0
+            echohl ErrorMsg | echomsg 'wezterm split-pane failed: ' . join(l:out) | echohl None
+            return
+        endif
+        let l:transport = 'wezterm'
+        let l:id = get(l:out, 0, '')
+        call system(s:AgentSh(['wezterm', 'cli', 'activate-pane', '--pane-id', l:id]))
+    elseif exists('$TMUX') && executable('tmux')
+        let l:out = systemlist(s:AgentSh(['tmux', 'split-window', '-h', '-P', '-F', '#{pane_id}', '-c', l:root, '--'] + l:cmd))
+        if v:shell_error != 0
+            echohl ErrorMsg | echomsg 'tmux split-window failed: ' . join(l:out) | echohl None
+            return
+        endif
+        let l:transport = 'tmux'
+        let l:id = get(l:out, 0, '')
+    else
+        " No WezTerm/tmux: run the agent in a :terminal split instead.
+        botright split
+        let l:id = term_start(l:cmd, {'curwin': 1, 'cwd': l:root})
+        let l:transport = 'term'
+    endif
+
+    if a:which ==# 'opencode'
+        if l:transport ==# 'term'
+            if l:id > 0
+                call timer_start(1500, {-> s:AgentSeed('term', l:id, l:ctx)})
+            endif
+        elseif l:id !=# ''
+            call timer_start(1500, {-> s:AgentSeed(l:transport, l:id, l:ctx)})
+        endif
+    endif
+endfunction
+
+function! s:AgentEcho() abort
+    for l:line in split(AgentContext(), "\n")
+        echomsg l:line
+    endfor
+endfunction
+
+command! Ccontext call s:AgentEcho()
+command! Cclaude call AgentOpen('claude')
+command! Ccursor call AgentOpen('cursor')
+command! Copencode call AgentOpen('opencode')
+
 " Plugins managed by vim-plug (downloaded to ~/.vim/autoload/plug.vim by the installer)
 if glob('~/.vim/autoload/plug.vim') != ''
     call plug#begin('~/.vim/plugged')

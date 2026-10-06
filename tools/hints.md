@@ -35,6 +35,8 @@ Git branch Tab-completion is enabled (`git switch <Tab>`, `git checkout <Tab>`, 
 
 | Keys | What it does |
 | --- | --- |
+| `:Cclaude` / `:Ccursor` / `:Copencode` | open that agent in a side split, seeded with open tabs + dirty files (`:Copencode`: press Enter to send) |
+| `:Ccontext` | preview the context an agent would receive, without launching |
 | `gt` / `gT` / `2gt` | next / prev / jump to nvim tab (styled by bufferline) |
 | `Tn` / `Tp` | next / previous tab (vim + nvim) |
 | `T1` … `T9` | jump straight to tab 1-9 (vim + nvim) |

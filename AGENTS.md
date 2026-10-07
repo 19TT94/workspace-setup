@@ -26,7 +26,8 @@ The legacy `shells/` directory is **not** called by `index.js`; do not extend it
 
 | Path | Role | Installed? |
 | --- | --- | --- |
-| `AGENTS.md` (this file) + `.cursor/rules/` | Rules for agents working **on this repo** | No |
+| `AGENTS.md` (this file) + `.cursor/rules/` | Rules for agents working **on this repo** (`CLAUDE.md` imports this file) | No |
+| `.cursor/skills/` (`.claude/skills` symlinks here) | Skills for agents working **on this repo** | No |
 | `agents/skills/` | Shared skills seeded to every agent's `skills/` dir | Yes |
 | `agents/templates/` | Shared templates (e.g. PR body) seeded to `~/.config/agent-templates/` | Yes |
 | `agents/cursor/rules/` | Global Cursor rules seeded to `~/.cursor/rules/` | Yes |

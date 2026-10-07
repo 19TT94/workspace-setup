@@ -326,10 +326,11 @@ The global `setup` bin is registered in `package.json` and points at `index.js`.
 After a machine has been running for a while, its installed dotfiles and agent files may have been edited locally. Compare them against the repo seeds:
 
 ```bash
-npm run audit       # or: node scripts/audit-seeds.js
+npm run audit         # or: node scripts/audit-seeds.js
+npm run audit:agents  # agent files only, drift only (--agents --quiet)
 ```
 
-The audit classifies each seeded file as `identical`, `DIFFERS` (local drift), `NOT INSTALLED`, or `LOCAL ONLY`. It is a read-only report — it never overwrites files. Use the `audit-local-config` skill in `.cursor/skills/` to decide which local changes belong back in `agents/` or `tools/`.
+The audit classifies each seeded file as `identical`, `DIFFERS` (local drift), `NOT INSTALLED`, or `LOCAL ONLY`. It is a read-only report — it never overwrites files. Flags: `--quiet` hides identical files, `--agents` / `--tools` limit the report to one section, `--full` shows untruncated diffs. Use the `audit-local-config` skill in `.cursor/skills/` (also visible to Claude Code via `.claude/skills`) to decide which local changes belong back in `agents/` or `tools/`.
 
 ## Legacy scripts
 

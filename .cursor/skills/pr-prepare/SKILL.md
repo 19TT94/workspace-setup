@@ -4,7 +4,6 @@ description: >-
   Prepares a Workspace Setup branch for commit/PR: syntax checks, dry run, seed sync, and a
   commit-message reminder. Use when the user is about to commit, open a PR, or wants a pre-merge
   checklist.
-disable-model-invocation: true
 ---
 
 # Prepare pull request (Workspace Setup)

@@ -45,6 +45,14 @@ fi
 autoload -Uz compinit
 compinit -u
 
+# Aliases
+alias ezshrc='nvim ~/.zshrc'
+alias rzshrc='source ~/.zshrc'
+alias opn='open'                 # open file(s) in their default app, e.g. `opn README.md`
+alias vimt='wezterm cli spawn -- nvim'
+# Open every vim session in Neovim when it is installed.
+command -v nvim >/dev/null 2>&1 && alias vim='nvim'
+
 # edit-here / edit-tab: open file(s) in the current pane, or a new WezTerm/tmux tab.
 # (fzf cannot bind bare `l` without breaking search — use ctrl-l there; lf uses `l`.)
 edit-here() {
@@ -71,7 +79,7 @@ edit-tab() {
   title="$(basename "${abs[-1]}")"
   [[ "$title" == +* ]] && title="$(basename "${abs[-2]}")"
 
-  # Prefer the real binary (whence -p ignores aliases like nvim=vim).
+  # Prefer the real binary (whence -p ignores aliases like vim=nvim).
   editor="$(whence -p "${EDITOR:-nvim}" 2>/dev/null || command -v "${EDITOR:-nvim}" || echo nvim)"
 
   if [ -n "${WEZTERM_PANE:-}" ] && command -v wezterm >/dev/null 2>&1; then

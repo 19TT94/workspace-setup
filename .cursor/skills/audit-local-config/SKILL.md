@@ -11,14 +11,20 @@ description: >-
 
 Workspace-setup is a template: `agents/` and `tools/` are seeds that the installer copies into the home directory. Over time the installed copies drift (users edit `~/.zshrc`, `~/.codex/AGENTS.md`, `~/.claude/CLAUDE.md`, etc.). This skill finds that drift and decides what belongs back in the repo.
 
+The goal is for a new machine built from this repo to get the latest working environment. So by default, local edits flow **back into the seeds**. The exceptions are machine-local content and secrets.
+
 ## Steps
 
 1. **Run the audit.** From the repo root:
 
    ```bash
+   npm run audit:agents                   # agents/ only, drift only (--agents --quiet)
+   node scripts/audit-seeds.js --quiet    # both sections, drift only
    node scripts/audit-seeds.js --full     # full unified diffs
-   node scripts/audit-seeds.js            # compact report
+   node scripts/audit-seeds.js            # compact report, every file
    ```
+
+   Flags combine: `--agents` / `--tools` limit the report to one section, `--quiet` hides identical files, and `--full` shows untruncated diffs.
 
    `scripts/audit-seeds.js` is the source of truth for the seed → home mapping. Keep this skill’s table in sync with it.
 
@@ -34,8 +40,15 @@ Workspace-setup is a template: `agents/` and `tools/` are seeds that the install
 3. **Classify every `DIFFERS` file** using the drift policy in the repo-root `AGENTS.md`:
 
    - **Machine-local** — personal paths, secrets, machine-specific preferences. Do **not** touch the seed. Leave the installed file as-is.
-   - **Template-worthy** — a fix or improvement that benefits any new machine built from this repo. Propose copying the installed file back into the matching seed.
+   - **Template-worthy** — a fix or improvement that benefits any new machine built from this repo. Propose copying the installed file back into the matching seed. This is the default for agent rules and skills.
    - **Undetermined** — ask the user before acting.
+
+   **LOCAL ONLY skills** (a skill created on the machine, e.g. `~/.claude/skills/foo/`) are candidates to promote. Decide where the seed goes:
+   - `agents/skills/foo/` if it works for every agent and names no agent-specific home path.
+   - `agents/<agent>/skills/foo/` if it relies on one agent's behavior.
+   - A skill name must live in exactly one seed. Check that `foo` doesn't already exist in the other location.
+
+   **Repo newer than local** (the seed changed after the last install): offer to copy seed → home, but ask before overwriting each file, matching the installer's prompt.
 
 4. **Pull a template-worthy change back into the repo** (reverse of the install direction):
 
@@ -57,6 +70,10 @@ Workspace-setup is a template: `agents/` and `tools/` are seeds that the install
 | `tools/wezterm.lua` | `~/.config/wezterm/wezterm.lua` |
 | `tools/lfrc` | `~/.config/lf/lfrc` |
 | `tools/vimrc` | `~/.vimrc` |
+| `tools/nvim/init.lua` | `~/.config/nvim/init.lua` |
+| `tools/hints.md` | `~/.config/shell/hints.md` |
+| `tools/vscode-settings.json` | VS Code User `settings.json` |
+| `tools/cursor-settings.json` | Cursor User `settings.json` |
 | `agents/cursor/rules/` (dir) | `~/.cursor/rules/` |
 | `agents/cursor/README.md` | `~/.cursor/rules/README.md` |
 | `agents/skills/` + `agents/cursor/skills/` (dirs) | `~/.cursor/skills/` |
@@ -68,7 +85,7 @@ Workspace-setup is a template: `agents/` and `tools/` are seeds that the install
 
 Each agent skills dir has two seeds; the agent-specific one wins on conflict, matching install order. A local edit to a shared skill should go back into `agents/skills/`, not one agent's folder.
 
-Not seed-backed (not audited as diffs): `~/.gitignore` is generated; `~/.nvm` and `~/.zsh/` git completions are created/downloaded; `~/.codex/skills/.system/` is Codex built-in content.
+Not seed-backed (not audited as diffs): `~/.gitignore` is generated; `~/.nvm` and `~/.zsh/` git completions are created/downloaded; `~/.codex/skills/.system/` is Codex built-in content; `~/.claude/skills/synced/` holds skills synced from claude.ai.
 
 ## Output format
 

@@ -17,6 +17,10 @@ Run `hint` to open this file in your default markdown app.
 | `gopen` | dirty git files → one new WezTerm/tmux tab (nvim tabs inside) |
 | `topen` | open file(s) in a new WezTerm/tmux tab: `topen path` |
 | `edit-tab` / `edit-here` | open file(s) in a new WezTerm/tmux tab / current pane |
+| `ezshrc` / `rzshrc` | edit / reload `~/.zshrc` (zsh only) |
+| `opn` | open file(s) in their default app: `opn notes.md` |
+| `vimt` | open Neovim in a new WezTerm tab |
+| `vim` | runs Neovim when it is installed |
 
 Git branch Tab-completion is enabled (`git switch <Tab>`, `git checkout <Tab>`, etc.).
 

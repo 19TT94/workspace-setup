@@ -1,4 +1,16 @@
 {
+  "scm.diffDecorations": "all",
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "window.autoDetectColorScheme": false,
+  "cursor.composer.shouldChimeAfterChatFinishes": true,
+  "cursor.composer.queueMessageDefaultBehavior": "steer",
   "workbench.colorTheme": "Cursor Dark",
   "editor.fontFamily": "Monaco",
   "editor.fontSize": 14,

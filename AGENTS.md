@@ -63,6 +63,7 @@ Shared templates in `agents/templates/` install once to `~/.config/agent-templat
 | `tools/vimrc` | `~/.vimrc` |
 | `tools/nvim/init.lua` | `~/.config/nvim/init.lua` (macOS) / `%LOCALAPPDATA%\nvim\init.lua` (Windows) |
 | `tools/hints.md` | `~/.config/shell/hints.md` |
+| `tools/pstash` | `~/.local/bin/pstash` (macOS; prompts are kept in `~/.config/shell/prompts.md`, which is not a seed) |
 | `tools/vscode-settings.json` | VS Code User `settings.json` (`~/Library/Application Support/Code/User/` on macOS, `%APPDATA%\Code\User\` on Windows) |
 | `tools/cursor-settings.json` | Cursor User `settings.json` (`~/Library/Application Support/Cursor/User/` on macOS, `%APPDATA%\Cursor\User\` on Windows) |
 | `agents/cursor/rules/` (dir) | `~/.cursor/rules/` |

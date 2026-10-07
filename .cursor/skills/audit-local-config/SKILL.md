@@ -72,6 +72,7 @@ The goal is for a new machine built from this repo to get the latest working env
 | `tools/vimrc` | `~/.vimrc` |
 | `tools/nvim/init.lua` | `~/.config/nvim/init.lua` |
 | `tools/hints.md` | `~/.config/shell/hints.md` |
+| `tools/pstash` | `~/.local/bin/pstash` (prompts in `~/.config/shell/prompts.md` are personal, not a seed) |
 | `tools/vscode-settings.json` | VS Code User `settings.json` |
 | `tools/cursor-settings.json` | Cursor User `settings.json` |
 | `agents/cursor/rules/` (dir) | `~/.cursor/rules/` |

@@ -184,7 +184,7 @@ async function copyFileWithPrompt(source, target, label) {
     return true;
 }
 
-async function copyDirContentsWithPrompt(sourceDir, targetDir, label) {
+async function copyDirContentsWithPrompt(sourceDir, targetDir, label, skip = []) {
     const resolvedSource = path.resolve(sourceDir);
     const resolvedTarget = ensureDir(targetDir);
 
@@ -201,6 +201,9 @@ async function copyDirContentsWithPrompt(sourceDir, targetDir, label) {
 
     let copied = 0;
     for (const entry of entries) {
+        if (skip.includes(entry.name)) {
+            continue;
+        }
         const sourcePath = path.join(resolvedSource, entry.name);
         const targetPath = path.join(resolvedTarget, entry.name);
         const entryLabel = `${label}/${entry.name}`;
@@ -578,7 +581,7 @@ async function install_agents() {
             const target = homePath(...entry.target);
 
             if (entry.type === 'dir') {
-                await copyDirContentsWithPrompt(source, target, entry.label);
+                await copyDirContentsWithPrompt(source, target, entry.label, entry.skip);
             } else {
                 await copyFileWithPrompt(source, target, entry.label);
             }

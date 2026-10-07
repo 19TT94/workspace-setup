@@ -7,7 +7,7 @@ This folder configures Cursor for the **Workspace Setup** repo (dotfiles, devtoo
 | [`BUGBOT.md`](BUGBOT.md) | Review rules for **Agent Review** and **Bugbot** on GitHub |
 | [`rules/workspace-setup.mdc`](rules/workspace-setup.mdc) | Agent rules: installer vs seed separation, platform parity, dry-run testing |
 | [`skills/audit-local-config/`](skills/audit-local-config/SKILL.md) | Agent skill: diff locally installed config/agent files vs repo seeds, decide what to pull back |
-| [`skills/code-review/`](skills/code-review/SKILL.md) | Agent skill: review a branch/PR against installer + seed conventions |
+| [`review/workspace-setup.md`](review/workspace-setup.md) | Review guide: installer + seed conventions, applied by the global `code-review` skill |
 | [`skills/pr-prepare/`](skills/pr-prepare/SKILL.md) | Agent skill: syntax checks + dry run checklist before opening a PR |
 
 Do not confuse this with `agents/cursor/` — that folder holds the seed rules that the installer copies to `~/.cursor/rules/` on a target machine.

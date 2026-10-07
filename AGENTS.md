@@ -98,10 +98,13 @@ Do not silently overwrite installed files with seeds (the installer prompts befo
 - **Syntax check any edited JS**: `node --check scripts/foo.js`.
 - Commit only when explicitly asked.
 
+## Review guide
+
+[`.cursor/review/workspace-setup.md`](.cursor/review/workspace-setup.md) holds this repo's review rules. The global `code-review` skill (Cursor, Codex) and Claude's built-in `/code-review` apply it.
+
 ## Skills
 
 | Skill | Purpose |
 | --- | --- |
 | [`audit-local-config`](.cursor/skills/audit-local-config/SKILL.md) | Diff installed home-dir files vs repo seeds; decide what belongs back in the repo |
-| [`code-review`](.cursor/skills/code-review/SKILL.md) | Review changes against installer + seed conventions |
 | [`pr-prepare`](.cursor/skills/pr-prepare/SKILL.md) | Pre-PR checklist (syntax checks, dry run, README/seed sync) |

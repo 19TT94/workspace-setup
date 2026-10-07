@@ -226,7 +226,10 @@ const AGENT_INSTALL_PATHS = {
                 type: 'dir',
                 source: ['agents', 'skills'],
                 target: ['.claude', 'skills'],
-                label: 'shared skills'
+                label: 'shared skills',
+                // Claude Code ships its own /code-review; the global rules point it
+                // at project review guides instead of shadowing it with ours.
+                skip: ['code-review']
             },
             {
                 type: 'dir',

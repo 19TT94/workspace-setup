@@ -2,8 +2,9 @@
 name: feature-planning
 description: >-
   Triages features and drafts concise tickets (Story/Task/Bug/Spike) for any
-  project. Use for planning, epics, stories, bugs, spikes. Say "full drafts"
-  for ticket Summary and Description copy boxes. CLI uses sentinel copy boxes;
+  project. Use for planning, epics, stories, bugs, spikes. A single ticket is
+  drafted in full right away; say "full drafts" to expand multi-ticket plans
+  into Summary and Description copy boxes. CLI uses sentinel copy boxes;
   IDE and GUI use a text fence. Customize project key and templates in
   reference.md.
 disable-model-invocation: true
@@ -27,7 +28,8 @@ stays product-agnostic.
 
 | Mode | When | What the user sees |
 |------|------|-------------------|
-| **Concise** (default) | Normal `@feature-planning` | Triage line + Next + optional Questions + ticket table + footer. No full descriptions. |
+| **Concise** (default) | Normal `@feature-planning` with 2+ tickets | Triage line + Next + optional Questions + ticket table + footer. No full descriptions. |
+| **Single ticket** | Triage proposes exactly **one** ticket (any type, including a lone Spike) | Triage line + Next + optional Questions, then that ticket's **full draft** (no ticket table) + footer. There is nothing to choose between, so skip the extra `full draft` round trip. |
 | **Full** | User says `full drafts`, `copy-paste`, `expand`, or `all tickets` | One copy box per ticket section. CLI: a sentinel box per section; clipboard only when a section is named. IDE and GUI: one `text` fence per section. See [reference.md](reference.md). |
 
 Never paste filled examples from `reference.md` or duplicate template section headings in concise mode.
@@ -40,7 +42,7 @@ Never paste filled examples from `reference.md` or duplicate template section he
 | **Next** | One-sentence recommended action; optional `(risk: …)` if critical | Ticket summaries, open questions, file paths |
 | **Questions** | Max **2** blocking unknowns | Anything already in Next or Tickets |
 | **Tickets** | Type, summary, **Deps** only (`—`, `#1`, `after #1`) | Agent effort, file paths, surfaces, rationale |
-| **Footer** | Agent effort + `full draft` pointer | Triage recap, ticket detail |
+| **Footer** | Agent effort + `full draft` pointer (single ticket: agent effort only) | Triage recap, ticket detail |
 
 ## Workflow (concise)
 
@@ -48,19 +50,19 @@ Never paste filled examples from `reference.md` or duplicate template section he
 2. **Triage** — Type, size, surfaces (one line).
 3. **Next** — One sentence; fold in the top risk only if it changes the recommendation.
 4. **Map** — Mention repo paths in chat only when non-obvious; do not add a separate **Map** heading in concise output.
-5. **Propose tickets** — Count by size (below). Summary line format per issue type.
-6. **Footer** — Agent effort range + which ticket to expand for `full draft`.
+5. **Propose tickets** — Count by size (below). Summary line format per issue type. Exactly one ticket → write its full draft in place of the table (see **Single ticket** above).
+6. **Footer** — Agent effort range + which ticket to expand for `full draft` (single ticket: agent effort only).
 7. **Tracker** — Create via MCP/CLI only if available; else stop at the index unless **full** mode.
 
 ### Ticket count (concise mode)
 
 | Size | Propose |
 |------|---------|
-| **S** | 1 ticket (summary + type). |
+| **S** | 1 ticket → full draft (single-ticket mode). |
 | **M** | 2–3 tickets: summary + type + deps only. |
 | **L** | 1 **Spike** or **Epic** line + child summaries (no bodies). Say which child to expand first in footer. |
 
-For unknown scope → **Spike** only, not a pile of Tasks.
+For unknown scope → **Spike** only, not a pile of Tasks (a lone Spike is a single ticket, so draft it in full).
 
 ### Agent effort estimates
 
@@ -109,7 +111,7 @@ Omit **Questions** when none. Footer is always the **last line**.
 
 ## Full output format
 
-Use when the user asks for full drafts. Each tracker section gets its own copy box. Leave the section heading outside the box.
+Use when the user asks for full drafts, and for the one ticket in single-ticket mode. Each tracker section gets its own copy box. Leave the section heading outside the box.
 
 | Surface | Handoff |
 |---------|---------|
@@ -167,7 +169,8 @@ One `text` fence per section. Do not use a `markdown` fence. The label above the
 - Propose 5+ tickets in concise mode — cap at Spike + 3 follow-ups or Epic + child list
 - Commit, open PRs, or guess Story Points / Components
 - File a **Bug** without repro — use **Spike** first
-- Output full ticket descriptions in concise mode
+- Output full ticket descriptions in concise mode (2+ tickets) — single-ticket output always includes the full draft
+- Show a one-row ticket table plus a `full draft` pointer — draft the single ticket instead
 - Use checkboxes (`[]`, `- [ ]`) in full-draft body blocks — use `-` bullets instead
 - Include **Out of Scope** in full drafts
 - Put `========== COPY BOX` or `========== END COPY BOX` lines on the clipboard

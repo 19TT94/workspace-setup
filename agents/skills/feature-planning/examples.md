@@ -1,6 +1,6 @@
 # Feature planning examples
 
-Default agent output is **concise** (see [SKILL.md](SKILL.md)). Full ticket bodies live in [reference.md](reference.md).
+Default agent output is **concise** when there are 2+ tickets; a single ticket is drafted in full (see [SKILL.md](SKILL.md)). Full ticket bodies live in [reference.md](reference.md).
 
 ---
 
@@ -31,7 +31,7 @@ _Agent effort: ~30–90 min · `full draft` for #1 or #2._
 
 ---
 
-## Concise — null-date bug (S, API-only)
+## Single ticket — null-date bug (S, API-only)
 
 **Input:** Draft records with a null due date are incorrectly marked overdue by a nightly job.
 
@@ -43,17 +43,19 @@ Bug · **S** · API (`process_overdue`)
 
 **Next:** Reproduce with a seeded draft record, fix the filter, add a test.
 
-## Tickets
-| # | Type | Summary | Deps |
-|---|------|---------|------|
-| 1 | Bug | Exclude draft records with null due date from overdue processing | — |
+### PROJ-??? — Exclude draft records with null due date from overdue processing (Bug)
 
-_Agent effort: ~10–20 min · `full draft` for #1._
+…one copy box each for Summary, Steps to Reproduce, and Environment
+(Actual / Expected omitted: the Summary states them). See "Full output format".
+
+_Agent effort: ~10–20 min._
 ```
+
+One ticket, so there is no table and no `full draft` pointer: the draft *is* the output.
 
 ---
 
-## Concise — vague input (L → Spike only)
+## Single ticket — vague input (L → Spike only)
 
 **Input:** Make the editor and saves faster.
 
@@ -69,10 +71,9 @@ Unknown · **L** (unscoped) · TBD
 - Editor UI, API write path, or both?
 - Large documents only, or all sizes?
 
-## Tickets
-| # | Type | Summary | Deps |
-|---|------|---------|------|
-| 1 | Spike | Which editor/save operations dominate latency for large documents? | — |
+### PROJ-??? — Which editor/save operations dominate latency for large documents? (Spike)
 
-_Agent effort: ~15–30 min · `full draft` for #1._
+…one copy box each for Summary, Question, Time box, and Done when.
+
+_Agent effort: ~15–30 min._
 ```

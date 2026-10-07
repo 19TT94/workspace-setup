@@ -158,11 +158,11 @@ function auditConfigEntry(entry) {
 // its own agents/<agent>/skills/), and the agent-specific one wins on conflict,
 // matching the installer's copy order. Later seeds overwrite earlier ones in the
 // seedPath map, so a relative path resolves to the seed that actually wins.
-function collectSeedFiles(seedDirs) {
+function collectSeedFiles(seedDirs, skipSeedTopDirs) {
     const seedPathByRel = new Map();
 
     for (const seedDir of seedDirs) {
-        for (const rel of walkFiles(seedDir)) {
+        for (const rel of walkFiles(seedDir, skipSeedTopDirs)) {
             seedPathByRel.set(rel, path.join(seedDir, rel));
         }
     }
@@ -180,7 +180,7 @@ function auditDirEntry(entry) {
         return { count: { identical: 0, differs: 0, missing: 0 } };
     }
 
-    const seedPathByRel = collectSeedFiles(existingSeeds);
+    const seedPathByRel = collectSeedFiles(existingSeeds, entry.skipSeedTopDirs);
     const targetFiles = walkFiles(targetDir, entry.ignoreTargetTopDirs);
     const allFiles = [...new Set([...seedPathByRel.keys(), ...targetFiles])];
 
@@ -304,7 +304,7 @@ function audit() {
         { label: 'codex AGENTS.md', seed: 'agents/codex/AGENTS.md', target: () => homePath('.codex', 'AGENTS.md') },
         { label: 'codex skills', seeds: ['agents/skills', 'agents/codex/skills'], target: () => homePath('.codex', 'skills'), dir: true, ignoreTargetTopDirs: ['.system'] },
         { label: 'claude CLAUDE.md', seed: 'agents/claude/CLAUDE.md', target: () => homePath('.claude', 'CLAUDE.md') },
-        { label: 'claude skills', seeds: ['agents/skills', 'agents/claude/skills'], target: () => homePath('.claude', 'skills'), dir: true, ignoreTargetTopDirs: ['synced'] },
+        { label: 'claude skills', seeds: ['agents/skills', 'agents/claude/skills'], target: () => homePath('.claude', 'skills'), dir: true, ignoreTargetTopDirs: ['synced'], skipSeedTopDirs: ['code-review'] },
         { label: 'agent templates', seed: 'agents/templates', target: () => getAgentTemplatesPath(), dir: true }
     ];
 
@@ -327,6 +327,7 @@ function audit() {
     console.log('  git completions are created/downloaded, so they are not audited.');
     console.log('  ~/.codex/skills/.system/ holds Codex built-in skills and is skipped.');
     console.log('  ~/.claude/skills/synced/ holds skills synced from claude.ai and is skipped.');
+    console.log('  The shared code-review skill is not installed for Claude, which has its own.');
     console.log('  Each agent skills dir is seeded by agents/skills/ + its own');
     console.log('  agents/<agent>/skills/; the agent-specific seed wins on conflict.');
     console.log('  LOCAL ONLY files usually belong to a single machine - do not copy');

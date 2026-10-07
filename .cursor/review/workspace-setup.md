@@ -1,50 +1,24 @@
 ---
-name: code-review
-description: >-
-  Reviews Workspace Setup changes using the installer/seed conventions from AGENTS.md
-  and .cursor/rules/workspace-setup.mdc. Use when the user asks for a code review, PR review,
-  pre-push review, Agent Review help, or findings before opening a PR.
+description: Workspace Setup review rules — installer code, seed content, dry-run safety
 ---
 
-# Code review (Workspace Setup)
+# Review guide (Workspace Setup)
 
-## When to use
+Applied by the global `code-review` skill (and Claude's built-in `/code-review`) to every change in this repo.
 
-- User asks to review changes, a branch diff, or a PR
-- Before opening a PR
-- Complementing (not replacing) Cursor Agent Review or Bugbot
+## Before reviewing
 
-## Instructions
-
-1. Read [`.cursor/BUGBOT.md`](../../BUGBOT.md) and [`.cursor/rules/workspace-setup.mdc`](../../rules/workspace-setup.mdc) for review rules and conventions.
+1. Read [`.cursor/BUGBOT.md`](../BUGBOT.md) and [`.cursor/rules/workspace-setup.mdc`](../rules/workspace-setup.mdc) for review rules and conventions.
 2. Compare against `master` (the default branch) unless the user specifies otherwise.
-3. Do **not** edit files unless the user asks — review only.
-4. Syntax-check anything touched: `node --check <file>`. Do not run a real install.
-
-## Output format
-
-```markdown
-## Summary
-[1–2 sentences]
-
-## Findings
-
-### Blocker
-- `path:line` — issue — suggested fix
-
-### Suggestion
-- ...
-
-### Nit
-- ... (skip items covered by tooling)
+3. Syntax-check anything touched: `node --check <file>`. Do not run a real install.
 
 ## Checklist
+
 - [ ] `node --check` on edited scripts
 - [ ] `npm run dry-run` passes if flows/prompts changed
 - [ ] Seed ↔ home mapping in `scripts/audit-seeds.js` matches installer + README
 - [ ] No repo-dev rules leaked into `agents/` (would seed every user’s global config)
 - [ ] Global core rules identical across Claude, Codex, and Cursor seeds
-```
 
 ## Priority areas
 
@@ -60,7 +34,7 @@ description: >-
 ## Workspace Setup-specific checks
 
 - **Seed vs installer separation** — new template content belongs in `agents/`/`tools/`; new installer behavior belongs in `scripts/`. Do not mix.
-- **Copy map in sync** — a new seed must be registered in `scripts/platform.js` (agents) or `scripts/install.js` (config), added to `scripts/audit-seeds.js`, and documented in the README tables.
+- **Copy map in sync** — a new seed must be registered in `scripts/platform.js` (agents) — including any per-agent `skip` list, mirrored as `skipSeedTopDirs` in the audit — or `scripts/install.js` (config), added to `scripts/audit-seeds.js`, and documented in the README tables.
 - **Platform parity** — macOS (apps) vs Windows (agents in `--all`, no apps). Shared tools behave the same in `brew.js` and `winget.js`.
 - **Dry run coverage** — file copies, dir creation, downloads, and repo deletion all log `Would ...` instead of acting in dry-run.
 - **No repo-dev rules under `agents/`** — `.cursor/` holds rules for working on this repo; `agents/cursor/` is seeded to every user.

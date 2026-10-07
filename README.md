@@ -229,7 +229,7 @@ Agent-specific seeds add to the same target afterwards:
 
 `agents/skills/` holds skills that work for every agent; `agents/<agent>/skills/` holds skills only that agent needs. A skill name must live in exactly one of them, or one copy overwrites the other — the installer warns when it detects that.
 
-Customize the files under `agents/` before running the installer to change what gets copied. Edit `agents/templates/pull_request_template.md` to change the global PR default (it installs once to `~/.config/agent-templates/`; the `pr-prepare` skill prefers a repo `.github/pull_request_template.md` when present). Edit `agents/skills/feature-planning/reference.md` to set your tracker project key and browse URL.
+Customize the files under `agents/` before running the installer to change what gets copied. Edit `agents/templates/pull_request_template.md` to change the global PR default (it installs once to `~/.config/agent-templates/`; the `pr-prepare` skill prefers a repo `.github/pull_request_template.md` when present). Edit `agents/skills/feature-planning/reference.md` to set your tracker project key and browse URL. The shared `code-review` skill applies each project's review guides in `.cursor/review/`; it is not installed for Claude Code, whose built-in `/code-review` is pointed at the same guides by the global rules.
 
 ## Devtools
 

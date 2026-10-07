@@ -8,6 +8,7 @@ changes here apply everywhere.
 | --- | --- |
 | `pr-prepare` | Draft a PR title/body from the repo or shared template, ask before creating, comment the PR; CLI/IDE copy handoff |
 | `feature-planning` | Triage work and draft concise (or full) tickets |
+| `code-review` | Review changes with the project's `.cursor/review/` guides (not installed for Claude, which has a built-in `/code-review`) |
 | `workspace-setup` | Bootstrap a machine with the installer, or check this machine against the repo |
 
 Customize here, not in a single agent's folder. Agent-only skills belong in that

@@ -135,7 +135,7 @@ View [PROJ-XXX](link_to_ticket)
 1. **Scope** — `git status` / `git diff --stat` against the PR base. Note packages or areas touched.
 2. **Checks** — run the project’s usual pre-merge commands for those areas (from README, `package.json` scripts, Makefile, etc.). Prefer targeted tests over full suites when the project documents that pattern.
 3. **Tests** — if test scenarios were approved for this work, confirm each one has a test and that it passes. Flag any scenario without a test above the payload; do not drop it silently.
-4. **Review** — Cursor: Source Control → Agent Review (or `/agent-review`). Claude: invoke a project code-review skill if one exists. Fix clear issues before drafting the PR body.
+4. **Review** — run the `code-review` skill (Claude: the built-in `/code-review`); both apply the project's `.cursor/review/` guides. Fix clear issues before drafting the PR body.
 5. **Migrations / data** — if the change includes schema or irreversible steps, note upgrade/downgrade or rollback in the PR body.
 
 ## Open PR

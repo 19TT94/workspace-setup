@@ -23,6 +23,10 @@ Use TDD when the work warrants it (new behavior, bug fixes, logic changes; not d
 - Never commit or push on your own. Commits, pushes, and PRs happen only through the `pr-prepare` skill, and only after the user says they want the work taken to a PR.
 - When the user asks for a PR, run `pr-prepare` yourself; they should not have to invoke it. Shared PR template: `~/.config/agent-templates/pull_request_template.md`.
 
+## Code review
+
+- When reviewing code — with a built-in reviewer or the `code-review` skill — also apply the project's review guides: `.cursor/review/*.md` whose `paths` match the changed files.
+
 ## Communication
 
 - Keep responses concise: one or two short paragraphs by default.

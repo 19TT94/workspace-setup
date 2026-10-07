@@ -2,21 +2,31 @@
 
 These preferences apply to every project unless overridden by a repository `CLAUDE.md`.
 
+## Working style
+
 - Read project context before making changes
-- Prefer minimal diffs that solve the stated problem
-- Match existing naming, structure, and tooling in the repo
+- Prefer small, focused diffs that solve the stated problem
+- Match existing naming, structure, conventions, and tooling in the repo
+- Write self-documenting code; add comments only for non-obvious logic
 - Run relevant tests or syntax checks when available
 
-## Global skills
+## Tests first
 
-Seeded to `~/.claude/skills/` (see `agents/skills/` for shared ones):
+Use TDD when the work warrants it (new behavior, bug fixes, logic changes; not docs, config, or trivial edits):
 
-| Skill | Purpose |
-| --- | --- |
-| `pr-prepare` | Draft PR title/body from the default or repo template, ask before creating, comment the PR; CLI/IDE copy handoff |
-| `feature-planning` | Triage work and draft concise (or full) tickets |
+1. Write the test scenarios in plain language (one line each, or given/when/then) and wait for approval.
+2. Write the approved tests and confirm they fail.
+3. Implement until they pass.
 
-Default PR body: `~/.config/agent-templates/pull_request_template.md`. Configure ticket key / tracker URL in `skills/feature-planning/reference.md`.
+## Git and pull requests
+
+- Never commit or push on your own. Commits, pushes, and PRs happen only through the `pr-prepare` skill, and only after the user says they want the work taken to a PR.
+- When the user asks for a PR, run `pr-prepare` yourself; they should not have to invoke it. Shared PR template: `~/.config/agent-templates/pull_request_template.md`.
+
+## Communication
+
+- Keep responses concise: one or two short paragraphs by default.
+- Offer more detail as a follow-up rather than front-loading it.
 
 ## GitHub issue access
 

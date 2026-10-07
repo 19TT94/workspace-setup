@@ -11,7 +11,7 @@ description: >-
 ## When to use
 
 - User asks to review changes, a branch diff, or a PR
-- Before opening a PR (this repo commits straight to `master`)
+- Before opening a PR
 - Complementing (not replacing) Cursor Agent Review or Bugbot
 
 ## Instructions
@@ -43,6 +43,7 @@ description: >-
 - [ ] `npm run dry-run` passes if flows/prompts changed
 - [ ] Seed ↔ home mapping in `scripts/audit-seeds.js` matches installer + README
 - [ ] No repo-dev rules leaked into `agents/` (would seed every user’s global config)
+- [ ] Global core rules identical across Claude, Codex, and Cursor seeds
 ```
 
 ## Priority areas
@@ -63,8 +64,9 @@ description: >-
 - **Platform parity** — macOS (apps) vs Windows (agents in `--all`, no apps). Shared tools behave the same in `brew.js` and `winget.js`.
 - **Dry run coverage** — file copies, dir creation, downloads, and repo deletion all log `Would ...` instead of acting in dry-run.
 - **No repo-dev rules under `agents/`** — `.cursor/` holds rules for working on this repo; `agents/cursor/` is seeded to every user.
+- **Global rules stay identical** — `agents/claude/CLAUDE.md` and `agents/codex/AGENTS.md` share the same body below their title and intro line; `agents/cursor/rules/*.mdc` carry the same sections split across files (frontmatter aside). A rule added, removed, or reworded in one must change in all three. Compare with `diff <(tail -n +4 agents/claude/CLAUDE.md) <(tail -n +4 agents/codex/AGENTS.md)` and check each section against the Cursor rules.
 - **Drift policy** — local file changes that belong in seeds should go through the `audit-local-config` skill; do not bulk-copy home files.
 
 ## After local review
 
-Remind the user: squash-commit to `master` only when asked; no PR flow is used in this repo.
+Remind the user: commit, push, and open a PR only through the `pr-prepare` skill, and only when asked.

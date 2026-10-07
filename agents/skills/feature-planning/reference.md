@@ -4,7 +4,9 @@ Templates for **full draft** / copy-paste into Jira (or similar). Concise mode b
 
 ## Configure these defaults
 
-Edit this file after install (it lands in your agent’s `skills/feature-planning/` directory) so ticket keys and links match your tracker.
+Trackers differ by project. Before using these values, check the current repo for its own: tracker links or ticket keys in the README, CONTRIBUTING, PR template, or recent PR titles and branch names. If the repo gives no answer, ask once. The values below are fallbacks only.
+
+To change the fallbacks, edit this file after install (it lands in your agent’s `skills/feature-planning/` directory).
 
 | Setting | Value | Notes |
 | ------- | ----- | ----- |

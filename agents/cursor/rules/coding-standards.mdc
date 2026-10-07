@@ -1,11 +1,20 @@
 ---
-description: Core coding standards for all projects
+description: Core coding standards and test-first workflow for all projects
 alwaysApply: true
 ---
 
-# Coding Standards
+## Working style
 
-- Prefer small, focused changes over large refactors
-- Match existing project conventions before introducing new patterns
+- Read project context before making changes
+- Prefer small, focused diffs that solve the stated problem
+- Match existing naming, structure, conventions, and tooling in the repo
 - Write self-documenting code; add comments only for non-obvious logic
 - Run relevant tests or syntax checks when available
+
+## Tests first
+
+Use TDD when the work warrants it (new behavior, bug fixes, logic changes; not docs, config, or trivial edits):
+
+1. Write the test scenarios in plain language (one line each, or given/when/then) and wait for approval.
+2. Write the approved tests and confirm they fail.
+3. Implement until they pass.

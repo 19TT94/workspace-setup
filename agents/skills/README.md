@@ -8,6 +8,7 @@ changes here apply everywhere.
 | --- | --- |
 | `pr-prepare` | Draft a PR title/body from the repo or shared template, ask before creating, comment the PR; CLI/IDE copy handoff |
 | `feature-planning` | Triage work and draft concise (or full) tickets |
+| `workspace-setup` | Bootstrap a machine with the installer, or check this machine against the repo |
 
 Customize here, not in a single agent's folder. Agent-only skills belong in that
 agent's `skills/` directory instead; a name must never exist in both places, or

@@ -9,6 +9,8 @@
  * Usage:
  *   node scripts/audit-seeds.js            # full report
  *   node scripts/audit-seeds.js --full     # include full unified diffs
+ *   node scripts/audit-seeds.js --quiet    # hide identical files, show drift only
+ *   node scripts/audit-seeds.js --agents   # only agents/ seeds (or --tools for tools/)
  *
  * Source of truth for the seed -> home mapping.
  */
@@ -21,6 +23,9 @@ const { isWindows, getPowerShellProfilePath, getVSCodeSettingsPath, getCursorSet
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const FULL_DIFFS = process.argv.includes('--full');
+const QUIET = process.argv.includes('--quiet');
+const ONLY_AGENTS = process.argv.includes('--agents');
+const ONLY_TOOLS = process.argv.includes('--tools');
 const DIFF_TRUNCATE = 40;
 
 function homePath(...segments) {
@@ -131,7 +136,9 @@ function auditConfigEntry(entry) {
     switch (result.status) {
         case 'identical':
             count.identical = 1;
-            console.log(`  ${label.padEnd(28)} IDENTICAL   -> ${targetPath}`);
+            if (!QUIET) {
+                console.log(`  ${label.padEnd(28)} IDENTICAL   -> ${targetPath}`);
+            }
             break;
         case 'DIFFERS - LOCAL DRIFT':
             count.differs = 1;
@@ -202,7 +209,9 @@ function auditDirEntry(entry) {
         const targetContent = readFileSafe(targetPath);
         if (seedContent === targetContent) {
             count.identical++;
-            console.log(`  ${displayPath.padEnd(36)} identical`);
+            if (!QUIET) {
+                console.log(`  ${displayPath.padEnd(36)} identical`);
+            }
         } else {
             count.differs++;
             console.log(`  ${displayPath.padEnd(36)} DIFFERS`);
@@ -236,6 +245,39 @@ function summarize(section, counts) {
     console.log(`  (${section}: ${bits.join(', ')})\n`);
 }
 
+function auditConfigSection(configSeeds, platform) {
+    console.log('=== Configuration files (tools/) ===');
+    const configCounts = { identical: 0, differs: 0, missing: 0, localOnly: 0 };
+    for (const entry of configSeeds) {
+        if (!entry.platforms.includes(platform)) {
+            continue;
+        }
+        const result = auditConfigEntry(entry);
+        configCounts.identical += result.count.identical;
+        configCounts.differs += result.count.differs;
+        configCounts.missing += result.count.missing;
+    }
+    summarize('config', configCounts);
+}
+
+function auditAgentSection(agentSeeds) {
+    console.log('=== AI agent starter files (agents/) ===');
+    const agentCounts = { identical: 0, differs: 0, missing: 0, localOnly: 0 };
+    for (const entry of agentSeeds) {
+        let result;
+        if (entry.dir) {
+            result = auditDirEntry(entry);
+            agentCounts.localOnly += result.localOnly || 0;
+        } else {
+            result = auditConfigEntry(entry);
+        }
+        agentCounts.identical += result.count.identical;
+        agentCounts.differs += result.count.differs;
+        agentCounts.missing += result.count.missing;
+    }
+    summarize('agents', agentCounts);
+}
+
 function audit() {
     const configSeeds = [
         { label: '.zshrc', seed: 'tools/zshrc', target: () => homePath('.zshrc'), platforms: ['darwin'] },
@@ -255,13 +297,14 @@ function audit() {
     // seeds: shared first, agent-specific second - later entries win, matching
     // the installer's copy order in scripts/install.js.
     const agentSeeds = [
-        { label: 'Cursor rules', seed: 'agents/cursor/rules', target: () => homePath('.cursor', 'rules'), dir: true },
+        // README.md in ~/.cursor/rules/ is seeded by the 'cursor README' entry below.
+        { label: 'Cursor rules', seed: 'agents/cursor/rules', target: () => homePath('.cursor', 'rules'), dir: true, ignoreTargetTopDirs: ['README.md'] },
         { label: 'cursor README', seed: 'agents/cursor/README.md', target: () => homePath('.cursor', 'rules', 'README.md') },
         { label: 'cursor skills', seeds: ['agents/skills', 'agents/cursor/skills'], target: () => homePath('.cursor', 'skills'), dir: true },
         { label: 'codex AGENTS.md', seed: 'agents/codex/AGENTS.md', target: () => homePath('.codex', 'AGENTS.md') },
         { label: 'codex skills', seeds: ['agents/skills', 'agents/codex/skills'], target: () => homePath('.codex', 'skills'), dir: true, ignoreTargetTopDirs: ['.system'] },
         { label: 'claude CLAUDE.md', seed: 'agents/claude/CLAUDE.md', target: () => homePath('.claude', 'CLAUDE.md') },
-        { label: 'claude skills', seeds: ['agents/skills', 'agents/claude/skills'], target: () => homePath('.claude', 'skills'), dir: true },
+        { label: 'claude skills', seeds: ['agents/skills', 'agents/claude/skills'], target: () => homePath('.claude', 'skills'), dir: true, ignoreTargetTopDirs: ['synced'] },
         { label: 'agent templates', seed: 'agents/templates', target: () => getAgentTemplatesPath(), dir: true }
     ];
 
@@ -272,39 +315,18 @@ function audit() {
     console.log(`Repo: ${REPO_ROOT}`);
     console.log('');
 
-    console.log('=== Configuration files (tools/) ===');
-    const configCounts = { identical: 0, differs: 0, missing: 0, localOnly: 0 };
-    for (const entry of configSeeds) {
-        if (!entry.platforms.includes(platform)) {
-            continue;
-        }
-        const result = auditConfigEntry(entry);
-        configCounts.identical += result.count.identical;
-        configCounts.differs += result.count.differs;
-        configCounts.missing += result.count.missing;
+    if (!ONLY_AGENTS) {
+        auditConfigSection(configSeeds, platform);
     }
-    summarize('config', configCounts);
-
-    console.log('=== AI agent starter files (agents/) ===');
-    const agentCounts = { identical: 0, differs: 0, missing: 0, localOnly: 0 };
-    for (const entry of agentSeeds) {
-        let result;
-        if (entry.dir) {
-            result = auditDirEntry(entry);
-            agentCounts.localOnly += result.localOnly || 0;
-        } else {
-            result = auditConfigEntry(entry);
-        }
-        agentCounts.identical += result.count.identical;
-        agentCounts.differs += result.count.differs;
-        agentCounts.missing += result.count.missing;
+    if (!ONLY_TOOLS) {
+        auditAgentSection(agentSeeds);
     }
-    summarize('agents', agentCounts);
 
     console.log('Notes:');
     console.log('  ~/.gitignore is generated (not a repo seed). ~/.nvm and ~/.zsh/');
     console.log('  git completions are created/downloaded, so they are not audited.');
     console.log('  ~/.codex/skills/.system/ holds Codex built-in skills and is skipped.');
+    console.log('  ~/.claude/skills/synced/ holds skills synced from claude.ai and is skipped.');
     console.log('  Each agent skills dir is seeded by agents/skills/ + its own');
     console.log('  agents/<agent>/skills/; the agent-specific seed wins on conflict.');
     console.log('  LOCAL ONLY files usually belong to a single machine - do not copy');

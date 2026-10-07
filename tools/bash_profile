@@ -42,6 +42,12 @@ if [ -f "$HOME/.zsh/git-completion.bash" ]; then
   . "$HOME/.zsh/git-completion.bash"
 fi
 
+# Aliases
+alias opn='open'                 # open file(s) in their default app, e.g. `opn README.md`
+alias vimt='wezterm cli spawn -- nvim'
+# Open every vim session in Neovim when it is installed.
+command -v nvim >/dev/null 2>&1 && alias vim='nvim'
+
 # edit-here / edit-tab: open file(s) in the current pane, or a new WezTerm/tmux tab.
 # (fzf cannot bind bare `l` without breaking search — use ctrl-l there; lf uses `l`.)
 edit-here() {
@@ -70,7 +76,7 @@ edit-tab() {
     +*) title="$(basename "${abs[${#abs[@]}-2]}")" ;;
   esac
 
-  # Prefer the real binary (type -P ignores aliases like nvim=vim).
+  # Prefer the real binary (type -P ignores aliases like vim=nvim).
   editor="$(type -P "${EDITOR:-nvim}" 2>/dev/null || command -v "${EDITOR:-nvim}" || echo nvim)"
 
   if [ -n "${WEZTERM_PANE:-}" ] && command -v wezterm >/dev/null 2>&1; then

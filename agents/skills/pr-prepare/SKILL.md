@@ -3,10 +3,10 @@ name: pr-prepare
 description: >-
   Prepares a branch for pull request: run project checks, draft a PR title/body
   from the default or repo template, ask before creating anything, then hand off
-  a copy-ready payload and comment the PR. Use when the user is about to open a
-  PR, asks to prepare for merge, wants a PR message, or wants a pre-PR
-  checklist. CLI copies the body to the clipboard; IDE and GUI show a copy box.
-disable-model-invocation: true
+  a copy-ready payload and, only where it adds context, comment the PR. Use
+  whenever the user asks to create or open a PR, prepare for merge, write a PR
+  message, or run a pre-PR checklist. CLI copies the body to the clipboard; IDE
+  and GUI show a copy box.
 ---
 
 # Prepare pull request
@@ -34,7 +34,8 @@ Draft the title and body from that template. Checklist notes (tests, lint, revie
 between title, link, checkbox group, change bullets, Root Cause, and Testing.
 Include every checkbox from the template. Check only what this PR did.
 Keep Testing boxes from the chosen template (extend only if the project’s
-template already defines more).
+template already defines more). When test scenarios were approved for this
+work, list them under the boxes as plain `-` lines, one scenario each.
 
 ### CLI
 
@@ -133,8 +134,9 @@ View [PROJ-XXX](link_to_ticket)
 
 1. **Scope** — `git status` / `git diff --stat` against the PR base. Note packages or areas touched.
 2. **Checks** — run the project’s usual pre-merge commands for those areas (from README, `package.json` scripts, Makefile, etc.). Prefer targeted tests over full suites when the project documents that pattern.
-3. **Review** — Cursor: Source Control → Agent Review (or `/agent-review`). Claude: invoke a project code-review skill if one exists. Fix clear issues before drafting the PR body.
-4. **Migrations / data** — if the change includes schema or irreversible steps, note upgrade/downgrade or rollback in the PR body.
+3. **Tests** — if test scenarios were approved for this work, confirm each one has a test and that it passes. Flag any scenario without a test above the payload; do not drop it silently.
+4. **Review** — Cursor: Source Control → Agent Review (or `/agent-review`). Claude: invoke a project code-review skill if one exists. Fix clear issues before drafting the PR body.
+5. **Migrations / data** — if the change includes schema or irreversible steps, note upgrade/downgrade or rollback in the PR body.
 
 ## Open PR
 
@@ -154,8 +156,8 @@ opening a PR — assemble one packet and ask:
 | Branch | `<type>/<short-description>` unless the project has its own convention |
 | Commit message | Subject plus why |
 | PR title / body | From the chosen template |
-| Summary comment | Drafted, editable — this is the one most worth reading closely |
-| Inline comments | Drafted content with file references. Line anchors resolve later |
+| Summary comment | Only when it adds context the PR body does not. Usually omitted |
+| Inline comments | Only to flag code that needs explanation. Line anchors resolve later. Often none |
 
 Present it in chat, ask once, apply edits, then proceed.
 
@@ -170,12 +172,21 @@ approval forward across a scope change.
 
 ## Comment the PR
 
-Once the PR exists, post a summary comment plus inline comments where the
-diff cannot speak for itself. This is what saves the reviewer from
-reconstructing your reasoning by reading five files.
+Comments are **optional, and the default is none**. The PR body already
+explains what changed and why; a comment that restates it is noise. Docs-only
+and other self-explanatory PRs normally get no comments at all.
 
-**One call posts both.** The review body is the general comment; the
-`comments` array is the inline set:
+Post comments only when one of these holds:
+
+- **Summary comment** — there is context a reviewer needs that the PR body
+  does not provide.
+- **Inline comments** — a specific piece of code needs explanation that the
+  diff cannot give on its own.
+
+If neither holds, skip this section and say so in one line.
+
+**One call posts both.** The review body is the summary comment (leave it
+`""` when there is none); the `comments` array is the inline set:
 
 ```bash
 gh api "repos/$REPO/pulls/$PR/reviews" --method POST --input - <<'JSON'
@@ -202,9 +213,9 @@ comments you forgot; edit the first with `PUT` on the same review id, or put
 the addition in the summary body. A trail of self-reviews makes the PR
 harder to read, not easier.
 
-### When to comment
+### When an inline comment earns its place
 
-Comment where a reviewer would otherwise have to dig:
+Flag code where a reviewer would otherwise have to dig:
 
 - **Non-obvious why** — the constraint that forced the choice, and what you
   rejected
@@ -257,6 +268,7 @@ the diff — fold it into the summary body. Never silently drop it.
 ## Do not
 
 - Open a PR, push, or post a comment before the user approves the packet
+- Post a summary comment that restates the PR body, or any comment on a PR whose body and diff already explain it
 - Treat approval for one scope as approval for a changed scope
 - Self-approve: `event` is always `COMMENT`
 - Post more than ~5 inline comments; fold the rest into the summary

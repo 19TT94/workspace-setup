@@ -11,7 +11,7 @@
     "dry-run": "node ./index.js --dry-run",
     "audit": "node ./scripts/audit-seeds.js",
     "audit:agents": "node ./scripts/audit-seeds.js --agents --quiet",
-    "test": "bash tests/pstash.test.sh"
+    "test": "bash tests/pstash.test.sh && bash tests/guard.test.sh && node --test tests/"
   },
   "repository": {
     "type": "git",

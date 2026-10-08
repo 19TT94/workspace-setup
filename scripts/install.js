@@ -21,6 +21,7 @@ const {
 const { installSelectedDevtools: installBrewDevtools, installSelectedApps } = require('./installers/brew');
 const { installSelectedDevtools: installWingetDevtools } = require('./installers/winget');
 const { isDryRun, log, promptMessage } = require('./dry-run');
+const { mergeJson, allowDenyOverlaps, ensureTomlKeys, parseTomlFragment } = require('./merge-config');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 
@@ -181,6 +182,73 @@ async function copyFileWithPrompt(source, target, label) {
     }
 
     console.log(`Installed ${label} -> ${resolvedTarget}`);
+    return true;
+}
+
+// Merge a seed fragment into a config file the user already has (JSON or the
+// top-level keys of a TOML file), showing the resulting diff before writing.
+async function mergeFileWithPrompt(source, target, label, kind) {
+    const resolvedSource = path.resolve(source);
+    if (!fs.existsSync(resolvedSource)) {
+        console.log(`Skipping ${label}: source not found at ${resolvedSource}`);
+        return false;
+    }
+
+    const exists = fs.existsSync(target);
+    const current = exists ? fs.readFileSync(target, 'utf8') : '';
+    let merged;
+    let warnings = [];
+
+    if (kind === 'json') {
+        let currentObj = {};
+        if (current.trim()) {
+            try {
+                currentObj = JSON.parse(current);
+            } catch (error) {
+                console.error(`Skipping ${label}: ${target} is not valid JSON (${error.message})`);
+                return false;
+            }
+        }
+        const mergedObj = mergeJson(currentObj, JSON.parse(fs.readFileSync(resolvedSource, 'utf8')));
+        merged = `${JSON.stringify(mergedObj, null, 2)}\n`;
+        if (mergedObj.permissions) {
+            warnings = allowDenyOverlaps(mergedObj.permissions)
+                .map((entry) => `${entry} in permissions.allow: some of its uses are now denied by the guard`);
+        }
+    } else {
+        ({ text: merged, warnings } = ensureTomlKeys(current, parseTomlFragment(fs.readFileSync(resolvedSource, 'utf8'))));
+    }
+
+    for (const warning of warnings) {
+        console.warn(`Note (${label}): ${warning}`);
+    }
+
+    if (merged === current) {
+        console.log(`${label} already up to date -> ${target}`);
+        return false;
+    }
+
+    if (exists && !await promptOverwrite(`Merge ${label} into ${displayHome(target)}?`, {
+        existingPath: target,
+        incomingContent: merged,
+        label
+    })) {
+        if (isDryRun()) {
+            log(`Would skip ${label}`);
+        } else {
+            console.log(`Skipped ${label}`);
+        }
+        return false;
+    }
+
+    if (isDryRun()) {
+        log(`Would merge ${label} -> ${target}`);
+        return true;
+    }
+
+    ensureDir(path.dirname(target));
+    fs.writeFileSync(target, merged, 'utf8');
+    console.log(`Merged ${label} -> ${target}`);
     return true;
 }
 
@@ -374,6 +442,16 @@ async function installHintsConfig() {
     );
 }
 
+async function installPstash() {
+    const target = homePath('.local', 'bin', 'pstash');
+    if (await copyFileWithPrompt(path.join(REPO_ROOT, 'tools/pstash'), target, 'pstash')) {
+        dryRunExec(`chmod +x "${target}"`);
+        if (!isDryRun()) {
+            shell.exec(`chmod +x "${target}"`);
+        }
+    }
+}
+
 async function installVimConfig() {
     if (await copyFileWithPrompt(
         path.join(REPO_ROOT, 'tools/vimrc'),
@@ -488,6 +566,10 @@ async function install_config() {
             await installHintsConfig();
         }
 
+        if (item === 'pstash') {
+            await installPstash();
+        }
+
         if (item === 'vimrc') {
             await installVimConfig();
         }
@@ -577,13 +659,23 @@ async function install_agents() {
         }
 
         for (const entry of config.paths) {
+            if (entry.platforms && !entry.platforms.includes(isWindows ? 'win32' : 'darwin')) {
+                continue;
+            }
             const source = path.join(REPO_ROOT, ...entry.source);
             const target = homePath(...entry.target);
 
             if (entry.type === 'dir') {
                 await copyDirContentsWithPrompt(source, target, entry.label, entry.skip);
-            } else {
-                await copyFileWithPrompt(source, target, entry.label);
+            } else if (entry.type === 'merge-json') {
+                await mergeFileWithPrompt(source, target, entry.label, 'json');
+            } else if (entry.type === 'merge-toml') {
+                await mergeFileWithPrompt(source, target, entry.label, 'toml');
+            } else if (await copyFileWithPrompt(source, target, entry.label) && entry.executable) {
+                dryRunExec(`chmod +x "${target}"`);
+                if (!isDryRun()) {
+                    shell.exec(`chmod +x "${target}"`);
+                }
             }
         }
     }

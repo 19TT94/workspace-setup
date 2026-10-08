@@ -1,6 +1,9 @@
 syntax on
 filetype plugin indent on
 
+" Space as Leader, matching tools/nvim/init.lua.
+let mapleader = " "
+
 " Cursor Dark palette (matches tools/wezterm.lua and the editors' Cursor Dark theme)
 set background=dark
 hi Comment        guifg=#989898 ctermfg=245 gui=italic cterm=italic
@@ -38,6 +41,12 @@ set mouse=a
 " Line number
 set number
 
+" New splits open right / below, and switching files keeps unsaved buffers
+" open in the background instead of failing with E37 -- both like Neovim.
+set splitright
+set splitbelow
+set hidden
+
 " show existing tab with 4 spaces width
 set tabstop=4
 
@@ -57,6 +66,109 @@ for s:tab in range(1, 9)
     execute 'nnoremap <silent> T' . s:tab . ' :' . s:tab . 'tabnext<CR>'
 endfor
 unlet s:tab
+
+nnoremap <silent> <Leader>w :write<CR>
+nnoremap <silent> <Leader>q :quit<CR>
+
+" Splits use the same second key as WezTerm/tmux (Ctrl+b % / " / z / x),
+" with <Space> in place of Ctrl+b. Same in tools/nvim/init.lua.
+nnoremap <silent> <Leader>% :vsplit<CR>
+nnoremap <silent> <Leader>" :split<CR>
+nnoremap <silent> <Leader>x :close<CR>
+function! s:ToggleZoom() abort
+    if get(t:, 'zoomed', 0)
+        wincmd =
+    else
+        wincmd _ | wincmd |
+    endif
+    let t:zoomed = !get(t:, 'zoomed', 0)
+endfunction
+nnoremap <silent> <Leader>z :call <SID>ToggleZoom()<CR>
+nnoremap <silent> <Leader>H :vertical resize -5<CR>
+nnoremap <silent> <Leader>L :vertical resize +5<CR>
+nnoremap <silent> <Leader>J :resize +5<CR>
+nnoremap <silent> <Leader>K :resize -5<CR>
+
+" Ctrl+h/j/k/l: move between splits, and into the neighbouring WezTerm/tmux
+" pane at the edge (tools/wezterm.lua and tools/tmux.conf pass the keys here).
+function! s:Navigate(dir) abort
+    let l:before = winnr()
+    execute 'wincmd ' . a:dir
+    if winnr() != l:before
+        return
+    endif
+    if exists('$TMUX')
+        call system('tmux select-pane -' . {'h': 'L', 'j': 'D', 'k': 'U', 'l': 'R'}[a:dir])
+    elseif exists('$WEZTERM_PANE') && executable('wezterm')
+        call system('wezterm cli activate-pane-direction ' . {'h': 'Left', 'j': 'Down', 'k': 'Up', 'l': 'Right'}[a:dir])
+    endif
+endfunction
+for s:dir in ['h', 'j', 'k', 'l']
+    execute 'nnoremap <silent> <C-' . s:dir . '> :call <SID>Navigate("' . s:dir . '")<CR>'
+endfor
+unlet s:dir
+
+" <Space>e: browse files with lf in a popup, same keys as in the shell:
+" Enter opens in a new tab, l opens here, Enter on a directory cds there.
+" tools/lfrc writes the pick to $LF_PICK instead of opening its own editor.
+function! s:LfDone(pick, ...) abort
+    let l:lines = filereadable(a:pick) ? readfile(a:pick) : []
+    call delete(a:pick)
+    let l:parts = matchlist(get(l:lines, 0, ''), '^\(\a\+\)\t\(.\+\)$')
+    if empty(l:parts)
+        return
+    endif
+    let l:cmd = get({'here': 'edit', 'tab': 'tabedit', 'cd': 'cd'}, l:parts[1], '')
+    if l:cmd !=# ''
+        execute l:cmd . ' ' . fnameescape(l:parts[2])
+    endif
+endfunction
+
+function! s:LfOpen() abort
+    if !executable('lf')
+        echohl ErrorMsg | echomsg 'lf is not installed' | echohl None
+        return
+    endif
+    let l:pick = tempname()
+    let l:file = expand('%:p')
+    let l:target = filereadable(l:file) ? l:file : getcwd()
+    let l:buf = term_start(['lf', l:target], {
+    \   'hidden': 1,
+    \   'term_finish': 'close',
+    \   'env': {'LF_PICK': l:pick},
+    \   'exit_cb': {-> timer_start(10, function('s:LfDone', [l:pick]))},
+    \ })
+    call popup_create(l:buf, {
+    \   'minwidth': float2nr(&columns * 0.85), 'minheight': float2nr(&lines * 0.8),
+    \   'border': [], 'borderchars': ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
+    \ })
+endfunction
+nnoremap <silent> <Leader>e :call <SID>LfOpen()<CR>
+
+" pstash (tools/pstash): stash prompts for later, same store as the shell.
+" <Space>s stashes the selected lines (visual) or asks for a one-liner
+" (normal); :Pstash [list | pop n | peek n] runs the shell command.
+function! s:Pstash(args, ...) abort
+    if !executable('pstash')
+        echohl ErrorMsg | echomsg 'pstash is not installed' | echohl None
+        return
+    endif
+    let l:cmd = join(['pstash'] + map(copy(a:args), 'shellescape(v:val)'), ' ')
+    let l:out = a:0 ? system(l:cmd, a:1) : system(l:cmd)
+    for l:line in split(l:out, "\n")
+        echomsg l:line
+    endfor
+endfunction
+function! s:PstashInput() abort
+    let l:text = input('Stash prompt: ')
+    redraw
+    if l:text !=# ''
+        call s:Pstash(['-'], l:text)
+    endif
+endfunction
+xnoremap <silent> <Leader>s :<C-u>call <SID>Pstash(['-'], join(getline("'<", "'>"), "\n"))<CR>
+nnoremap <silent> <Leader>s :call <SID>PstashInput()<CR>
+command! -nargs=* Pstash call s:Pstash(empty([<f-args>]) ? ['list'] : [<f-args>])
 
 " Context agents: :Cclaude / :Ccursor / :Copencode open that agent in a split
 " beside the editor (WezTerm/tmux pane, else :terminal), seeded with this
@@ -231,9 +343,58 @@ if glob('~/.vim/autoload/plug.vim') != ''
     " JS + React/JSX syntax highlighting (vim-jsx-pretty must load after the JS plugin)
     Plug 'pangloss/vim-javascript'
     Plug 'MaxMEllon/vim-jsx-pretty'
+    " gcc / gc comment toggling, like Comment.nvim
+    Plug 'tpope/vim-commentary'
     call plug#end()
 
-    " Ctrl+p: file explorer, <Leader>r: grep
-    nnoremap <silent> <C-p> :Files<CR>
-    nnoremap <silent> <Leader>r :Rg<CR>
+    " Cmd+/ (WezTerm sends Ctrl+_) toggles comments, like Neovim.
+    nmap <C-_> gcc
+    xmap <C-_> gc
+
+    " Same pickers and keys as the shell and Neovim: Cmd+P (WezTerm sends
+    " Ctrl+P) finds files, <Space>/ searches text. Enter opens in a new tab,
+    " Ctrl+O opens here.
+    let s:pick_header = ['--expect=ctrl-o', '--header', 'enter: new tab  |  ctrl-o: here']
+    let s:bat = executable('bat') ? 'bat --style=numbers --color=always ' : 'cat '
+
+    function! s:PickFiles(lines) abort
+        if len(a:lines) < 2
+            return
+        endif
+        let l:cmd = a:lines[0] ==# 'ctrl-o' ? 'edit' : 'tabedit'
+        for l:file in a:lines[1:]
+            execute l:cmd . ' ' . fnameescape(l:file)
+        endfor
+    endfunction
+
+    function! s:PickGrep(lines) abort
+        if len(a:lines) < 2
+            return
+        endif
+        let l:cmd = a:lines[0] ==# 'ctrl-o' ? 'edit' : 'tabedit'
+        let l:parts = split(a:lines[1], ':')
+        execute l:cmd . ' +' . l:parts[1] . ' ' . fnameescape(l:parts[0])
+    endfunction
+
+    function! s:FindFiles() abort
+        call fzf#run(fzf#wrap({
+        \   'source': 'rg --files --hidden -g "!.git"',
+        \   'sink*': function('s:PickFiles'),
+        \   'options': ['--multi', '--preview', s:bat . '{}'] + s:pick_header,
+        \ }))
+    endfunction
+
+    function! s:SearchText() abort
+        let l:rg = 'rg -i --hidden -g "!.git" --line-number --no-heading --color=never'
+        call fzf#run(fzf#wrap({
+        \   'source': 'true',
+        \   'sink*': function('s:PickGrep'),
+        \   'options': ['--disabled', '--prompt', 'search> ',
+        \               '--bind', 'change:reload:' . l:rg . ' -e {q} || true',
+        \               '--delimiter', ':', '--preview', s:bat . '{1}'] + s:pick_header,
+        \ }))
+    endfunction
+
+    nnoremap <silent> <C-p> :call <SID>FindFiles()<CR>
+    nnoremap <silent> <Leader>/ :call <SID>SearchText()<CR>
 endif

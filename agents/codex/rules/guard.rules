@@ -1,0 +1,159 @@
+# Ask before production writes and destructive commands (Codex execpolicy).
+# Same list as agents/claude/settings.json and agents/cursor/cli-config.json.
+# Patterns match the start of a command, one argument per position; a list
+# inside a position matches any of its values. match/not_match examples are
+# checked by Codex when it loads this file.
+# Check a command: codex execpolicy check --pretty --rules ~/.codex/rules/guard.rules -- <command>
+
+# --- AWS writes and secret reads ---
+prefix_rule(
+    pattern = ["aws", "cloudformation", ["deploy", "delete-stack", "create-stack", "update-stack", "execute-change-set", "update-termination-protection"]],
+    decision = "prompt",
+    justification = "Changes CloudFormation stacks",
+    match = ["aws cloudformation deploy --stack-name hero-frm", "aws cloudformation delete-stack --stack-name x"],
+    not_match = ["aws cloudformation describe-stacks"],
+)
+prefix_rule(
+    pattern = ["aws", "ecs", ["update-service", "register-task-definition", "run-task", "stop-task", "execute-command", "delete-service", "delete-cluster"]],
+    decision = "prompt",
+    justification = "Changes or shells into ECS services",
+    match = ["aws ecs update-service --cluster hero --service api"],
+    not_match = ["aws ecs describe-services --cluster hero"],
+)
+prefix_rule(
+    pattern = ["aws", "ssm", ["put-parameter", "delete-parameter", "delete-parameters", "get-parameter", "get-parameters", "get-parameters-by-path"]],
+    decision = "prompt",
+    justification = "Writes SSM parameters, or reads them (they may be decrypted secrets)",
+    match = ["aws ssm put-parameter --name x --value y"],
+    not_match = ["aws ssm describe-parameters"],
+)
+prefix_rule(
+    pattern = ["aws", "secretsmanager"],
+    decision = "prompt",
+    justification = "Reads or changes production secrets",
+    match = ["aws secretsmanager get-secret-value --secret-id hero/prod"],
+)
+prefix_rule(
+    pattern = ["aws", "s3", ["cp", "mv", "rm", "sync", "mb", "rb"]],
+    decision = "prompt",
+    justification = "Writes or deletes S3 objects",
+    match = ["aws s3 sync ./build s3://hero-client"],
+    not_match = ["aws s3 ls"],
+)
+prefix_rule(
+    pattern = ["aws", ["s3api", "rds", "iam", "ec2", "lambda", "route53", "cloudfront", "kafka", "elasticache", "sns", "sqs", "events", "logs", "ecr", "codepipeline", "codebuild"],
+               ["create-bucket", "put-bucket-policy", "put-public-access-block", "put-object", "delete-object", "delete-bucket",
+                "create-db-instance", "modify-db-instance", "delete-db-instance", "reboot-db-instance", "restore-db-instance-from-db-snapshot",
+                "create-role", "delete-role", "attach-role-policy", "detach-role-policy", "put-role-policy", "create-user", "delete-user", "create-access-key",
+                "run-instances", "terminate-instances", "stop-instances", "start-instances", "authorize-security-group-ingress", "revoke-security-group-ingress",
+                "update-function-code", "update-function-configuration", "delete-function", "invoke",
+                "change-resource-record-sets", "create-invalidation", "update-distribution",
+                "delete-log-group", "put-retention-policy", "batch-delete-image", "put-image",
+                "start-pipeline-execution", "start-build", "publish", "send-message", "purge-queue", "put-events"]],
+    decision = "prompt",
+    justification = "AWS write operation",
+    match = ["aws iam attach-role-policy --role-name x --policy-arn y", "aws rds reboot-db-instance --db-instance-identifier hero"],
+    not_match = ["aws rds describe-db-instances", "aws iam list-roles"],
+)
+prefix_rule(
+    pattern = ["aws", "configure", "set"],
+    decision = "prompt",
+    justification = "Changes local AWS credentials or profile",
+)
+
+# --- hero-builder infrastructure scripts (ALLOW_PRODUCTION gate lives inside them) ---
+prefix_rule(
+    pattern = [["./deployECS.sh", "./deployRDS.sh", "./deployVPC.sh", "./deployVPN.sh", "./deployRedis.sh", "./deployService.sh", "./deployPipeline.sh", "./deployPipelineApiTests.sh",
+                "./deleteECS.sh", "./deleteRDS.sh", "./deleteVPC.sh", "./deleteRedis.sh", "./deleteService.sh", "./deletePipeline.sh", "./deletePipelineApiTests.sh",
+                "./upload-parameters.sh", "./download-parameters.sh", "./delete-parameters.sh", "./connectToTask.sh"]],
+    decision = "prompt",
+    justification = "hero-builder infrastructure script (deploys, deletes, or touches secrets)",
+    match = ["./deployECS.sh frm"],
+)
+
+# --- Terraform, migrations, databases ---
+prefix_rule(
+    pattern = ["terraform", ["apply", "destroy", "import", "taint"]],
+    decision = "prompt",
+    justification = "Changes real infrastructure",
+    match = ["terraform apply", "terraform destroy -auto-approve"],
+    not_match = ["terraform plan"],
+)
+prefix_rule(
+    pattern = ["terraform", "state", ["rm", "mv"]],
+    decision = "prompt",
+    justification = "Rewrites Terraform state",
+)
+prefix_rule(
+    pattern = ["flask", "db"],
+    decision = "prompt",
+    justification = "Database migration",
+    match = ["flask db upgrade"],
+)
+prefix_rule(
+    pattern = ["alembic"],
+    decision = "prompt",
+    justification = "Database migration",
+    match = ["alembic upgrade head"],
+)
+prefix_rule(
+    pattern = ["psql"],
+    decision = "prompt",
+    justification = "Database shell (may be a production host over the VPN)",
+    match = ["psql -h hero-prod.rds.amazonaws.com"],
+)
+
+# --- Supabase and Netlify ---
+prefix_rule(
+    pattern = ["supabase", ["db", "migration", "functions", "secrets", "projects"], ["push", "reset", "repair", "deploy", "delete", "set", "unset"]],
+    decision = "prompt",
+    justification = "Changes a Supabase project",
+    match = ["supabase db push", "supabase functions deploy notify"],
+    not_match = ["supabase db diff"],
+)
+prefix_rule(
+    pattern = ["netlify", ["deploy", "env:set", "env:unset", "sites:delete", "api"]],
+    decision = "prompt",
+    justification = "Deploys or changes a Netlify site",
+    match = ["netlify deploy --prod"],
+    not_match = ["netlify status"],
+)
+
+# --- Git and GitHub (pushes to master/main/stage deploy hero-builder) ---
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "prompt",
+    justification = "Pushing can deploy (master/main/stage) or rewrite history",
+    match = ["git push origin master", "git push --force"],
+    not_match = ["git status"],
+)
+prefix_rule(
+    pattern = ["gh", "pr", "merge"],
+    decision = "prompt",
+    justification = "Merging can deploy",
+)
+prefix_rule(
+    pattern = ["git", ["reset", "clean"]],
+    decision = "prompt",
+    justification = "Discards local work",
+    match = ["git reset --hard", "git clean -fdx"],
+)
+prefix_rule(
+    pattern = ["git", "branch", "-D"],
+    decision = "prompt",
+    justification = "Deletes an unmerged branch",
+)
+
+# --- Local destructive ---
+prefix_rule(
+    pattern = ["rm", ["-r", "-R", "-f", "-rf", "-fr", "-Rf", "-fR", "--recursive", "--force"]],
+    decision = "prompt",
+    justification = "Recursive or forced delete",
+    match = ["rm -rf node_modules"],
+    not_match = ["rm notes.txt"],
+)
+prefix_rule(
+    pattern = ["docker", ["system", "volume"], ["prune", "rm"]],
+    decision = "prompt",
+    justification = "Deletes Docker data",
+)

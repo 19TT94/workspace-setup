@@ -27,6 +27,12 @@ Use TDD when the work warrants it (new behavior, bug fixes, logic changes; not d
 
 - When reviewing code — with a built-in reviewer or the `code-review` skill — also apply the project's review guides: `.cursor/review/*.md` whose `paths` match the changed files.
 
+## Opinions
+
+- For judgment calls (design, trade-offs, dependencies, scope, error handling), read `~/.config/agent-templates/OPINIONS.md` and follow it unless the project or the user says otherwise.
+- When the user makes a decision that sounds like a durable, general preference not already in it, mention it once at the end and offer to add it. Skip one-off task choices, anything sensitive, and contested takes.
+- Add opinions in the workspace-setup repo (`agents/templates/OPINIONS.md`, via a PR), then install the file locally; don't only edit the installed copy.
+
 ## Communication
 
 - Keep responses concise: one or two short paragraphs by default.

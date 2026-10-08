@@ -32,6 +32,11 @@ if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
 
+# Personal scripts installed by workspace-setup (e.g. pstash)
+if [ -d "$HOME/.local/bin" ]; then
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+
 # Default editor (used by lf and the P finder)
 export EDITOR=nvim
 export VISUAL=nvim
@@ -54,7 +59,7 @@ alias vimt='wezterm cli spawn -- nvim'
 command -v nvim >/dev/null 2>&1 && alias vim='nvim'
 
 # edit-here / edit-tab: open file(s) in the current pane, or a new WezTerm/tmux tab.
-# (fzf cannot bind bare `l` without breaking search — use ctrl-l there; lf uses `l`.)
+# (fzf cannot bind bare `l` without breaking search — use ctrl-o there; lf uses `l`. ctrl-h/j/k/l move between panes.)
 edit-here() {
   if [ $# -eq 0 ]; then
     echo "Usage: edit-here <file>..."
@@ -93,20 +98,36 @@ edit-tab() {
   fi
 }
 
+# fzf_pick: run fzf while telling WezTerm it is open (user var IN_FZF), so
+# WezTerm hands Ctrl+h/j/k/l to fzf instead of moving panes (tools/wezterm.lua).
+# Written to /dev/tty so it never lands in a $(...) capture.
+_wezterm_uservar() {
+  [ -n "${WEZTERM_PANE:-}" ] && [ -z "${TMUX:-}" ] || return 0
+  printf '\033]1337;SetUserVar=%s=%s\007' "$1" "$(printf '%s' "$2" | base64)" > /dev/tty
+}
+fzf_pick() {
+  local rc
+  _wezterm_uservar IN_FZF true
+  fzf "$@"
+  rc=$?
+  _wezterm_uservar IN_FZF false
+  return $rc
+}
+
 # Ctrl+P (Cmd+P in WezTerm): fuzzy find + preview + open any file
-# enter = new WezTerm tab; ctrl-l = current pane (lf uses enter / l)
+# enter = new WezTerm tab; ctrl-o = current pane (lf uses enter / l)
 fzf-open() {
   local out key files
   local prev='bat --style=numbers --color=always --line-range=:200 {}'
   command -v bat >/dev/null 2>&1 || prev='cat {}'
-  out=$(rg --files --hidden --follow -g '!*/.git/*' | fzf --height 80% --layout reverse --border \
+  out=$(rg --files --hidden --follow -g '!*/.git/*' | fzf_pick --height 80% --layout reverse --border \
     --preview-window 'right:50%:wrap' --preview "$prev" --multi \
-    --header 'enter: new tab  |  ctrl-l: here' \
-    --expect=ctrl-l)
+    --header 'enter: new tab  |  ctrl-o: here' \
+    --expect=ctrl-o)
   key=$(printf '%s\n' "$out" | head -n1)
   files=$(printf '%s\n' "$out" | tail -n +2)
   if [ -n "$files" ]; then
-    if [ "$key" = "ctrl-l" ]; then
+    if [ "$key" = "ctrl-o" ]; then
       edit-here ${(f)files}
     else
       edit-tab ${(f)files}
@@ -151,16 +172,16 @@ hint() {
 # rfind: global text search in the current directory (needs: ripgrep + fzf).
 #   rfind <term>  -> search for <term> now, pick a match to open at that line
 #   rfind         -> live search: type to filter matches across the whole tree
-# enter = new WezTerm tab; ctrl-l = current pane
+# enter = new WezTerm tab; ctrl-o = current pane
 rfind() {
     local query="$*"
     local out key pick file line
     local preview='p=$(echo {} | cut -d: -f1); l=$(echo {} | cut -d: -f2); if command -v bat >/dev/null 2>&1; then bat --style=numbers --color=always --line-range="$((l-5)):$((l+5))" --paging=never "$p" 2>/dev/null; else sed -n "$((l-5)),$((l+5))p" "$p" 2>/dev/null; fi'
-    local fzf_opts=(--height 80% --layout reverse --border --preview-window 'right:50%:wrap' --preview "$preview" --header 'enter: new tab  |  ctrl-l: here' --expect=ctrl-l)
+    local fzf_opts=(--height 80% --layout reverse --border --preview-window 'right:50%:wrap' --preview "$preview" --header 'enter: new tab  |  ctrl-o: here' --expect=ctrl-o)
     if [ -n "$query" ]; then
-        out=$(rg -i --hidden --follow -g '!*/.git/*' --line-number -e "$query" | fzf "${fzf_opts[@]}")
+        out=$(rg -i --hidden --follow -g '!*/.git/*' --line-number -e "$query" | fzf_pick "${fzf_opts[@]}")
     else
-        out=$(fzf "${fzf_opts[@]}" \
+        out=$(fzf_pick "${fzf_opts[@]}" \
             --bind 'change:reload:rg -i --hidden --follow -g "!*/.git/*" --line-number {q} || true')
     fi
     key=$(printf '%s\n' "$out" | head -n1)
@@ -168,7 +189,7 @@ rfind() {
     [ -z "$pick" ] && return
     file=$(echo "$pick" | cut -d: -f1)
     line=$(echo "$pick" | cut -d: -f2)
-    if [ "$key" = "ctrl-l" ]; then
+    if [ "$key" = "ctrl-o" ]; then
         edit-here "+$line" "$file"
     else
         edit-tab "+$line" "$file"

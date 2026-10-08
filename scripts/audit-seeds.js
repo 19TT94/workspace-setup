@@ -19,6 +19,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execSync } = require('child_process');
+const { mergeJson, ensureTomlKeys, parseTomlFragment } = require('./merge-config');
 const { isWindows, getPowerShellProfilePath, getVSCodeSettingsPath, getCursorSettingsPath, getAgentTemplatesPath } = require('./platform');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -154,6 +155,44 @@ function auditConfigEntry(entry) {
     return { count, statusCounts: count };
 }
 
+// Guard fragments are merged into files the user owns, so "identical" means
+// every seeded entry is already present (merging again would change nothing).
+function auditMergeEntry(entry) {
+    const targetPath = normalize(entry.target());
+    const count = { identical: 0, differs: 0, missing: 0 };
+    if (!fs.existsSync(targetPath)) {
+        count.missing = 1;
+        console.log(`  ${entry.label.padEnd(28)} NOT INSTALLED -> ${targetPath}`);
+        return { count };
+    }
+    const current = readFileSafe(targetPath);
+    let complete;
+    try {
+        if (entry.merge === 'json') {
+            const parsed = JSON.parse(current || '{}');
+            complete = entry.seeds.every((seed) => {
+                const fragment = JSON.parse(readFileSafe(resolveSeed(seed)));
+                return JSON.stringify(mergeJson(parsed, fragment)) === JSON.stringify(parsed);
+            });
+        } else {
+            const result = ensureTomlKeys(current, parseTomlFragment(readFileSafe(resolveSeed(entry.seeds[0]))));
+            complete = result.text === current && result.warnings.length === 0;
+        }
+    } catch (error) {
+        complete = false;
+    }
+    if (complete) {
+        count.identical = 1;
+        if (!QUIET) {
+            console.log(`  ${entry.label.padEnd(28)} INCLUDES GUARD -> ${targetPath}`);
+        }
+    } else {
+        count.differs = 1;
+        console.log(`  ${entry.label.padEnd(28)} MISSING GUARD ENTRIES -> ${targetPath}`);
+    }
+    return { count };
+}
+
 // An agent's skills dir is seeded by more than one repo dir (agents/skills/ plus
 // its own agents/<agent>/skills/), and the agent-specific one wins on conflict,
 // matching the installer's copy order. Later seeds overwrite earlier ones in the
@@ -264,8 +303,13 @@ function auditAgentSection(agentSeeds) {
     console.log('=== AI agent starter files (agents/) ===');
     const agentCounts = { identical: 0, differs: 0, missing: 0, localOnly: 0 };
     for (const entry of agentSeeds) {
+        if (entry.platforms && !entry.platforms.includes(isWindows ? 'win32' : 'darwin')) {
+            continue;
+        }
         let result;
-        if (entry.dir) {
+        if (entry.merge) {
+            result = auditMergeEntry(entry);
+        } else if (entry.dir) {
             result = auditDirEntry(entry);
             agentCounts.localOnly += result.localOnly || 0;
         } else {
@@ -290,6 +334,7 @@ function audit() {
         { label: 'nvim init.lua', seed: 'tools/nvim/init.lua', target: () => isWindows ? path.join(process.env.LOCALAPPDATA || homePath('AppData', 'Local'), 'nvim', 'init.lua') : homePath('.config', 'nvim', 'init.lua'), platforms: ['darwin', 'win32'] },
         { label: 'lfrc', seed: 'tools/lfrc', target: () => homePath('.config', 'lf', 'lfrc'), platforms: ['darwin'] },
         { label: 'hints', seed: 'tools/hints.md', target: () => homePath('.config', 'shell', 'hints.md'), platforms: ['darwin', 'win32'] },
+        { label: 'pstash', seed: 'tools/pstash', target: () => homePath('.local', 'bin', 'pstash'), platforms: ['darwin'] },
         { label: 'vscode settings', seed: 'tools/vscode-settings.json', target: () => getVSCodeSettingsPath(), platforms: ['darwin', 'win32'] },
         { label: 'cursor settings', seed: 'tools/cursor-settings.json', target: () => getCursorSettingsPath(), platforms: ['darwin', 'win32'] }
     ];
@@ -305,7 +350,12 @@ function audit() {
         { label: 'codex skills', seeds: ['agents/skills', 'agents/codex/skills'], target: () => homePath('.codex', 'skills'), dir: true, ignoreTargetTopDirs: ['.system'] },
         { label: 'claude CLAUDE.md', seed: 'agents/claude/CLAUDE.md', target: () => homePath('.claude', 'CLAUDE.md') },
         { label: 'claude skills', seeds: ['agents/skills', 'agents/claude/skills'], target: () => homePath('.claude', 'skills'), dir: true, ignoreTargetTopDirs: ['synced'], skipSeedTopDirs: ['code-review'] },
-        { label: 'agent templates', seed: 'agents/templates', target: () => getAgentTemplatesPath(), dir: true }
+        { label: 'agent templates', seed: 'agents/templates', target: () => getAgentTemplatesPath(), dir: true },
+        { label: 'claude guard settings', merge: 'json', seeds: isWindows ? ['agents/claude/settings.json'] : ['agents/claude/settings.json', 'agents/claude/settings.hooks.json'], target: () => homePath('.claude', 'settings.json') },
+        { label: 'claude guard hook', seed: 'agents/claude/hooks/guard.py', target: () => homePath('.claude', 'hooks', 'guard.py'), platforms: ['darwin'] },
+        { label: 'codex guard rules', seed: 'agents/codex/rules/guard.rules', target: () => homePath('.codex', 'rules', 'guard.rules') },
+        { label: 'codex approval settings', merge: 'toml', seeds: ['agents/codex/config.toml'], target: () => homePath('.codex', 'config.toml') },
+        { label: 'cursor CLI guard', merge: 'json', seeds: ['agents/cursor/cli-config.json'], target: () => homePath('.cursor', 'cli-config.json') }
     ];
 
     const platform = isWindows ? 'win32' : 'darwin';

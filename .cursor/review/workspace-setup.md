@@ -39,6 +39,7 @@ Applied by the global `code-review` skill (and Claude's built-in `/code-review`)
 - **Dry run coverage** — file copies, dir creation, downloads, and repo deletion all log `Would ...` instead of acting in dry-run.
 - **No repo-dev rules under `agents/`** — `.cursor/` holds rules for working on this repo; `agents/cursor/` is seeded to every user.
 - **Global rules stay identical** — `agents/claude/CLAUDE.md` and `agents/codex/AGENTS.md` share the same body below their title and intro line; `agents/cursor/rules/*.mdc` carry the same sections split across files (frontmatter aside). A rule added, removed, or reworded in one must change in all three. Compare with `diff <(tail -n +4 agents/claude/CLAUDE.md) <(tail -n +4 agents/codex/AGENTS.md)` and check each section against the Cursor rules.
+- **Guard lists stay in sync** — the ask-first list lives in four forms: `agents/claude/settings.json` (`permissions.ask`), `agents/claude/hooks/guard.py`, `agents/codex/rules/guard.rules`, and `agents/cursor/cli-config.json` (`permissions.deny`). An entry added or removed in one must change in all four; `bash tests/guard.test.sh` covers the hook.
 - **Drift policy** — local file changes that belong in seeds should go through the `audit-local-config` skill; do not bulk-copy home files.
 
 ## After local review

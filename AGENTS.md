@@ -63,6 +63,7 @@ Shared templates in `agents/templates/` install once to `~/.config/agent-templat
 | `tools/vimrc` | `~/.vimrc` |
 | `tools/nvim/init.lua` | `~/.config/nvim/init.lua` (macOS) / `%LOCALAPPDATA%\nvim\init.lua` (Windows) |
 | `tools/hints.md` | `~/.config/shell/hints.md` |
+| `tools/pstash` | `~/.local/bin/pstash` (macOS; prompts are kept in `~/.config/shell/prompts.md`, which is not a seed) |
 | `tools/vscode-settings.json` | VS Code User `settings.json` (`~/Library/Application Support/Code/User/` on macOS, `%APPDATA%\Code\User\` on Windows) |
 | `tools/cursor-settings.json` | Cursor User `settings.json` (`~/Library/Application Support/Cursor/User/` on macOS, `%APPDATA%\Cursor\User\` on Windows) |
 | `agents/cursor/rules/` (dir) | `~/.cursor/rules/` |
@@ -73,6 +74,11 @@ Shared templates in `agents/templates/` install once to `~/.config/agent-templat
 | `agents/claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
 | `agents/skills/` + `agents/claude/skills/` (dirs) | `~/.claude/skills/` |
 | `agents/templates/` (dir) | `~/.config/agent-templates/` |
+| `agents/claude/settings.json` (+ `settings.hooks.json` on macOS) | merged into `~/.claude/settings.json` (run-everything mode, ask list, guard hook) |
+| `agents/claude/hooks/guard.py` | `~/.claude/hooks/guard.py` (macOS) |
+| `agents/codex/rules/guard.rules` | `~/.codex/rules/guard.rules` |
+| `agents/codex/config.toml` | missing top-level keys merged into `~/.codex/config.toml` |
+| `agents/cursor/cli-config.json` | merged into `~/.cursor/cli-config.json` (deny list) |
 
 Rows that list two seeds are installed shared-first, agent-specific-second. `~/.gitignore` is generated (not a repo seed); `~/.nvm` and git completions in `~/.zsh/` are created/downloaded, not copied. Keep this list in sync whenever seeds change.
 

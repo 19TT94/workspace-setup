@@ -160,6 +160,7 @@ Prompts let you pick which dotfiles to install. Existing files trigger an overwr
 | vimrc               | `tools/vimrc`             | `~/.vimrc` (+ vim-plug, fzf, and ripgrep when selected) |
 | lf                  | `tools/lfrc`              | `~/.config/lf/lfrc` (Enter/l opens files in nvim; `q`, `:q`, or `exit` quits) |
 | hints               | `tools/hints.md`          | `~/.config/shell/hints.md` (open with `hint`; `rfind` searches this dir) |
+| pstash              | `tools/pstash`            | `~/.local/bin/pstash` (stash prompts for later: `pstash`, `pstash list`, `pstash pop`; stored in `~/.config/shell/prompts.md`) |
 | Neovim              | `tools/nvim/init.lua`     | `~/.config/nvim/init.lua` (plugin setup bootstraps on first launch) |
 | vscode settings     | `tools/vscode-settings.json` | VS Code `User/settings.json` (Cursor Dark via the "Anysphere Dark" port + Spline Sans Mono 14; installs `hkeric.theme-anysphere`) |
 | cursor settings     | `tools/cursor-settings.json` | Cursor `User/settings.json` (built-in "Cursor Dark"; Spline Sans Mono 14) |
@@ -230,6 +231,8 @@ Agent-specific seeds add to the same target afterwards:
 `agents/skills/` holds skills that work for every agent; `agents/<agent>/skills/` holds skills only that agent needs. A skill name must live in exactly one of them, or one copy overwrites the other — the installer warns when it detects that.
 
 Customize the files under `agents/` before running the installer to change what gets copied. Edit `agents/templates/pull_request_template.md` to change the global PR default (it installs once to `~/.config/agent-templates/`; the `pr-prepare` skill prefers a repo `.github/pull_request_template.md` when present). Edit `agents/skills/feature-planning/reference.md` to set your tracker project key and browse URL. The shared `code-review` skill applies each project's review guides in `.cursor/review/`; it is not installed for Claude Code, whose built-in `/code-review` is pointed at the same guides by the global rules.
+
+The agent flow also installs a **guard**: agents run everything without asking, except production writes and destructive commands (AWS writes, Terraform, migrations, remote `psql`, Supabase/Netlify deploys, pushes to deploy branches, `rm -rf`, …), which ask first. It is merged into your existing `~/.claude/settings.json`, `~/.codex/config.toml`, and `~/.cursor/cli-config.json` rather than replacing them; see `agents/cursor/README.md` for the Cursor IDE step.
 
 ## Devtools
 

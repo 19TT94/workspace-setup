@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+# pstash: stash prompts for later, like `git stash` for agent ideas.
+# Prompts live in one markdown file ($PROMPTS_FILE) so they stay readable and
+# editable by hand. Each entry starts with a header line ending in the marker
+# below; the marker is what separates entries, so markdown inside a prompt
+# (headings, code fences) is never mistaken for a new entry.
+
+set -euo pipefail
+
+PROMPTS_FILE="${PROMPTS_FILE:-$HOME/.config/shell/prompts.md}"
+MARK='<!-- pstash -->'
+
+usage() {
+    cat <<'EOF'
+Stash prompts for later, like git stash.
+
+  pstash "text"     stash a one-line prompt
+  pstash            write a longer prompt in $EDITOR
+  pstash -          stash the prompt piped on stdin
+  pstash -- "text"  stash text that starts with a dash
+  pstash list       numbered list, newest first
+  pstash pop [n]    copy prompt n (default 1 = newest) to the clipboard and remove it
+  pstash peek [n]   copy prompt n without removing it
+  pstash edit       open the prompts file in $EDITOR
+EOF
+}
+
+# Shared awk helper: a header is "## ... <marker>".
+AWK_HEADER='function is_header(line) {
+    return substr(line, 1, 3) == "## " && substr(line, length(line) - length(m) + 1) == m
+}'
+
+count() {
+    [ -f "$PROMPTS_FILE" ] || { echo 0; return; }
+    awk -v m="$MARK" "$AWK_HEADER"'
+        is_header($0) { n++ }
+        END { print n + 0 }' "$PROMPTS_FILE"
+}
+
+# Body of entry $1 (1 = first in the file), without surrounding blank lines.
+body() {
+    awk -v m="$MARK" -v want="$1" "$AWK_HEADER"'
+        is_header($0) { n++; next }
+        n == want { buf[++k] = $0 }
+        END {
+            s = 1; while (s <= k && buf[s] ~ /^[ \t]*$/) s++
+            e = k; while (e >= s && buf[e] ~ /^[ \t]*$/) e--
+            for (j = s; j <= e; j++) print buf[j]
+        }' "$PROMPTS_FILE"
+}
+
+# Print the file without entry $1.
+without() {
+    awk -v m="$MARK" -v drop="$1" "$AWK_HEADER"'
+        is_header($0) { n++ }
+        n != drop { print }' "$PROMPTS_FILE"
+}
+
+copy() {
+    if [ -n "${PSTASH_CLIP:-}" ]; then
+        sh -c "$PSTASH_CLIP"
+    elif command -v pbcopy >/dev/null 2>&1; then
+        pbcopy
+    elif command -v wl-copy >/dev/null 2>&1; then
+        wl-copy
+    elif command -v xclip >/dev/null 2>&1; then
+        xclip -selection clipboard
+    else
+        cat >/dev/null
+        echo "(no clipboard tool found; prompt printed only)" >&2
+    fi
+}
+
+tag() {
+    local root
+    if root="$(git rev-parse --show-toplevel 2>/dev/null)"; then
+        basename "$root"
+    else
+        basename "$PWD"
+    fi
+}
+
+add() {
+    local text="$1"
+    if [ -z "$(printf '%s' "$text" | tr -d ' \t\n')" ]; then
+        echo "Nothing stashed (empty prompt)."
+        return 0
+    fi
+    mkdir -p "$(dirname "$PROMPTS_FILE")"
+    if [ ! -f "$PROMPTS_FILE" ]; then
+        printf '# Stashed prompts\n\nManaged by `pstash` (run `pstash help`). Newest entries are at the bottom.\n' > "$PROMPTS_FILE"
+    fi
+    printf '\n## %s · %s %s\n\n%s\n' "$(date '+%Y-%m-%d %H:%M')" "$(tag)" "$MARK" "$text" >> "$PROMPTS_FILE"
+    echo "Stashed ($(count) total)."
+}
+
+add_from_editor() {
+    local tmp
+    tmp="$(mktemp "${TMPDIR:-/tmp}/pstash.XXXXXX")"
+    # Unquoted on purpose: EDITOR may carry flags, e.g. "code --wait".
+    if ! ${EDITOR:-vi} "$tmp"; then
+        rm -f "$tmp"
+        echo "Nothing stashed (editor exited with an error)."
+        return 0
+    fi
+    add "$(cat "$tmp")"
+    rm -f "$tmp"
+}
+
+list() {
+    if [ "$(count)" -eq 0 ]; then
+        echo "No stashed prompts"
+        return 0
+    fi
+    awk -v m="$MARK" "$AWK_HEADER"'
+        is_header($0) {
+            n++
+            t = substr($0, 4, length($0) - 3 - length(m) - 1)
+            tags[n] = t
+            next
+        }
+        n > 0 && first[n] == "" && $0 !~ /^[ \t]*$/ { first[n] = $0 }
+        END { for (k = 1; k <= n; k++) printf "%2d  %s  %s\n", k, tags[n - k + 1], first[n - k + 1] }' "$PROMPTS_FILE"
+}
+
+take() {
+    local mode="$1" n="${2:-1}" total text tmp
+    total="$(count)"
+    if [ "$total" -eq 0 ]; then
+        echo "No stashed prompts"
+        return 1
+    fi
+    case "$n" in
+        '' | *[!0-9]* | 0) echo "No prompt #$n ($total stashed)."; return 1 ;;
+    esac
+    if [ "$n" -gt "$total" ]; then
+        echo "No prompt #$n ($total stashed)."
+        return 1
+    fi
+    # The list numbers newest first; the file stores oldest first.
+    local index=$((total - n + 1))
+    text="$(body "$index")"
+    printf '%s' "$text" | copy
+    printf '%s\n' "$text"
+    if [ "$mode" = pop ]; then
+        tmp="$(mktemp "${TMPDIR:-/tmp}/pstash.XXXXXX")"
+        without "$index" > "$tmp"
+        mv "$tmp" "$PROMPTS_FILE"
+        echo "(popped #$n and copied to the clipboard)" >&2
+    else
+        echo "(copied #$n to the clipboard)" >&2
+    fi
+}
+
+case "${1:-}" in
+    '') add_from_editor ;;
+    -) add "$(cat)" ;;
+    list | ls) list ;;
+    pop | peek) take "$1" "${2:-1}" ;;
+    edit)
+        [ -f "$PROMPTS_FILE" ] || add_header=1
+        mkdir -p "$(dirname "$PROMPTS_FILE")"
+        [ -n "${add_header:-}" ] && printf '# Stashed prompts\n' > "$PROMPTS_FILE"
+        ${EDITOR:-vi} "$PROMPTS_FILE"
+        ;;
+    help | -h | --help) usage ;;
+    --) shift; add "$*" ;;
+    # A lone flag-like word (e.g. --frob) is a typo, not a prompt; a dash
+    # followed by more words (a markdown bullet) is a prompt.
+    -*) if [ $# -eq 1 ] && [ "${1#* }" = "$1" ]; then usage; else add "$*"; fi ;;
+    *) add "$*" ;;
+esac

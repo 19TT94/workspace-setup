@@ -93,6 +93,7 @@ function getConfigChoices() {
         { name: 'vimrc', value: 'vimrc', checked: true },
         { name: 'lf', value: 'lf', checked: true },
         { name: 'hints', value: 'hints', checked: true },
+        { name: 'pstash (prompt stash)', value: 'pstash', checked: true },
         { name: 'neovim config', value: 'neovim config', checked: true },
         { name: 'vscode settings', value: 'vscode settings', checked: true },
         { name: 'cursor settings', value: 'cursor settings', checked: true },
@@ -185,6 +186,14 @@ const AGENT_INSTALL_PATHS = {
                 source: ['agents', 'cursor', 'skills'],
                 target: ['.cursor', 'skills'],
                 label: 'cursor skills'
+            },
+            {
+                // Merged, not copied: keeps your own allow list. Deny entries
+                // block production writes and destructive commands.
+                type: 'merge-json',
+                source: ['agents', 'cursor', 'cli-config.json'],
+                target: ['.cursor', 'cli-config.json'],
+                label: 'cursor CLI guard (deny list)'
             }
         ]
     },
@@ -209,6 +218,19 @@ const AGENT_INSTALL_PATHS = {
                 source: ['agents', 'codex', 'skills'],
                 target: ['.codex', 'skills'],
                 label: 'codex skills'
+            },
+            {
+                type: 'file',
+                source: ['agents', 'codex', 'rules', 'guard.rules'],
+                target: ['.codex', 'rules', 'guard.rules'],
+                label: 'codex guard rules'
+            },
+            {
+                // Only adds missing top-level keys; values you set are kept.
+                type: 'merge-toml',
+                source: ['agents', 'codex', 'config.toml'],
+                target: ['.codex', 'config.toml'],
+                label: 'codex approval settings'
             }
         ]
     },
@@ -236,6 +258,29 @@ const AGENT_INSTALL_PATHS = {
                 source: ['agents', 'claude', 'skills'],
                 target: ['.claude', 'skills'],
                 label: 'claude skills'
+            },
+            {
+                // Merged, not copied: keeps your theme and other settings.
+                type: 'merge-json',
+                source: ['agents', 'claude', 'settings.json'],
+                target: ['.claude', 'settings.json'],
+                label: 'claude settings (run everything + ask list)'
+            },
+            {
+                // The hook is a python3 script, so macOS only for now.
+                type: 'merge-json',
+                source: ['agents', 'claude', 'settings.hooks.json'],
+                target: ['.claude', 'settings.json'],
+                label: 'claude guard hook settings',
+                platforms: ['darwin']
+            },
+            {
+                type: 'file',
+                source: ['agents', 'claude', 'hooks', 'guard.py'],
+                target: ['.claude', 'hooks', 'guard.py'],
+                label: 'claude guard hook',
+                executable: true,
+                platforms: ['darwin']
             }
         ]
     }

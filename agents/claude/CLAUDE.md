@@ -20,10 +20,10 @@ Use TDD when the work warrants it (new behavior, bug fixes, logic changes; not d
 
 ## Type safety
 
-- After editing Python, TypeScript, or JavaScript, run the project's type checker (pyright or basedpyright, `tsc --noEmit`, or the `typecheck` script) and fix errors in code you added or changed before reporting done.
+- After editing code, run the project's type checks (its type checker or compiler check, e.g. `tsc --noEmit`, pyright, `cargo check`, `go vet`) and fix errors in code you added or changed before reporting done.
 - Don't fix pre-existing errors on your own. At the end, list them (files and counts) and ask how far to go: leave them, fix the ones in files you touched, or do a full pass.
-- Never silence an error (`# type: ignore`, `Any`, `as any`, `@ts-ignore`, `@ts-expect-error`) without a one-line reason.
-- Add type hints to new or changed Python functions.
+- Never silence a type error (ignore comments, `any`-style escape hatches, unchecked casts) without a one-line reason.
+- In languages where typing is optional, add type annotations to new or changed functions when the project uses them or has a type checker.
 
 ## Git and pull requests
 

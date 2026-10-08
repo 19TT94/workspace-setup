@@ -15,3 +15,5 @@ Installed copies drift — run `npm run audit` to compare, and see the
 
 Skills prefer a **repo** `.github/pull_request_template.md` when present;
 otherwise they use the shared default.
+
+`OPINIONS.md` follows Kun Chen's ["Everyone Should Have an OPINIONS.md"](https://blog.kunchenguid.com/p/everyone-should-have-an-opinionsmd).

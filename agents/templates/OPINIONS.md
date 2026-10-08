@@ -1,5 +1,9 @@
 # Opinions
 
+Inspired by Kun Chen's "Everyone Should Have an OPINIONS.md"
+(https://blog.kunchenguid.com/p/everyone-should-have-an-opinionsmd); a few
+entries are adapted from his.
+
 How I'd decide when no rule says what to do. Read this when a task involves a
 judgment call: design, trade-offs, scope, tooling, or how to present work.
 Rules (`AGENTS.md` / `CLAUDE.md`) say what must happen; these are defaults

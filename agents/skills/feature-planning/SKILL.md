@@ -44,7 +44,7 @@ Never paste filled examples from `reference.md` or duplicate template section he
 
 ## Workflow (concise)
 
-1. **Clarify** — Ask at most **2** questions if blocked; skip if the request is clear enough to triage.
+1. **Clarify** — Ask at most **2** questions if blocked; skip if the request is clear enough to triage. If it needs more than that, suggest running `grill` first.
 2. **Triage** — Type, size, surfaces (one line).
 3. **Next** — One sentence; fold in the top risk only if it changes the recommendation.
 4. **Map** — Mention repo paths in chat only when non-obvious; do not add a separate **Map** heading in concise output.

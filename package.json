@@ -25,7 +25,7 @@
   "homepage": "https://github.com/19TT94/workspace-setup#readme",
     "dependencies": {
     "commander": "^2.20.0",
-    "figlet": "^1.2.3",
+    "figlet": "^1.11.3",
     "fs": "0.0.1-security",
     "inquirer": "^14.2.2",
     "ora": "^3.4.0",

@@ -18,6 +18,13 @@ Use TDD when the work warrants it (new behavior, bug fixes, logic changes; not d
 2. Write the approved tests and confirm they fail.
 3. Implement until they pass.
 
+## Type safety
+
+- After editing Python, TypeScript, or JavaScript, run the project's type checker (pyright or basedpyright, `tsc --noEmit`, or the `typecheck` script) and fix errors in code you added or changed before reporting done.
+- Don't fix pre-existing errors on your own. At the end, list them (files and counts) and ask how far to go: leave them, fix the ones in files you touched, or do a full pass.
+- Never silence an error (`# type: ignore`, `Any`, `as any`, `@ts-ignore`, `@ts-expect-error`) without a one-line reason.
+- Add type hints to new or changed Python functions.
+
 ## Git and pull requests
 
 - Never commit or push on your own. Commits, pushes, and PRs happen only through the `pr-prepare` skill, and only after the user says they want the work taken to a PR.

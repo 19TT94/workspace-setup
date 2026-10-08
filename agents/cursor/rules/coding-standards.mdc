@@ -1,5 +1,5 @@
 ---
-description: Core coding standards and test-first workflow for all projects
+description: Core coding standards, test-first workflow, and type safety for all projects
 alwaysApply: true
 ---
 
@@ -18,3 +18,10 @@ Use TDD when the work warrants it (new behavior, bug fixes, logic changes; not d
 1. Write the test scenarios in plain language (one line each, or given/when/then) and wait for approval.
 2. Write the approved tests and confirm they fail.
 3. Implement until they pass.
+
+## Type safety
+
+- After editing Python, TypeScript, or JavaScript, run the project's type checker (pyright or basedpyright, `tsc --noEmit`, or the `typecheck` script) and fix errors in code you added or changed before reporting done.
+- Don't fix pre-existing errors on your own. At the end, list them (files and counts) and ask how far to go: leave them, fix the ones in files you touched, or do a full pass.
+- Never silence an error (`# type: ignore`, `Any`, `as any`, `@ts-ignore`, `@ts-expect-error`) without a one-line reason.
+- Add type hints to new or changed Python functions.

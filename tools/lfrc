@@ -1,24 +1,38 @@
 # Keep selections alive when leaving a directory
 set hidden
 
-# Enter: new WezTerm/tmux tab (dirs: quit into that dir)
-# l: open in current pane (dirs: enter directory)
+# Same keys in the shell, Neovim (<Space>e) and Vim (<Space>e):
+#   Enter: new tab (dirs: leave lf in that dir)
+#   l:     open in current pane / window (dirs: enter directory)
+# In the shell a "tab" is a WezTerm/tmux tab; inside an editor it is an editor tab.
 map <enter> open-tab
 map l open-here
 
 cmd q quit
 cmd exit quit
 
+# Inside Neovim/Vim the editor sets LF_PICK to a temp file: write
+# "<action>\t<path>" there and quit, and the editor opens it.
 cmd open-here ${{
   if [ -d "$f" ]; then
     lf -remote "send $id cd \"$f\""
+  elif [ -n "${LF_PICK:-}" ]; then
+    printf 'here\t%s\n' "$f" > "$LF_PICK"
+    lf -remote "send $id quit"
   else
     ${EDITOR:-nvim} "$f"
   fi
 }}
 
 cmd open-tab ${{
-  if [ -d "$f" ]; then
+  if [ -n "${LF_PICK:-}" ]; then
+    if [ -d "$f" ]; then
+      printf 'cd\t%s\n' "$f" > "$LF_PICK"
+    else
+      printf 'tab\t%s\n' "$f" > "$LF_PICK"
+    fi
+    lf -remote "send $id quit"
+  elif [ -d "$f" ]; then
     lf -remote "send $id cd \"$f\""
     lf -remote "send $id quit"
   else

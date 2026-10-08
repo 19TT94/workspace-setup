@@ -116,6 +116,35 @@ for i = 1, 9 do
     table.insert(config.keys, { key = tostring(i), mods = 'LEADER', action = wezterm.action.ActivateTab(i - 1) })
 end
 
+-- Ctrl+h/j/k/l: move between panes without the leader. When the pane runs
+-- Vim/Neovim (or tmux) the key goes through instead, and the editor moves
+-- between its own splits and hands off to WezTerm at the edge
+-- (smart-splits.nvim sets IS_NVIM; plain vim is matched by process name).
+local function passes_through(pane)
+    local vars = pane:get_user_vars()
+    -- IN_FZF: set by the shell's fzf pickers (tools/zshrc), so fzf keeps
+    -- Ctrl+j/k for list navigation.
+    if vars.IS_NVIM == 'true' or vars.IN_FZF == 'true' then
+        return true
+    end
+    local name = (pane:get_foreground_process_name() or ''):match('[^/\\]+$') or ''
+    return name:match('^n?vim') ~= nil or name:match('^tmux') ~= nil
+end
+
+for key, dir in pairs({ h = 'Left', j = 'Down', k = 'Up', l = 'Right' }) do
+    table.insert(config.keys, {
+        key = key,
+        mods = 'CTRL',
+        action = wezterm.action_callback(function(window, pane)
+            if passes_through(pane) then
+                window:perform_action(wezterm.action.SendKey { key = key, mods = 'CTRL' }, pane)
+            else
+                window:perform_action(wezterm.action.ActivatePaneDirection(dir), pane)
+            end
+        end),
+    })
+end
+
 -- Pane actions (tmux: prefix z / x / o / [ / ])
 table.insert(config.keys, { key = 'z', mods = 'LEADER', action = wezterm.action.TogglePaneZoomState })
 table.insert(config.keys, { key = 'x', mods = 'LEADER', action = wezterm.action.CloseCurrentPane { confirm = true } })

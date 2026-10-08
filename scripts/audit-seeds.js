@@ -290,6 +290,7 @@ function audit() {
         { label: 'nvim init.lua', seed: 'tools/nvim/init.lua', target: () => isWindows ? path.join(process.env.LOCALAPPDATA || homePath('AppData', 'Local'), 'nvim', 'init.lua') : homePath('.config', 'nvim', 'init.lua'), platforms: ['darwin', 'win32'] },
         { label: 'lfrc', seed: 'tools/lfrc', target: () => homePath('.config', 'lf', 'lfrc'), platforms: ['darwin'] },
         { label: 'hints', seed: 'tools/hints.md', target: () => homePath('.config', 'shell', 'hints.md'), platforms: ['darwin', 'win32'] },
+        { label: 'pstash', seed: 'tools/pstash', target: () => homePath('.local', 'bin', 'pstash'), platforms: ['darwin'] },
         { label: 'vscode settings', seed: 'tools/vscode-settings.json', target: () => getVSCodeSettingsPath(), platforms: ['darwin', 'win32'] },
         { label: 'cursor settings', seed: 'tools/cursor-settings.json', target: () => getCursorSettingsPath(), platforms: ['darwin', 'win32'] }
     ];

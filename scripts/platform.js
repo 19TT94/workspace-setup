@@ -93,6 +93,7 @@ function getConfigChoices() {
         { name: 'vimrc', value: 'vimrc', checked: true },
         { name: 'lf', value: 'lf', checked: true },
         { name: 'hints', value: 'hints', checked: true },
+        { name: 'pstash (prompt stash)', value: 'pstash', checked: true },
         { name: 'neovim config', value: 'neovim config', checked: true },
         { name: 'vscode settings', value: 'vscode settings', checked: true },
         { name: 'cursor settings', value: 'cursor settings', checked: true },

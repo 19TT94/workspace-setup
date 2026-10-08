@@ -374,6 +374,16 @@ async function installHintsConfig() {
     );
 }
 
+async function installPstash() {
+    const target = homePath('.local', 'bin', 'pstash');
+    if (await copyFileWithPrompt(path.join(REPO_ROOT, 'tools/pstash'), target, 'pstash')) {
+        dryRunExec(`chmod +x "${target}"`);
+        if (!isDryRun()) {
+            shell.exec(`chmod +x "${target}"`);
+        }
+    }
+}
+
 async function installVimConfig() {
     if (await copyFileWithPrompt(
         path.join(REPO_ROOT, 'tools/vimrc'),
@@ -486,6 +496,10 @@ async function install_config() {
 
         if (item === 'hints') {
             await installHintsConfig();
+        }
+
+        if (item === 'pstash') {
+            await installPstash();
         }
 
         if (item === 'vimrc') {

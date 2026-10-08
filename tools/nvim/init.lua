@@ -30,6 +30,95 @@ for tab = 1, 9 do
   vim.keymap.set("n", "T" .. tab, "<cmd>" .. tab .. "tabnext<cr>", { desc = "Go to tab " .. tab })
 end
 
+-- Splits use the same second key as WezTerm/tmux (Ctrl+b % / " / z / x),
+-- with <Space> in place of Ctrl+b. Same in tools/vimrc.
+vim.keymap.set("n", "<leader>%", "<cmd>vsplit<cr>", { desc = "Split side by side" })
+vim.keymap.set("n", '<leader>"', "<cmd>split<cr>", { desc = "Split stacked" })
+vim.keymap.set("n", "<leader>x", "<cmd>close<cr>", { desc = "Close split" })
+vim.keymap.set("n", "<leader>z", function()
+  if vim.t.zoomed then
+    vim.cmd("wincmd =")
+  else
+    vim.cmd("wincmd _ | wincmd |")
+  end
+  vim.t.zoomed = not vim.t.zoomed
+end, { desc = "Zoom / unzoom split" })
+
+-- Neovim 0.11+ ships gra/gri/grn/grr/grt/grx, which make the `gr` mapping
+-- below wait for a possible second key. Drop them so `gr` fires at once;
+-- rename and code action keep their <leader>rn / <leader>a mappings.
+for _, lhs in ipairs({ "gra", "gri", "grn", "grr", "grt", "grx" }) do
+  pcall(vim.keymap.del, "n", lhs)
+end
+pcall(vim.keymap.del, "x", "gra")
+
+-- <Space>e: browse files with lf in a float, same keys as in the shell:
+-- Enter opens in a new tab, l opens here, Enter on a directory cds there.
+-- tools/lfrc writes the pick to $LF_PICK instead of opening its own editor.
+vim.keymap.set("n", "<leader>e", function()
+  local pick = vim.fn.tempname()
+  local file = vim.api.nvim_buf_get_name(0)
+  local target = file ~= "" and vim.fn.filereadable(file) == 1 and file or vim.fn.getcwd()
+  local width = math.floor(vim.o.columns * 0.85)
+  local height = math.floor(vim.o.lines * 0.8)
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.bo[buf].bufhidden = "wipe"
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = "editor", width = width, height = height, border = "rounded",
+    row = math.floor((vim.o.lines - height) / 2), col = math.floor((vim.o.columns - width) / 2),
+  })
+  vim.fn.jobstart({ "lf", target }, {
+    term = true,
+    env = { LF_PICK = pick },
+    on_exit = function()
+      vim.schedule(function()
+        if vim.api.nvim_win_is_valid(win) then
+          vim.api.nvim_win_close(win, true)
+        end
+        local line = vim.fn.filereadable(pick) == 1 and vim.fn.readfile(pick)[1] or nil
+        vim.fn.delete(pick)
+        if not line then
+          return
+        end
+        local action, path = line:match("^(%a+)\t(.+)$")
+        local cmd = ({ here = "edit", tab = "tabedit", cd = "cd" })[action]
+        if cmd then
+          vim.cmd[cmd](vim.fn.fnameescape(path))
+        end
+      end)
+    end,
+  })
+  vim.cmd.startinsert()
+end, { desc = "Browse files (lf)" })
+
+-- pstash (tools/pstash): stash prompts for later, same store as the shell.
+-- <Space>s stashes the selection (visual) or asks for a one-liner (normal);
+-- :Pstash [list | pop n | peek n] runs the shell command.
+local function pstash(args, input)
+  if vim.fn.executable("pstash") ~= 1 then
+    vim.notify("pstash is not installed", vim.log.levels.ERROR)
+    return
+  end
+  local cmd = { "pstash" }
+  vim.list_extend(cmd, args)
+  vim.notify(vim.trim(vim.fn.system(cmd, input)))
+end
+vim.keymap.set("x", "<leader>s", function()
+  local lines = vim.fn.getregion(vim.fn.getpos("v"), vim.fn.getpos("."), { type = vim.fn.mode() })
+  vim.api.nvim_feedkeys(vim.keycode("<Esc>"), "nx", false)
+  pstash({ "-" }, table.concat(lines, "\n"))
+end, { desc = "Stash selection as a prompt" })
+vim.keymap.set("n", "<leader>s", function()
+  vim.ui.input({ prompt = "Stash prompt: " }, function(text)
+    if text and text ~= "" then
+      pstash({ "-" }, text)
+    end
+  end)
+end, { desc = "Stash a prompt" })
+vim.api.nvim_create_user_command("Pstash", function(opts)
+  pstash(#opts.fargs > 0 and opts.fargs or { "list" })
+end, { nargs = "*", desc = "pstash list / pop n / peek n" })
+
 vim.filetype.add({
   extension = { tf = "terraform", tfvars = "terraform" },
 })
@@ -311,6 +400,17 @@ vim.api.nvim_create_user_command("Copencode", function()
   agent_open("opencode")
 end, { desc = "Open opencode in a split with session context" })
 
+-- File pickers (Cmd+P, <Space>/, <Space>gm) open like the shell pickers and
+-- lf: Enter in a new tab, Ctrl+O here. Other pickers keep Telescope defaults.
+local function open_in_tab_or_here(_, map)
+  local actions = require("telescope.actions")
+  for _, mode in ipairs({ "i", "n" }) do
+    map(mode, "<CR>", actions.select_tab)
+    map(mode, "<C-o>", actions.select_default)
+  end
+  return true
+end
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   vim.fn.system({
@@ -441,7 +541,8 @@ require("lazy").setup({
         vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
         vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
         vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action, opts)
-        vim.keymap.set({ "n", "i" }, "<C-k>", vim.lsp.buf.signature_help, opts)
+        -- Insert mode only: normal-mode Ctrl+k moves between splits/panes.
+        vim.keymap.set("i", "<C-k>", vim.lsp.buf.signature_help, opts)
         vim.keymap.set("n", "<leader>F", function()
           vim.lsp.buf.format({ async = true })
         end, opts)
@@ -637,6 +738,26 @@ require("lazy").setup({
   },
 
   {
+    -- Ctrl+h/j/k/l move between splits and keep going into WezTerm/tmux
+    -- panes at the edge; <Space>H/J/K/L resize like Ctrl+b H/J/K/L.
+    -- tools/wezterm.lua and tools/tmux.conf pass the keys through to nvim.
+    "mrjones2014/smart-splits.nvim",
+    lazy = false,
+    config = function()
+      local ss = require("smart-splits")
+      ss.setup({})
+      vim.keymap.set("n", "<C-h>", ss.move_cursor_left, { desc = "Move to left split/pane" })
+      vim.keymap.set("n", "<C-j>", ss.move_cursor_down, { desc = "Move to lower split/pane" })
+      vim.keymap.set("n", "<C-k>", ss.move_cursor_up, { desc = "Move to upper split/pane" })
+      vim.keymap.set("n", "<C-l>", ss.move_cursor_right, { desc = "Move to right split/pane" })
+      vim.keymap.set("n", "<leader>H", ss.resize_left, { desc = "Resize left" })
+      vim.keymap.set("n", "<leader>J", ss.resize_down, { desc = "Resize down" })
+      vim.keymap.set("n", "<leader>K", ss.resize_up, { desc = "Resize up" })
+      vim.keymap.set("n", "<leader>L", ss.resize_right, { desc = "Resize right" })
+    end,
+  },
+
+  {
     "nvim-telescope/telescope.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     cmd = "Telescope",
@@ -644,6 +765,18 @@ require("lazy").setup({
     -- plugin has loaded, so keymaps set there stay dead until `:Telescope` is
     -- first typed. `keys` registers them at startup and lazy-loads on press.
     keys = {
+      -- Same pickers and keys as the shell: Cmd+P (WezTerm sends Ctrl+P) finds
+      -- files like `fzf-open`, <Space>/ searches text like `rfind`.
+      {
+        "<C-p>",
+        function() require("telescope.builtin").find_files({ hidden = true, attach_mappings = open_in_tab_or_here }) end,
+        desc = "Find file",
+      },
+      {
+        "<leader>/",
+        function() require("telescope.builtin").live_grep({ attach_mappings = open_in_tab_or_here }) end,
+        desc = "Search text",
+      },
       {
         "<leader>gd",
         function() require("telescope.builtin").lsp_definitions() end,
@@ -653,12 +786,14 @@ require("lazy").setup({
         -- `<leader>gs` is gitsigns' repo-wide hunk quickfix. Telescope's
         -- git_status is available here as `gm` so the two never collide.
         "<leader>gm",
-        function() require("telescope.builtin").git_status() end,
+        function() require("telescope.builtin").git_status({ attach_mappings = open_in_tab_or_here }) end,
         desc = "Git modified files",
       },
     },
     config = function()
-      require("telescope").setup({})
+      require("telescope").setup({
+        defaults = { file_ignore_patterns = { "^.git/" } },
+      })
     end,
   },
 

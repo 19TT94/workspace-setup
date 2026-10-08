@@ -83,6 +83,11 @@ The goal is for a new machine built from this repo to get the latest working env
 | `agents/claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
 | `agents/skills/` + `agents/claude/skills/` (dirs) | `~/.claude/skills/` |
 | `agents/templates/` (dir) | `~/.config/agent-templates/` |
+| `agents/claude/settings.json` (+ `settings.hooks.json` on macOS) | merged into `~/.claude/settings.json` (run-everything mode, ask list, guard hook) |
+| `agents/claude/hooks/guard.py` | `~/.claude/hooks/guard.py` (macOS) |
+| `agents/codex/rules/guard.rules` | `~/.codex/rules/guard.rules` |
+| `agents/codex/config.toml` | missing top-level keys merged into `~/.codex/config.toml` |
+| `agents/cursor/cli-config.json` | merged into `~/.cursor/cli-config.json` (deny list) |
 
 Each agent skills dir has two seeds; the agent-specific one wins on conflict, matching install order. A local edit to a shared skill should go back into `agents/skills/`, not one agent's folder.
 

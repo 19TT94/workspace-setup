@@ -1,0 +1,5 @@
+# Top-level keys merged into ~/.codex/config.toml by the installer (only when
+# missing; values you already set are left alone). Commands run without
+# approval; rules/guard.rules marks the ones that must ask first.
+approval_policy = "on-request"
+sandbox_mode = "danger-full-access"

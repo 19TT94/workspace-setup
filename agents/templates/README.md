@@ -7,6 +7,7 @@ Canonical defaults referenced by global skills. Installed to
 | File | Used by | Install location |
 | --- | --- | --- |
 | `pull_request_template.md` | `pr-prepare` | `~/.config/agent-templates/pull_request_template.md` |
+| `OPINIONS.md` | global rules (judgment calls) | `~/.config/agent-templates/OPINIONS.md` |
 
 Edit here before running the installer to change the default for future machines.
 Installed copies drift — run `npm run audit` to compare, and see the

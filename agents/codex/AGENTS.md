@@ -18,6 +18,13 @@ Use TDD when the work warrants it (new behavior, bug fixes, logic changes; not d
 2. Write the approved tests and confirm they fail.
 3. Implement until they pass.
 
+## Type safety
+
+- After editing code, run the project's type checks (its type checker or compiler check, e.g. `tsc --noEmit`, pyright, `cargo check`, `go vet`) and fix errors in code you added or changed before reporting done.
+- Don't fix pre-existing errors on your own. At the end, list them (files and counts) and ask how far to go: leave them, fix the ones in files you touched, or do a full pass.
+- Never silence a type error (ignore comments, `any`-style escape hatches, unchecked casts) without a one-line reason.
+- In languages where typing is optional, add type annotations to new or changed functions when the project uses them or has a type checker.
+
 ## Git and pull requests
 
 - Never commit or push on your own. Commits, pushes, and PRs happen only through the `pr-prepare` skill, and only after the user says they want the work taken to a PR.

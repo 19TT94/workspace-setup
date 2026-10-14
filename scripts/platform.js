@@ -264,7 +264,7 @@ const AGENT_INSTALL_PATHS = {
                 type: 'merge-json',
                 source: ['agents', 'claude', 'settings.json'],
                 target: ['.claude', 'settings.json'],
-                label: 'claude settings (run everything + ask list)'
+                label: 'claude settings (auto mode + ask list)'
             },
             {
                 // The hook is a python3 script, so macOS only for now.

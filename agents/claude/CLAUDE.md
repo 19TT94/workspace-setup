@@ -45,6 +45,18 @@ Use TDD when the work warrants it (new behavior, bug fixes, logic changes; not d
 - Keep responses concise: one or two short paragraphs by default.
 - Offer more detail as a follow-up rather than front-loading it.
 
+## Explaining changes
+
+When asked to explain a change (a PR, a diff, or your own work): what changed, why, or what to focus on:
+
+1. Answer the question asked, in the order it was asked.
+2. Open with 2–3 plain sentences: what it did before, what it does now, and why. No file paths yet.
+3. Explain through how the code runs, as numbered steps, not a file-by-file list.
+4. Say each fact once. Put each risk under the part of the code it lives in, with when to fix it (before merge, next slice, not urgent).
+5. Keep the body to what changes a decision. Check results and the merge verdict get one line at the end, unless that was the question.
+6. Move everything else (pre-existing bugs, warnings already on the base branch, nits) into a short **Want more?** list at the end: one specific line per item, never a generic "let me know if you want more".
+7. When several files are involved, offer a file map in that list: a plain-text diagram ordered by how a call moves through the files (not the directory tree), with arrows for who calls whom, marking circular imports, duplicated logic, and the file to focus on.
+
 ## GitHub issue access
 
 When asked to implement or select a GitHub issue:

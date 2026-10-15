@@ -14,9 +14,10 @@ These preferences apply to every repository unless overridden by a project-level
 
 Use TDD when the work warrants it (new behavior, bug fixes, logic changes; not docs, config, or trivial edits):
 
-1. Write the test scenarios in plain language (one line each, or given/when/then) and wait for approval.
-2. Write the approved tests and confirm they fail.
-3. Implement until they pass.
+1. Draft the test scenarios in plain language (one line each, or given/when/then), then present them **one at a time** for approval, numbered ("Scenario 2 of 5"). Use your question tool when you have one (approve, approve and build now, drop; free text to change it); otherwise ask in plain text. A skipped or empty answer is not approval: ask again.
+2. Build when the user says to ("build now", "build the approved ones", "build the last 3"): write those tests, confirm they fail, implement until they pass, then return to the next scenario. After the last scenario, build any approved ones still waiting.
+3. Track approved scenarios as a checklist (your task list, when you have one) and check each off when its test passes.
+4. When the work is done, offer the `quizme` skill so the user can check their understanding before review.
 
 ## Type safety
 

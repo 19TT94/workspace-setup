@@ -8,6 +8,7 @@ changes here apply everywhere.
 | --- | --- |
 | `pr-prepare` | Draft a PR title/body from the repo or shared template, ask before creating, comment the PR; CLI/IDE copy handoff |
 | `grill` | Interview you about a plan until there's a shared understanding, before tickets or code |
+| `quizme` | Quiz you on a finished implementation, one question at a time, so you understand it before review |
 | `diagnose` | Hard bugs and regressions: reproduce with a failing check, rank hypotheses, fix with a regression test |
 | `handoff` | Compress a session into a short note and stash it (`pstash`) for another agent to continue |
 | `feature-planning` | Triage work and draft concise (or full) tickets |

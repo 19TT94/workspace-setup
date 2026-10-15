@@ -4,8 +4,9 @@ description: >-
   Interviews the user about a plan, feature, or design until both sides share
   one understanding of it, before any tickets or code. Use when the user says
   "grill me", wants to pressure-test an idea, or brings a request that is too
-  fuzzy to plan. Asks a few questions per round, each with a recommended
-  answer, and looks up facts instead of asking about them.
+  fuzzy to plan. Asks one question at a time with a recommended answer, settles
+  it through back-and-forth before moving on, and looks up facts instead of
+  asking about them.
 ---
 
 # Grill
@@ -19,10 +20,11 @@ interview.
 
 1. **Map the decisions.** Sketch the decisions the plan depends on as a tree:
    a decision whose answer shapes others comes first.
-2. **Ask in rounds.** Each round asks only the open decisions whose
-   prerequisites are settled, at most **3** per round, numbered. A question
-   that depends on another question still open in the same round waits for a
-   later round. Wait for the answers before the next round.
+2. **One question at a time.** Ask about a single decision whose
+   prerequisites are settled, then wait. Keep going on that decision with
+   follow-ups until it's settled and the user agrees it's right; only then
+   move to the next. Pick the next question from what the answer just
+   changed.
 3. **Recommend an answer.** Every question carries your recommendation and is
    phrased so that "yes" accepts it.
 4. **Look it up, don't ask.** Facts that live in the code, docs, config, or
@@ -44,17 +46,17 @@ interview.
 6. **Stop when it's clear.** End when the open decisions are settled, or as
    soon as the user says that's enough.
 
-### Round format
+### Question format
 
 ```markdown
-**1. Where should exports run?**
+**Where should exports run?**
 Synchronously in the request, or as a background job with a download link?
 ➡️ Recommended: background job — large accounts would time out otherwise.
-
----
-
-**2. …**
 ```
+
+Keep each turn to that one question (plus any follow-up on the current
+decision). When a decision settles, restate it in one line before asking the
+next question.
 
 ## Finish
 
@@ -73,7 +75,8 @@ Synchronously in the request, or as a background job with a download link?
 
 ## Do not
 
-- Ask more than 3 questions in a round, or ask about something you can look up
+- Ask more than one question at a time, or ask about something you can look up
+- Move on from a decision before the user agrees it's settled
 - Write code, tickets, or files before the summary is confirmed
 - Introduce new doc conventions (glossary files, ADR folders) without agreement
 - Keep grilling after the user says that's enough

@@ -232,7 +232,7 @@ Agent-specific seeds add to the same target afterwards:
 
 Customize the files under `agents/` before running the installer to change what gets copied. Edit `agents/templates/pull_request_template.md` to change the global PR default (it installs once to `~/.config/agent-templates/`; the `pr-prepare` skill prefers a repo `.github/pull_request_template.md` when present). Edit `agents/skills/feature-planning/reference.md` to set your tracker project key and browse URL. The shared `code-review` skill applies each project's review guides in `.cursor/review/`; it is not installed for Claude Code, whose built-in `/code-review` is pointed at the same guides by the global rules.
 
-The agent flow also installs a **guard**: agents run everything without asking, except production writes and destructive commands (AWS writes, Terraform, migrations, remote `psql`, Supabase/Netlify deploys, pushes to deploy branches, `rm -rf`, …), which ask first. It is merged into your existing `~/.claude/settings.json`, `~/.codex/config.toml`, and `~/.cursor/cli-config.json` rather than replacing them; see `agents/cursor/README.md` for the Cursor IDE step.
+The agent flow also installs a **guard**: agents run without asking (Claude in auto mode, where a classifier reviews each action), except production writes and destructive commands (AWS writes, Terraform, migrations, remote `psql`, Supabase/Netlify deploys, pushes to deploy branches, `rm -rf`, …), which ask first. It is merged into your existing `~/.claude/settings.json`, `~/.codex/config.toml`, and `~/.cursor/cli-config.json` rather than replacing them; see `agents/cursor/README.md` for the Cursor IDE step.
 
 ## Devtools
 

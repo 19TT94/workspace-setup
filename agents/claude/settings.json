@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "defaultMode": "bypassPermissions",
+    "defaultMode": "auto",
     "ask": [
       "Bash(aws * create-*)",
       "Bash(aws * delete-*)",

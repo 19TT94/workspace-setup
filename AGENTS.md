@@ -74,7 +74,7 @@ Shared templates in `agents/templates/` install once to `~/.config/agent-templat
 | `agents/claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
 | `agents/skills/` + `agents/claude/skills/` (dirs) | `~/.claude/skills/` |
 | `agents/templates/` (dir) | `~/.config/agent-templates/` |
-| `agents/claude/settings.json` (+ `settings.hooks.json` on macOS) | merged into `~/.claude/settings.json` (run-everything mode, ask list, guard hook) |
+| `agents/claude/settings.json` (+ `settings.hooks.json` on macOS) | merged into `~/.claude/settings.json` (auto mode, ask list, guard hook) |
 | `agents/claude/hooks/guard.py` | `~/.claude/hooks/guard.py` (macOS) |
 | `agents/codex/rules/guard.rules` | `~/.codex/rules/guard.rules` |
 | `agents/codex/config.toml` | missing top-level keys merged into `~/.codex/config.toml` |

@@ -35,7 +35,7 @@ Applied by the global `code-review` skill (and Claude's built-in `/code-review`)
 
 - **Seed vs installer separation** — new template content belongs in `agents/`/`tools/`; new installer behavior belongs in `scripts/`. Do not mix.
 - **Copy map in sync** — a new seed must be registered in `scripts/platform.js` (agents) — including any per-agent `skip` list, mirrored as `skipSeedTopDirs` in the audit — or `scripts/install.js` (config), added to `scripts/audit-seeds.js`, and documented in the README tables.
-- **Platform parity** — macOS (apps) vs Windows (agents in `--all`, no apps). Shared tools behave the same in `brew.js` and `winget.js`.
+- **Platform parity** — `--all` includes agents on both platforms; apps are macOS-only. Shared tools behave the same in `brew.js` and `winget.js`.
 - **Dry run coverage** — file copies, dir creation, downloads, and repo deletion all log `Would ...` instead of acting in dry-run.
 - **No repo-dev rules under `agents/`** — `.cursor/` holds rules for working on this repo; `agents/cursor/` is seeded to every user.
 - **Global rules stay identical** — `agents/claude/CLAUDE.md` and `agents/codex/AGENTS.md` share the same body below their title and intro line; `agents/cursor/rules/*.mdc` carry the same sections split across files (frontmatter aside). A rule added, removed, or reworded in one must change in all three. Compare with `diff <(tail -n +4 agents/claude/CLAUDE.md) <(tail -n +4 agents/codex/AGENTS.md)` and check each section against the Cursor rules.

@@ -482,6 +482,8 @@ require("lazy").setup({
   },
 
   {
+    -- The main branch compiles parsers with the tree-sitter CLI (`tree-sitter`
+    -- on PATH, plus a C compiler); the installer adds it alongside neovim.
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     lazy = false,

@@ -87,14 +87,14 @@ npm run dry-run
 
 If you launch without CLI flags, you choose one of these flows:
 
-| Flow                                          |          macOS           |            Windows            |
-| --------------------------------------------- | :----------------------: | :---------------------------: |
-| Install everything                            | config + devtools + apps | config + devtools + AI agents |
-| Install everything except configuration files |     devtools + apps      |         devtools only         |
-| Install devtools and configuration files      |           yes            |              yes              |
-| Install devtools only                         |           yes            |              yes              |
-| Install apps only                             |           yes            |               —               |
-| Install AI agent starter files                |           yes            |              yes              |
+| Flow                                          |                macOS                 |            Windows            |
+| --------------------------------------------- | :----------------------------------: | :---------------------------: |
+| Install everything                            | config + devtools + apps + AI agents | config + devtools + AI agents |
+| Install everything except configuration files |           devtools + apps            |         devtools only         |
+| Install devtools and configuration files      |                 yes                  |              yes              |
+| Install devtools only                         |                 yes                  |              yes              |
+| Install apps only                             |                 yes                  |               —               |
+| Install AI agent starter files                |                 yes                  |              yes              |
 
 Each flow uses checkbox prompts so you can unselect individual items before anything runs.
 
@@ -120,7 +120,7 @@ node ./index.js --all
 node ./index.js --dry-run --devtools
 ```
 
-**Note:** `--all` behavior differs by platform. On macOS it includes apps but not AI agent files. On Windows it includes AI agent files but not apps.
+**Note:** `--all` includes AI agent files on both platforms (each agent is still a checkbox you can unselect). Apps are macOS-only, so Windows `--all` skips them.
 
 ## Project layout
 
@@ -198,7 +198,11 @@ Prettier/StyLua/terraform-fmt on save via conform, Telescope pickers for
 definition candidates (`<leader>gd`) and modified files (`<leader>gm`), and
 TODO/FIXME highlighting.
 The first `nvim` launch needs git + network once to bootstrap plugins and LSP
-servers; after that it works offline. Update plugins with `:Lazy`, servers with
+servers; after that it works offline. nvim-treesitter compiles its parsers with
+the tree-sitter CLI and a C compiler, so the `neovim` devtool also installs
+`tree-sitter-cli` (Homebrew's `tree-sitter` formula is only the library). On
+macOS, `xcode-select` provides the compiler; on Windows the installer warns if
+the MSVC Build Tools are missing and prints the winget command to add them. Update plugins with `:Lazy`, servers with
 `:MasonInstallAll`.
 
 WezTerm is offered as an **unchecked optional** devtool/config — install it when
@@ -207,7 +211,7 @@ tmux and Neovim workflow works in the built-in terminal.
 
 ## AI agent starter files
 
-Available on both platforms as a standalone flow or as part of Windows `--all`.
+Available on both platforms as a standalone flow or as part of `--all`.
 
 Shared seeds install once for every selected agent:
 
@@ -240,13 +244,13 @@ Installed only when selected in the devtools checkbox. The installer checks whet
 
 ### macOS (Homebrew)
 
-`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `neovim`, `wezterm` (optional), `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `docker`, `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional), `cursor` (optional)
+`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `neovim` (+ `tree-sitter-cli`), `wezterm` (optional), `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `docker`, `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional), `cursor` (optional)
 
 `react` appears in the menu but has no install step yet.
 
 ### Windows (winget)
 
-`git`, `winget` (verification only), `node`, `php`, `python`, `neovim`, `wezterm` (optional), `starship`, `nvm-windows`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `docker` (CLI only), `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional), `cursor` (optional)
+`git`, `winget` (verification only), `node`, `php`, `python`, `neovim` (+ `tree-sitter-cli`), `wezterm` (optional), `starship`, `nvm-windows`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `docker` (CLI only), `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional), `cursor` (optional)
 
 Optional AI CLIs are unchecked by default:
 

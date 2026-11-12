@@ -20,6 +20,34 @@ function wingetCommand(packageId) {
     return `winget install --id ${packageId} -e ${WINGET_FLAGS}`;
 }
 
+// The winget tree-sitter CLI is an MSVC build, so it looks for cl.exe via
+// Visual Studio's installer metadata rather than a gcc/clang on PATH.
+function hasMsvcBuildTools() {
+    const vswhere = path.join(
+        process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)',
+        'Microsoft Visual Studio', 'Installer', 'vswhere.exe'
+    );
+    if (!fs.existsSync(vswhere)) {
+        return false;
+    }
+
+    const result = shell.execCapture(
+        `"${vswhere}" -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`
+    );
+    return result.code === 0 && result.stdout.trim() !== '';
+}
+
+// Build Tools is a multi-GB download, so point at it instead of installing it.
+function warnIfNoCCompiler() {
+    if (process.env.CC || hasMsvcBuildTools()) {
+        return;
+    }
+
+    console.log('tree-sitter-cli needs a C compiler to build nvim-treesitter parsers. Install the MSVC Build Tools:');
+    console.log(`  winget install --id Microsoft.VisualStudio.BuildTools -e ${WINGET_FLAGS} --override "--quiet --wait --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"`);
+    console.log('  (or set CC to an existing gcc/clang)');
+}
+
 function appendToFile(filePath, content) {
     if (isDryRun()) {
         log(`Would append to ${filePath} (blocked by dry run)`);
@@ -121,6 +149,16 @@ async function installSelectedDevtools(selected, helpers) {
                 installed,
                 exist
             });
+            // nvim-treesitter compiles parsers with the tree-sitter CLI.
+            await installIfMissing({
+                label: 'tree-sitter-cli',
+                isInstalled: () => commandExists('tree-sitter --version'),
+                install: () => wingetInstall('tree-sitter.tree-sitter-cli'),
+                command: wingetCommand('tree-sitter.tree-sitter-cli'),
+                installed,
+                exist
+            });
+            warnIfNoCCompiler();
         }
 
         if (tool === 'wezterm') {

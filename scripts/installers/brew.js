@@ -101,6 +101,16 @@ async function installSelectedDevtools(selected, helpers) {
                 installed,
                 exist
             });
+            // nvim-treesitter compiles parsers with the tree-sitter CLI; the
+            // `tree-sitter` formula is only the library. xcode-select supplies cc.
+            await installIfMissing({
+                label: 'tree-sitter-cli',
+                isInstalled: () => commandExists('tree-sitter --version'),
+                install: () => shell.exec('brew install tree-sitter-cli'),
+                command: 'brew install tree-sitter-cli',
+                installed,
+                exist
+            });
         }
 
         if (tool === 'wezterm') {

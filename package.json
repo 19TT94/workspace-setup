@@ -23,11 +23,11 @@
     "url": "https://github.com/19TT94/workspace-setup/issues"
   },
   "homepage": "https://github.com/19TT94/workspace-setup#readme",
-    "dependencies": {
+  "dependencies": {
     "commander": "^2.20.0",
     "figlet": "^1.11.3",
     "fs": "0.0.1-security",
-    "inquirer": "^14.2.2",
+    "inquirer": "^8.2.7",
     "ora": "^3.4.0",
     "path": "^0.12.7"
   }

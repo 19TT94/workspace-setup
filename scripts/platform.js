@@ -339,7 +339,7 @@ function getInstallChoices() {
 
     return [
         {
-            name: 'Install everything',
+            name: 'Install everything (config, devtools, apps, and AI agent files)',
             value: 'all'
         },
         {

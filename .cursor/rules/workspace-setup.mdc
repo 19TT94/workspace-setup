@@ -34,7 +34,7 @@ Do not mix them. Agent rules for working on this repo live in `.cursor/` — nev
 
 ## Platform parity
 
-- macOS: apps + devtools + config + agents flow. Windows: devtools + config + agents in `--all`; **no apps**.
+- macOS: apps + devtools + config + agents in `--all`. Windows: devtools + config + agents in `--all`; **no apps**.
 - `isWindows` branches must stay symmetric with `isMac` behavior for shared tools and seeds.
 - Keep `brew.js` and `winget.js` aligned for install/uninstall/indent behavior where the tool exists on both.
 

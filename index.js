@@ -31,9 +31,7 @@ async function runInstall(selection) {
             if (!isWindows) {
                 await install_apps();
             }
-            if (isWindows) {
-                await install_agents();
-            }
+            await install_agents();
             break;
         case 'no-config':
             await install_devtools();

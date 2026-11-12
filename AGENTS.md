@@ -100,7 +100,7 @@ Do not silently overwrite installed files with seeds (the installer prompts befo
 - **A bare Enter is always the safe answer.** The `expand` prompts in `index.js` (`keep`) and `scripts/install.js` (`promptOverwrite`) list Keep/Skip **first**, so Enter can never overwrite a dotfile or delete the repo. Keep it that way if you add prompts.
 - **CommonJS + no new dependencies.** Match the existing style (`require`, 4-space indent, `commander`, `inquirer`). Prefer `shell.exec` helpers in `scripts/installers/`.
 - **Registry mappings live in `scripts/platform.js`** — `AGENT_INSTALL_PATHS`, `getConfigChoices`, `getDevtoolChoices`. `scripts/install.js` consumes them. Keep installer source→target in sync with the audit map and README tables.
-- **Platform parity** — flows differ by OS (apps are macOS-only; agent seeds are in Windows `--all`). Respect `isWindows` branches; keep `brew.js` and `winget.js` behaviorally aligned for shared tools.
+- **Platform parity** — flows differ by OS (apps are macOS-only; agent seeds are in `--all` on both). Respect `isWindows` branches; keep `brew.js` and `winget.js` behaviorally aligned for shared tools.
 - **Syntax check any edited JS**: `node --check scripts/foo.js`.
 - Commit only when explicitly asked.
 

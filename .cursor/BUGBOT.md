@@ -13,7 +13,7 @@ Project rules for [Cursor Agent Review](https://cursor.com/docs/agent/agent-revi
 - Correctness of flows in `index.js` and `scripts/install.js` (`--all`, `--dry-run`, `--devtools`)
 - **Dry-run discipline** — every mutating action (file copy, dir create, download, repo delete) must branch on `isDryRun()` and log `Would ...`
 - Seed ↔ installer sync — new seeds registered in `scripts/platform.js` / `scripts/install.js`, mapped in `scripts/audit-seeds.js`, documented in README tables
-- **Platform parity** — macOS (apps + agents flow) vs Windows (agents in `--all`, no apps); `brew.js` ↔ `winget.js` aligned for shared tools
+- **Platform parity** — `--all` includes agents on both; apps are macOS-only; `brew.js` ↔ `winget.js` aligned for shared tools
 - Platform-specific path bugs (home dir vs `%USERPROFILE%`, PowerShell profile detection)
 
 ## Prefer

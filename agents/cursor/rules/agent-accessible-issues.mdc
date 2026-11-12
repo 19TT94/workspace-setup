@@ -1,5 +1,5 @@
 ---
-description: Only work GitHub issues marked agent-accessible unless the user explicitly overrides
+description: Work any GitHub issue unless it is labeled no-agent; on no-agent issues, never be the sole contributor
 alwaysApply: true
 ---
 
@@ -8,8 +8,7 @@ alwaysApply: true
 When asked to implement or select a GitHub issue:
 
 1. Check its labels before making changes.
-2. Proceed when it has the `agent` label.
-3. Do not begin work on an issue labeled `no-agent` unless the user explicitly directs you to do so.
-4. If neither label is present, ask the user whether to proceed.
+2. Any issue without the `no-agent` label is open to you; it needs no other label.
+3. On a `no-agent` issue you may help, but never be the sole contributor, even when asked: the user must write part of the change themselves. Explain, review, and draft the pieces they ask for; don't implement the whole issue end to end or open its PR on your own.
 
-The `agent` and `no-agent` labels are configured separately in each GitHub repository.
+The `no-agent` label is configured separately in each GitHub repository.

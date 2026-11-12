@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const shell = require('../shell');
 const { homePath } = require('../platform');
-const { commandExists, installIfMissing, logInstallSummary } = require('./common');
+const { addDockerCliPluginDir, commandExists, installIfMissing, logInstallSummary } = require('./common');
 const { isDryRun, log } = require('../dry-run');
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -234,6 +234,18 @@ async function installSelectedDevtools(selected, helpers) {
                 installed,
                 exist
             });
+            await installIfMissing({
+                label: 'docker compose',
+                isInstalled: () => commandExists('docker compose version'),
+                install: () => {
+                    shell.exec('brew install docker-compose');
+                    const brewPrefix = shell.execCapture('brew --prefix').stdout.trim();
+                    addDockerCliPluginDir(path.join(brewPrefix, 'lib', 'docker', 'cli-plugins'));
+                },
+                command: 'brew install docker-compose; add its plugin dir to cliPluginsExtraDirs in ~/.docker/config.json',
+                installed,
+                exist
+            });
         }
 
         if (tool === 'github cli') {
@@ -324,7 +336,7 @@ async function installSelectedApps(selected) {
     const caskInstalls = {
         virtualbox: 'virtualbox',
         vagrant: 'vagrant',
-        'docker desktop': 'docker',
+        'docker desktop': 'docker-desktop',
         slack: 'slack',
         atom: 'atom',
         vscode: 'visual-studio-code',
@@ -344,6 +356,12 @@ async function installSelectedApps(selected) {
         iterm2: 'iterm2'
     };
 
+    // Apps often installed from a vendor download rather than Homebrew; the
+    // cask would fail on the existing bundle.
+    const appBundles = {
+        'docker desktop': '/Applications/Docker.app'
+    };
+
     for (const app of selected) {
         const cask = caskInstalls[app];
         if (!cask) {
@@ -352,7 +370,8 @@ async function installSelectedApps(selected) {
 
         await installIfMissing({
             label: app,
-            isInstalled: () => shell.execProbe(`brew list --cask ${cask}`).code === 0,
+            isInstalled: () => (appBundles[app] && fs.existsSync(appBundles[app]))
+                || shell.execProbe(`brew list --cask ${cask}`).code === 0,
             install: () => shell.exec(`brew install --cask ${cask}`),
             command: `brew install --cask ${cask}`,
             installed,

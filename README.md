@@ -244,13 +244,13 @@ Installed only when selected in the devtools checkbox. The installer checks whet
 
 ### macOS (Homebrew)
 
-`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `neovim` (+ `tree-sitter-cli`), `wezterm` (optional), `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `docker`, `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional), `cursor` (optional)
+`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `neovim` (+ `tree-sitter-cli`), `wezterm` (optional), `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `docker` (CLI + compose), `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional), `cursor` (optional)
 
 `react` appears in the menu but has no install step yet.
 
 ### Windows (winget)
 
-`git`, `winget` (verification only), `node`, `php`, `python`, `neovim` (+ `tree-sitter-cli`), `wezterm` (optional), `starship`, `nvm-windows`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `docker` (CLI only), `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional), `cursor` (optional)
+`git`, `winget` (verification only), `node`, `php`, `python`, `neovim` (+ `tree-sitter-cli`), `wezterm` (optional), `starship`, `nvm-windows`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `docker desktop` (optional), `docker` (CLI + compose), `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional), `cursor` (optional)
 
 Optional AI CLIs are unchecked by default:
 
@@ -262,6 +262,14 @@ Optional AI CLIs are unchecked by default:
 | Cursor CLI | `brew install --cask cursor-cli` | `powershell -NoProfile -Command "irm 'https://cursor.com/install?win32=true' \| iex"` |
 
 Starter config files under `agents/` are still a separate install flow from installing these CLIs.
+
+`docker` installs the Docker CLI plus the Compose plugin (`docker-compose`
+formula / `Docker.DockerCompose`) and adds the plugin's directory to
+`cliPluginsExtraDirs` in `~/.docker/config.json`, so `docker compose` works.
+The CLI alone has no engine: to run containers, pick **Docker Desktop**
+(unchecked by default because it is a large download). It is in the apps list
+on macOS and in the devtools list on Windows, and it ships its own CLI and
+Compose, so Windows skips the separate CLI when both are selected.
 
 ## Desktop apps (macOS only)
 

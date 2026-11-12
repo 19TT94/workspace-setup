@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const shell = require('../shell');
 const { homePath, getShellConfigPath } = require('../platform');
-const { commandExists, installIfMissing, logInstallSummary } = require('./common');
+const { addDockerCliPluginDir, commandExists, installIfMissing, logInstallSummary } = require('./common');
 const { isDryRun, log } = require('../dry-run');
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -257,12 +257,42 @@ async function installSelectedDevtools(selected, helpers) {
             });
         }
 
-        if (tool === 'docker') {
+        if (tool === 'docker desktop') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => wingetList('Docker.DockerDesktop'),
+                install: () => wingetInstall('Docker.DockerDesktop'),
+                command: wingetCommand('Docker.DockerDesktop'),
+                installed,
+                exist
+            });
+        }
+
+        // Docker Desktop ships its own CLI and Compose plugin.
+        if (tool === 'docker' && selected.includes('docker desktop')) {
+            exist.push('docker (via docker desktop)');
+        } else if (tool === 'docker') {
             await installIfMissing({
                 label: tool,
                 isInstalled: () => commandExists('docker --version'),
                 install: () => wingetInstall('Docker.DockerCLI'),
                 command: wingetCommand('Docker.DockerCLI'),
+                installed,
+                exist
+            });
+            // winget's portable Compose lands in its Links dir as docker-compose.exe.
+            const wingetLinks = path.join(
+                process.env.LOCALAPPDATA || homePath('AppData', 'Local'),
+                'Microsoft', 'WinGet', 'Links'
+            );
+            await installIfMissing({
+                label: 'docker compose',
+                isInstalled: () => commandExists('docker compose version'),
+                install: () => {
+                    wingetInstall('Docker.DockerCompose');
+                    addDockerCliPluginDir(wingetLinks);
+                },
+                command: `${wingetCommand('Docker.DockerCompose')}; add ${wingetLinks} to cliPluginsExtraDirs in ~/.docker/config.json`,
                 installed,
                 exist
             });

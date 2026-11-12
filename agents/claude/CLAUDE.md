@@ -63,6 +63,5 @@ When asked to explain a change (a PR, a diff, or your own work): what changed, w
 When asked to implement or select a GitHub issue:
 
 - Check its labels before making changes.
-- Proceed when it has the `agent` label.
-- Do not begin work on an issue labeled `no-agent` unless the user explicitly directs you to do so.
-- If neither label is present, ask the user whether to proceed.
+- Any issue without the `no-agent` label is open to you; it needs no other label.
+- On a `no-agent` issue you may help, but never be the sole contributor, even when asked: the user must write part of the change themselves. Explain, review, and draft the pieces they ask for; don't implement the whole issue end to end or open its PR on your own.

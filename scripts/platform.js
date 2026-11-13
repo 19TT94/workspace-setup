@@ -147,6 +147,7 @@ function getDevtoolChoices() {
         { name: 'react', value: 'react', checked: true },
         { name: 'laravel', value: 'laravel', checked: true },
         { name: 'tmux', value: 'tmux', checked: true },
+        { name: 'lf', value: 'lf', checked: true },
         { name: 'docker', value: 'docker', checked: true },
         { name: 'github cli', value: 'github cli', checked: true },
         { name: 'fzf', value: 'fzf', checked: true },

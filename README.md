@@ -158,7 +158,7 @@ Prompts let you pick which dotfiles to install. Existing files trigger an overwr
 | nvm       | —                 | creates `~/.nvm`                                   |
 | tmux.conf           | `tools/tmux.conf`         | `~/.tmux.conf`                                        |
 | vimrc               | `tools/vimrc`             | `~/.vimrc` (+ vim-plug, fzf, and ripgrep when selected) |
-| lf                  | `tools/lfrc`              | `~/.config/lf/lfrc` (Enter/l opens files in nvim; `q`, `:q`, or `exit` quits) |
+| lf                  | `tools/lfrc`              | `~/.config/lf/lfrc` (Enter/l opens files in nvim; `q`, `:q`, or `exit` quits; the `lf` devtool installs lf itself) |
 | hints               | `tools/hints.md`          | `~/.config/shell/hints.md` (open with `hint`; `rfind` searches this dir) |
 | pstash              | `tools/pstash`            | `~/.local/bin/pstash` (stash prompts for later: `pstash`, `pstash list`, `pstash pop`; stored in `~/.config/shell/prompts.md`) |
 | Neovim              | `tools/nvim/init.lua`     | `~/.config/nvim/init.lua` (plugin setup bootstraps on first launch) |
@@ -244,7 +244,7 @@ Installed only when selected in the devtools checkbox. The installer checks whet
 
 ### macOS (Homebrew)
 
-`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `neovim` (+ `tree-sitter-cli`), `wezterm` (optional), `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `docker`, `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional), `cursor` (optional)
+`xcode-select`, `homebrew`, `homebrew cask` (verification only), `node`, `php`, `python`, `neovim` (+ `tree-sitter-cli`), `wezterm` (optional), `starship`, `nvm`, `npm`, `yarn`, `composer`, `vue`, `laravel`, `tmux`, `lf`, `docker`, `github cli`, `fzf`, `ripgrep`, `claude code` (optional), `opencode` (optional), `codex` (optional), `cursor` (optional)
 
 `react` appears in the menu but has no install step yet.
 

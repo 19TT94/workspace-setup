@@ -717,7 +717,7 @@ async function install_apps() {
             choices: [
                 { name: 'virtualbox', value: 'virtualbox', checked: false },
                 { name: 'vagrant', value: 'vagrant', checked: false },
-                { name: 'docker desktop', value: 'docker desktop', checked: false },
+                { name: 'docker desktop (engine + compose)', value: 'docker desktop', checked: false },
                 { name: 'slack', value: 'slack', checked: true },
                 { name: 'atom', value: 'atom', checked: false },
                 { name: 'vscode', value: 'vscode', checked: true },

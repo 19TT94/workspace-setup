@@ -80,7 +80,7 @@ Shared templates in `agents/templates/` install once to `~/.config/agent-templat
 | `agents/codex/config.toml` | missing top-level keys merged into `~/.codex/config.toml` |
 | `agents/cursor/cli-config.json` | merged into `~/.cursor/cli-config.json` (deny list) |
 
-Rows that list two seeds are installed shared-first, agent-specific-second. `~/.gitignore` is generated (not a repo seed); `~/.nvm` and git completions in `~/.zsh/` are created/downloaded, not copied. Keep this list in sync whenever seeds change.
+Rows that list two seeds are installed shared-first, agent-specific-second. `~/.gitignore` is generated (not a repo seed); `~/.docker/config.json` only gets `cliPluginsExtraDirs` merged in when Compose is installed; `~/.nvm` and git completions in `~/.zsh/` are created/downloaded, not copied. Keep this list in sync whenever seeds change.
 
 ## Drift policy — local edits vs repo seeds
 

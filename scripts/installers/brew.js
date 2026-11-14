@@ -225,6 +225,18 @@ async function installSelectedDevtools(selected, helpers) {
             });
         }
 
+        // The lf config and the lfcd alias in tools/zshrc need the lf binary.
+        if (tool === 'lf') {
+            await installIfMissing({
+                label: tool,
+                isInstalled: () => commandExists('lf -version'),
+                install: () => shell.exec('brew install lf'),
+                command: 'brew install lf',
+                installed,
+                exist
+            });
+        }
+
         if (tool === 'docker') {
             await installIfMissing({
                 label: tool,

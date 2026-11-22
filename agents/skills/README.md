@@ -13,7 +13,7 @@ changes here apply everywhere.
 | `handoff` | Compress a session into a short note and stash it (`pstash`) for another agent to continue |
 | `feature-planning` | Triage work and draft concise (or full) tickets |
 | `code-review` | Review changes with the project's `.cursor/review/` guides (not installed for Claude, which has a built-in `/code-review`) |
-| `workspace-setup` | Bootstrap a machine with the installer, or check this machine against the repo |
+| `workspace-setup` | Share a local config change as a PR, or sync this machine with merged repo changes |
 
 Customize here, not in a single agent's folder. Agent-only skills belong in that
 agent's `skills/` directory instead; a name must never exist in both places, or

@@ -12,7 +12,7 @@ description: >-
 
 - **Installer code:** `index.js`, `run.sh` / `run.ps1`, `scripts/`
 - **Seed templates:** `agents/` (global Cursor/Codex/Claude config), `tools/` (dotfiles)
-- **Mapping source of truth:** `scripts/audit-seeds.js`
+- **Mapping source of truth:** `scripts/seed-map.js`
 - **Legacy (do not touch):** `shells/`
 
 ## Checklist (run in order)
@@ -26,7 +26,7 @@ description: >-
 
 2. **Syntax-check every edited JS**
    ```bash
-   node --check index.js scripts/install.js scripts/platform.js scripts/audit-seeds.js
+   node --check index.js scripts/install.js scripts/platform.js scripts/seed-map.js scripts/audit-seeds.js scripts/sync.js
    ```
    Or target only the files you changed.
 

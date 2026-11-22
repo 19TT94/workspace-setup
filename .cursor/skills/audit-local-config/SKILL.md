@@ -26,7 +26,7 @@ The goal is for a new machine built from this repo to get the latest working env
 
    Flags combine: `--agents` / `--tools` limit the report to one section, `--quiet` hides identical files, and `--full` shows untruncated diffs.
 
-   `scripts/audit-seeds.js` is the source of truth for the seed → home mapping. Keep this skill’s table in sync with it.
+   `scripts/seed-map.js` is the source of truth for the seed → home mapping. Keep this skill’s table in sync with it.
 
 2. **Read each status.**
 

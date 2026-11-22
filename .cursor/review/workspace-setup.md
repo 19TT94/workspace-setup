@@ -16,7 +16,7 @@ Applied by the global `code-review` skill (and Claude's built-in `/code-review`)
 
 - [ ] `node --check` on edited scripts
 - [ ] `npm run dry-run` passes if flows/prompts changed
-- [ ] Seed ↔ home mapping in `scripts/audit-seeds.js` matches installer + README
+- [ ] Seed ↔ home mapping in `scripts/seed-map.js` matches installer + README
 - [ ] No repo-dev rules leaked into `agents/` (would seed every user’s global config)
 - [ ] Global core rules identical across Claude, Codex, and Cursor seeds
 
@@ -29,12 +29,12 @@ Applied by the global `code-review` skill (and Claude's built-in `/code-review`)
 | Installers | `scripts/installers/brew.js`, `scripts/installers/winget.js` (keep parity) |
 | Dry-run behavior | `scripts/dry-run.js` — anything mutating must branch on `isDryRun()` + log `Would ...` |
 | Seed content | `tools/` (dotfiles), `agents/` (global Cursor/Codex/Claude config) |
-| Audit | `scripts/audit-seeds.js` — mapping is the source of truth |
+| Audit / sync | `scripts/seed-map.js` — mapping is the source of truth; `audit-seeds.js` and `sync.js` read it |
 
 ## Workspace Setup-specific checks
 
 - **Seed vs installer separation** — new template content belongs in `agents/`/`tools/`; new installer behavior belongs in `scripts/`. Do not mix.
-- **Copy map in sync** — a new seed must be registered in `scripts/platform.js` (agents) — including any per-agent `skip` list, mirrored as `skipSeedTopDirs` in the audit — or `scripts/install.js` (config), added to `scripts/audit-seeds.js`, and documented in the README tables.
+- **Copy map in sync** — a new seed must be registered in `scripts/platform.js` (agents) — including any per-agent `skip` list, mirrored as `skipSeedTopDirs` in the audit — or `scripts/install.js` (config), added to `scripts/seed-map.js`, and documented in the README tables.
 - **Platform parity** — `--all` includes agents on both platforms; apps are macOS-only. Shared tools behave the same in `brew.js` and `winget.js`.
 - **Dry run coverage** — file copies, dir creation, downloads, and repo deletion all log `Would ...` instead of acting in dry-run.
 - **No repo-dev rules under `agents/`** — `.cursor/` holds rules for working on this repo; `agents/cursor/` is seeded to every user.

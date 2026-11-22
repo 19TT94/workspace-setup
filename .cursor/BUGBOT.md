@@ -6,13 +6,13 @@ Project rules for [Cursor Agent Review](https://cursor.com/docs/agent/agent-revi
 
 - **Installer:** `index.js`, `run.sh` / `run.ps1`, `scripts/` — prompts, copies, installs
 - **Seeds:** `agents/` (global Cursor/Codex/Claude config), `tools/` (dotfile templates)
-- **Mapping source of truth:** `scripts/audit-seeds.js`
+- **Mapping source of truth:** `scripts/seed-map.js`
 
 ## Always check
 
 - Correctness of flows in `index.js` and `scripts/install.js` (`--all`, `--dry-run`, `--devtools`)
 - **Dry-run discipline** — every mutating action (file copy, dir create, download, repo delete) must branch on `isDryRun()` and log `Would ...`
-- Seed ↔ installer sync — new seeds registered in `scripts/platform.js` / `scripts/install.js`, mapped in `scripts/audit-seeds.js`, documented in README tables
+- Seed ↔ installer sync — new seeds registered in `scripts/platform.js` / `scripts/install.js`, mapped in `scripts/seed-map.js`, documented in README tables
 - **Platform parity** — `--all` includes agents on both; apps are macOS-only; `brew.js` ↔ `winget.js` aligned for shared tools
 - Platform-specific path bugs (home dir vs `%USERPROFILE%`, PowerShell profile detection)
 
@@ -48,4 +48,4 @@ Flag blockers for:
 | Dry-run | `scripts/dry-run.js` |
 | Dotfile seeds | `tools/` |
 | Agent seeds | `agents/` |
-| Audit map | `scripts/audit-seeds.js` |
+| Audit / sync map | `scripts/seed-map.js` |

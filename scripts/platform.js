@@ -101,8 +101,8 @@ function getConfigChoices() {
     ];
 }
 
-function getDevtoolChoices() {
-    if (isWindows) {
+function getDevtoolChoices(platform = process.platform) {
+    if (platform === 'win32') {
         return [
             { name: 'git', value: 'git', checked: true },
             { name: 'winget', value: 'winget', checked: true },

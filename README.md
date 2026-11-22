@@ -134,7 +134,9 @@ workspace-setup/
     install.js             # Install orchestration and file-copy helpers
     platform.js            # OS detection and platform-specific menus
     dry-run.js             # Dry-run mode
+    seed-map.js            # Seed -> home mapping (shared by audit and sync)
     audit-seeds.js         # Diff installed home files vs repo seeds (npm run audit)
+    sync.js                # Merge repo seed changes into installed files (npm run sync)
     installers/
       brew.js              # macOS Homebrew installs
       winget.js            # Windows winget installs
@@ -346,6 +348,18 @@ npm run audit:agents  # agent files only, drift only (--agents --quiet)
 ```
 
 The audit classifies each seeded file as `identical`, `DIFFERS` (local drift), `NOT INSTALLED`, or `LOCAL ONLY`. It is a read-only report — it never overwrites files. Flags: `--quiet` hides identical files, `--agents` / `--tools` limit the report to one section, `--full` shows untruncated diffs. Use the `audit-local-config` skill in `.cursor/skills/` (also visible to Claude Code via `.claude/skills`) to decide which local changes belong back in `agents/` or `tools/`.
+
+### Syncing a machine
+
+The seeded `workspace-setup` skill keeps machines in step: ask any agent to "share" a local change (it opens a PR against the seeds) or to "sync" this machine after changes are merged. It works from a clone at `~/.config/workspace-setup/repo`. Under the hood:
+
+```bash
+npm run sync               # preview seed changes since this machine's last sync
+npm run sync -- --apply    # write clean merges and new files
+npm run sync -- --mark     # record the current commit (after a first sync)
+```
+
+Sync three-way merges each changed seed with the installed file (`git merge-file`), so local edits are kept. Overlapping edits are reported as conflicts and left untouched, and files this machine never installed stay uninstalled. The last synced commit is kept in `~/.config/workspace-setup/last-sync` and only advances once every change is applied. It also lists devtools added since the last sync, without installing them.
 
 ## Legacy scripts
 

@@ -7,6 +7,7 @@ npm install
 npm start          # interactive install
 npm run dry-run    # walk every prompt, change nothing
 npm run audit      # diff installed home-dir files vs repo seeds
+npm run sync       # preview repo seed changes since this machine last synced (--apply to write)
 ```
 
 This file is the **tool-agnostic** entrypoint for coding agents (Cursor, Codex, opencode, Claude Code, etc.) working **on** this repo.
@@ -49,7 +50,7 @@ A skill or template goes in **one** of two places:
 
 Shared templates in `agents/templates/` install once to `~/.config/agent-templates/` rather than being copied into each skill, so a skill points at one path instead of carrying a private duplicate.
 
-## Seed → home mapping (source of truth: `scripts/audit-seeds.js`)
+## Seed → home mapping (source of truth: `scripts/seed-map.js`)
 
 | Seed | Target |
 | --- | --- |

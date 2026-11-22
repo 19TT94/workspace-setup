@@ -167,6 +167,26 @@ hint() {
     fi
 }
 
+# hintcat [term]: print the cheat sheet in the terminal; with a term, only the
+# sections whose heading contains it (e.g. `hintcat tabs`)
+hintcat() {
+    if [ ! -f "$HINTS_FILE" ]; then
+        echo "No hints file yet - create $HINTS_FILE"
+        return 1
+    fi
+    local text
+    text=$(awk -v term="$1" '/^## /{ keep = index(tolower($0), tolower(term)) > 0 } term == "" || keep' "$HINTS_FILE")
+    if [ -z "$text" ]; then
+        echo "No hints section matches '$1'"
+        return 1
+    fi
+    if command -v bat >/dev/null 2>&1; then
+        printf '%s\n' "$text" | bat --language=md --style=plain --paging=never
+    else
+        printf '%s\n' "$text"
+    fi
+}
+
 # rfind: global text search in the current directory (needs: ripgrep + fzf).
 #   rfind <term>  -> search for <term> now, pick a match to open at that line
 #   rfind         -> live search: type to filter matches across the whole tree

@@ -1,7 +1,8 @@
 # Shell hints
 
 Personal cheat sheet for aliases, keybindings, and tools to integrate into your workflow.
-Run `hint` to open this file in your default markdown app.
+Run `hint` to open this file in your default markdown app, `hintcat [term]` to print it
+(or just the sections whose heading matches) in the terminal, or `:Hints` / `Space ?` in Vim.
 
 > Add a new reminder quickly:
 > `printf -- "- %s\n" "note text" >> ~/.config/shell/hints.md`
@@ -51,6 +52,7 @@ In the shell a "tab" is a WezTerm/tmux tab; inside an editor it is an editor tab
 | `opn` | open file(s) in their default app: `opn notes.md` |
 | `ezshrc` / `rzshrc` | edit / reload `~/.zshrc` (zsh only) |
 | `hint` | open this file in the default markdown app |
+| `hintcat [term]` | print this file (or matching sections) in the terminal: `hintcat tabs` |
 | `pstash "idea"` / `pstash` | stash a prompt for later (no text: write it in your editor) |
 | `pstash list` / `pop [n]` / `peek [n]` | list stashed prompts; copy one to the clipboard (pop also removes it) |
 
@@ -70,10 +72,17 @@ Git branch Tab-completion is enabled (`git switch <Tab>`, `git checkout <Tab>`, 
 | Keys | What it does |
 | --- | --- |
 | `Space w` / `Space q` | write / quit |
+| `Space ?` / `:Hints [term]` | the Vim sections of this file (or sections matching a term) in a split; `q` closes |
 | `Space s` | stash the selection as a prompt (normal mode: type a one-liner) |
 | `:Pstash` / `:Pstash pop 2` | list stashed prompts / pop one to the clipboard |
 | `:Cclaude` / `:Ccursor` / `:Copencode` | open that agent in a side split, seeded with open tabs + dirty files (`:Copencode`: press Enter to send) |
-| `:Ccontext` | preview the context an agent would receive, without launching |
+| `Space cc` / `Space cr` (or `:Cclaude!` / `:Ccursor!`) | new Claude / Cursor chat about just this file and cursor line |
+| `:Ccontext` / `:Ccontext!` | preview the context an agent would receive, without launching |
+| `Ctrl+click` / `gf` | open the file under the cursor, e.g. an import path (Neovim with a language server: go to definition) |
+| `Space e` | file tree (lf): `h`/`l` out/in, `l` on a file opens it here |
+| `]c` / `[c` | next / previous changed lines (git hunk) |
+| `Space hp` / `Space hd` | preview hunk / side-by-side diff of this file against git |
+| `Space hs` / `Space hr` | stage / undo hunk |
 | `Ctrl+V` → `Shift+I` → `Esc` | visual block mode: insert text at the front of multiple lines |
 | `0` / `$` | start / end of line |
 
@@ -81,7 +90,7 @@ Git branch Tab-completion is enabled (`git switch <Tab>`, `git checkout <Tab>`, 
 
 | Keys | What it does |
 | --- | --- |
-| `gd` / `Space gt` / `Space gd` | go to definition / in a new tab / pick from candidates |
+| `gd` / `Ctrl+click` / `Space gt` / `Space gd` | go to definition / same with the mouse / in a new tab / pick from candidates |
 | `gr` | references |
 | `K` | hover docs |
 | `Space rn` / `Space a` | rename symbol / code action |
@@ -89,10 +98,7 @@ Git branch Tab-completion is enabled (`git switch <Tab>`, `git checkout <Tab>`, 
 | `Space F` | format the file (also runs on save) |
 | `Ctrl+Space` / `Tab` / `Shift-Tab` | completion: open / next / previous (or indent / unindent) |
 | `Ctrl+K` (insert mode) | signature help |
-| `]c` / `[c` | next / previous git hunk |
-| `Space hp` / `Space hd` | preview hunk / side-by-side diff against the index |
-| `Space hs` / `Space hr` | stage / reset hunk |
-| `Space gs` / `Space gm` | all git hunks (quickfix) / pick from modified files |
+| `Space gs` / `Space gm` | all git hunks (quickfix) / pick from modified files, then `Space hd` to diff one |
 | right scrollbar | map of git changes, diagnostics and search matches |
 | `:Lazy` / `:Mason` | manage plugins / language servers and formatters |
 

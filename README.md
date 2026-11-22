@@ -159,7 +159,7 @@ Prompts let you pick which dotfiles to install. Existing files trigger an overwr
 | tmux.conf           | `tools/tmux.conf`         | `~/.tmux.conf`                                        |
 | vimrc               | `tools/vimrc`             | `~/.vimrc` (+ vim-plug, fzf, and ripgrep when selected) |
 | lf                  | `tools/lfrc`              | `~/.config/lf/lfrc` (Enter/l opens files in nvim; `q`, `:q`, or `exit` quits; the `lf` devtool installs lf itself) |
-| hints               | `tools/hints.md`          | `~/.config/shell/hints.md` (open with `hint`; `rfind` searches this dir) |
+| hints               | `tools/hints.md`          | `~/.config/shell/hints.md` (open with `hint`, print with `hintcat`, `:Hints` in Vim; `rfind` searches this dir) |
 | pstash              | `tools/pstash`            | `~/.local/bin/pstash` (stash prompts for later: `pstash`, `pstash list`, `pstash pop`; stored in `~/.config/shell/prompts.md`) |
 | Neovim              | `tools/nvim/init.lua`     | `~/.config/nvim/init.lua` (plugin setup bootstraps on first launch) |
 | vscode settings     | `tools/vscode-settings.json` | VS Code `User/settings.json` (Cursor Dark via the "Anysphere Dark" port + Spline Sans Mono 14; installs `hkeric.theme-anysphere`) |

@@ -119,6 +119,40 @@ vim.api.nvim_create_user_command("Pstash", function(opts)
   pstash(#opts.fargs > 0 and opts.fargs or { "list" })
 end, { nargs = "*", desc = "pstash list / pop n / peek n" })
 
+-- :Hints [term] shows the hints.md sections whose heading contains term
+-- (default: vim) in a read-only split; q closes it. <Space>? = :Hints.
+local function hints(term)
+  local file = vim.fn.expand("~/.config/shell/hints.md")
+  if vim.fn.filereadable(file) ~= 1 then
+    vim.notify("No hints file yet - create " .. file, vim.log.levels.ERROR)
+    return
+  end
+  term = (term ~= "" and term or "vim"):lower()
+  local lines, keep = {}, false
+  for _, line in ipairs(vim.fn.readfile(file)) do
+    if line:match("^## ") then
+      keep = line:lower():find(term, 1, true) ~= nil
+    end
+    if keep then
+      table.insert(lines, line)
+    end
+  end
+  if #lines == 0 then
+    vim.notify('No hints section matches "' .. term .. '"')
+    return
+  end
+  vim.cmd("new")
+  vim.bo.buftype, vim.bo.bufhidden, vim.bo.swapfile = "nofile", "wipe", false
+  vim.bo.filetype = "markdown"
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+  vim.bo.modifiable = false
+  vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = true, silent = true })
+end
+vim.api.nvim_create_user_command("Hints", function(opts)
+  hints(opts.args)
+end, { nargs = "?", desc = "Show vim hints (or sections matching a term)" })
+vim.keymap.set("n", "<leader>?", function() hints("") end, { desc = "Show vim hints" })
+
 vim.filetype.add({
   extension = { tf = "terraform", tfvars = "terraform" },
 })
@@ -222,6 +256,8 @@ end
 -- Context agents: :Cclaude / :Ccursor / :Copencode open that agent in a split
 -- beside this window (WezTerm/tmux pane, else :terminal), seeded with this
 -- session's open tabs + dirty files. :Ccontext previews the context first.
+-- With a bang (:Cclaude!, <Space>cc / <Space>cr) the context is only the
+-- current file and cursor line.
 local function agent_root()
   local cwd = vim.fn.getcwd()
   local root = vim.fn.systemlist({ "git", "-C", cwd, "rev-parse", "--show-toplevel" })
@@ -264,15 +300,22 @@ local function agent_rel(root, path)
   return path
 end
 
-local function agent_context()
+local function agent_context(file_only)
   local root = agent_root()
-  local dirty = agent_dirty(root)
-  local tabs = vim.api.nvim_list_tabpages()
-  local cur = vim.api.nvim_get_current_tabpage()
   local raw = vim.api.nvim_buf_get_name(0)
   local path = raw == "" and "" or vim.fn.fnamemodify(raw, ":p")
   local name = path == "" and "(unnamed)" or agent_rel(root, path)
   local pos = path == "" and "" or (":" .. vim.api.nvim_win_get_cursor(0)[1])
+  if file_only then
+    return table.concat({
+      "Context from my editor (open in a split beside you).",
+      ("Focus on this file: %s%s"):format(name, pos),
+      "Repo root: " .. root,
+    }, "\n")
+  end
+  local dirty = agent_dirty(root)
+  local tabs = vim.api.nvim_list_tabpages()
+  local cur = vim.api.nvim_get_current_tabpage()
   local cur_idx = 1
   for i, t in ipairs(tabs) do
     if t == cur then
@@ -331,9 +374,9 @@ local function agent_seed(transport, id, ctx)
   end
 end
 
-local function agent_open(which)
+local function agent_open(which, file_only)
   local root = agent_root()
-  local ctx = agent_context()
+  local ctx = agent_context(file_only)
   local cmd
   if which == "claude" then
     cmd = { "claude", ctx }
@@ -387,18 +430,25 @@ local function agent_open(which)
   end
 end
 
-vim.api.nvim_create_user_command("Ccontext", function()
-  print(agent_context())
-end, { desc = "Preview the context an agent would receive" })
-vim.api.nvim_create_user_command("Cclaude", function()
-  agent_open("claude")
-end, { desc = "Open Claude Code in a split with session context" })
-vim.api.nvim_create_user_command("Ccursor", function()
-  agent_open("cursor")
-end, { desc = "Open Cursor Agent in a split with session context" })
-vim.api.nvim_create_user_command("Copencode", function()
-  agent_open("opencode")
-end, { desc = "Open opencode in a split with session context" })
+vim.api.nvim_create_user_command("Ccontext", function(opts)
+  print(agent_context(opts.bang))
+end, { bang = true, desc = "Preview the context an agent would receive (! = current file only)" })
+vim.api.nvim_create_user_command("Cclaude", function(opts)
+  agent_open("claude", opts.bang)
+end, { bang = true, desc = "Open Claude Code in a split with session context (! = current file only)" })
+vim.api.nvim_create_user_command("Ccursor", function(opts)
+  agent_open("cursor", opts.bang)
+end, { bang = true, desc = "Open Cursor Agent in a split with session context (! = current file only)" })
+vim.api.nvim_create_user_command("Copencode", function(opts)
+  agent_open("opencode", opts.bang)
+end, { bang = true, desc = "Open opencode in a split with session context (! = current file only)" })
+vim.keymap.set("n", "<leader>cc", function() agent_open("claude", true) end, { desc = "Claude chat about this file" })
+vim.keymap.set("n", "<leader>cr", function() agent_open("cursor", true) end, { desc = "Cursor chat about this file" })
+
+-- Ctrl+click (terminals cannot report Cmd+click) or gf opens the file under
+-- the cursor; LSP buffers override Ctrl+click with go-to-definition.
+vim.opt.suffixesadd:append({ ".js", ".jsx", ".ts", ".tsx", ".json", ".lua" })
+vim.keymap.set("n", "<C-LeftMouse>", "<LeftMouse>gf", { desc = "Open file under cursor" })
 
 -- File pickers (Cmd+P, <Space>/, <Space>gm) open like the shell pickers and
 -- lf: Enter in a new tab, Ctrl+O here. Other pickers keep Telescope defaults.
@@ -534,6 +584,8 @@ require("lazy").setup({
       local function on_attach(_, bufnr)
         local opts = { buffer = bufnr }
         vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+        -- Terminals cannot report Cmd+click, so Ctrl+click is the IDE-style jump.
+        vim.keymap.set("n", "<C-LeftMouse>", "<LeftMouse><cmd>lua vim.lsp.buf.definition()<cr>", opts)
         vim.keymap.set("n", "<leader>gt", function()
           vim.cmd("tab split")
           vim.lsp.buf.definition()

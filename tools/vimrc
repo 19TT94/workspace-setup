@@ -170,9 +170,43 @@ xnoremap <silent> <Leader>s :<C-u>call <SID>Pstash(['-'], join(getline("'<", "'>
 nnoremap <silent> <Leader>s :call <SID>PstashInput()<CR>
 command! -nargs=* Pstash call s:Pstash(empty([<f-args>]) ? ['list'] : [<f-args>])
 
+" :Hints [term] shows the hints.md sections whose heading contains term
+" (default: vim) in a read-only split; q closes it. <Space>? = :Hints.
+function! s:Hints(term) abort
+    let l:file = expand('~/.config/shell/hints.md')
+    if !filereadable(l:file)
+        echohl ErrorMsg | echomsg 'No hints file yet - create ' . l:file | echohl None
+        return
+    endif
+    let l:term = tolower(empty(a:term) ? 'vim' : a:term)
+    let l:lines = []
+    let l:keep = 0
+    for l:line in readfile(l:file)
+        if l:line =~# '^## '
+            let l:keep = stridx(tolower(l:line), l:term) >= 0
+        endif
+        if l:keep
+            call add(l:lines, l:line)
+        endif
+    endfor
+    if empty(l:lines)
+        echomsg 'No hints section matches "' . l:term . '"'
+        return
+    endif
+    new
+    setlocal buftype=nofile bufhidden=wipe noswapfile filetype=markdown
+    call setline(1, l:lines)
+    setlocal nomodifiable
+    nnoremap <buffer> <silent> q :close<CR>
+endfunction
+command! -nargs=? Hints call s:Hints(<q-args>)
+nnoremap <silent> <Leader>? :Hints<CR>
+
 " Context agents: :Cclaude / :Ccursor / :Copencode open that agent in a split
 " beside the editor (WezTerm/tmux pane, else :terminal), seeded with this
 " session's open tabs + dirty files. :Ccontext previews the context first.
+" With a bang (:Cclaude!, <Space>cc / <Space>cr) the context is only the
+" current file and cursor line.
 " Kept outside the vim-plug block: these need no plugin.
 " Unlike nvim, vim's system() takes a String only, so argv lists get
 " shellescape-joined before they are run through 'shell'.
@@ -221,13 +255,20 @@ function! s:AgentRel(root, path) abort
     return a:path
 endfunction
 
-function! AgentContext() abort
+function! AgentContext(...) abort
     let l:root = s:AgentRoot()
-    let l:dirty = s:AgentDirty(l:root)
-    let l:total = tabpagenr('$')
     let l:path = expand('%:p')
     let l:name = l:path ==# '' ? '(unnamed)' : s:AgentRel(l:root, l:path)
     let l:pos = l:path ==# '' ? '' : ':' . line('.')
+    if get(a:, 1, 0)
+        return join([
+        \   'Context from my editor (open in a split beside you).',
+        \   printf('Focus on this file: %s%s', l:name, l:pos),
+        \   'Repo root: ' . l:root,
+        \ ], "\n")
+    endif
+    let l:dirty = s:AgentDirty(l:root)
+    let l:total = tabpagenr('$')
     let l:lines = [
     \   'Context from my editor session (open in a split beside you).',
     \   'Treat this as your starting point: the files below are already open in my editor.',
@@ -268,9 +309,9 @@ function! s:AgentSeed(transport, id, ctx) abort
     endif
 endfunction
 
-function! AgentOpen(which) abort
+function! AgentOpen(which, ...) abort
     let l:root = s:AgentRoot()
-    let l:ctx = AgentContext()
+    let l:ctx = AgentContext(get(a:, 1, 0))
     if a:which ==# 'claude'
         let l:cmd = ['claude', l:ctx]
     elseif a:which ==# 'cursor'
@@ -322,16 +363,23 @@ function! AgentOpen(which) abort
     endif
 endfunction
 
-function! s:AgentEcho() abort
-    for l:line in split(AgentContext(), "\n")
+function! s:AgentEcho(file_only) abort
+    for l:line in split(AgentContext(a:file_only), "\n")
         echomsg l:line
     endfor
 endfunction
 
-command! Ccontext call s:AgentEcho()
-command! Cclaude call AgentOpen('claude')
-command! Ccursor call AgentOpen('cursor')
-command! Copencode call AgentOpen('opencode')
+command! -bang Ccontext call s:AgentEcho(<bang>0)
+command! -bang Cclaude call AgentOpen('claude', <bang>0)
+command! -bang Ccursor call AgentOpen('cursor', <bang>0)
+command! -bang Copencode call AgentOpen('opencode', <bang>0)
+nnoremap <silent> <Leader>cc :call AgentOpen('claude', 1)<CR>
+nnoremap <silent> <Leader>cr :call AgentOpen('cursor', 1)<CR>
+
+" Ctrl+click (terminals cannot report Cmd+click) or gf opens the file under
+" the cursor, e.g. an import path; extensionless JS/TS imports resolve too.
+set suffixesadd+=.js,.jsx,.ts,.tsx,.json
+nnoremap <C-LeftMouse> <LeftMouse>gf
 
 " Plugins managed by vim-plug (downloaded to ~/.vim/autoload/plug.vim by the installer)
 if glob('~/.vim/autoload/plug.vim') != ''
@@ -345,7 +393,18 @@ if glob('~/.vim/autoload/plug.vim') != ''
     Plug 'MaxMEllon/vim-jsx-pretty'
     " gcc / gc comment toggling, like Comment.nvim
     Plug 'tpope/vim-commentary'
+    " git change signs, ]c / [c hunk jumps, hunk preview and diff (like gitsigns)
+    Plug 'airblade/vim-gitgutter'
     call plug#end()
+
+    " Same hunk keys as Neovim's gitsigns.
+    let g:gitgutter_map_keys = 0
+    nmap ]c <Plug>(GitGutterNextHunk)
+    nmap [c <Plug>(GitGutterPrevHunk)
+    nmap <Leader>hp <Plug>(GitGutterPreviewHunk)
+    nmap <Leader>hs <Plug>(GitGutterStageHunk)
+    nmap <Leader>hr <Plug>(GitGutterUndoHunk)
+    nnoremap <silent> <Leader>hd :GitGutterDiffOrig<CR>
 
     " Cmd+/ (WezTerm sends Ctrl+_) toggles comments, like Neovim.
     nmap <C-_> gcc
